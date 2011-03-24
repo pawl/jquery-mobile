@@ -4,10 +4,11 @@
 	<title>Page Title</title> 
 	<link rel="stylesheet" href="jquery.mobile-1.0a4pre.css" />
 	<link rel="stylesheet" href="jquery.mobile.twoColumn.css" />
+  <link rel="stylesheet"  href="jquery.mobile.scrollview.css" />
 </head> 
   <body> 
 
-    <div data-role="panel" data-id="menu">
+    <div data-role="panel" data-id="menu" data-scroll="true">
       <!-- Start of first page -->
       <div data-role="page" id="inbox">
 
@@ -15,7 +16,7 @@
       		<h1>Inbox</h1>
       	</div><!-- /header -->
 
-      	<div data-role="content">	
+      	<div data-role="content"  data-scroll="true">	
       		<ul data-role="listview" data-theme="g">
       		  <li>Admin
       		    <ul>
@@ -55,7 +56,6 @@
                 <li><a href="#badz" data-panel="main">badz</a></li>
               </ul>
             </li>
-            <li>nate menda</li>
           </ul>
       	</div><!-- /content -->
 
@@ -76,7 +76,7 @@
           <h1>Menu</h1>
         </div><!-- /header -->
 
-        <div data-role="content"> 
+        <div data-role="content"  data-scroll="true"> 
           <ul data-role="listview" data-theme="g">
             <li>Admin
               <ul>
@@ -108,7 +108,7 @@
       		<h1>Bar</h1>
       	</div><!-- /header -->
 
-      	<div data-role="content">	
+      	<div data-role="content"  data-scroll="true">	
       		<p>I'm first in the source order so I'm shown as the page.</p>		
       		<p><a href="#foo">Back to foo</a></p>	
       	</div><!-- /content -->
@@ -132,7 +132,7 @@
       		<h1>badz</h1>
       	</div><!-- /header -->
 
-      	<div data-role="content">	
+      	<div data-role="content"  data-scroll="true">	
       		<p>I'm first in the source order so I'm shown as the page.</p>
       		<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque consectetur, ligula quis convallis gravida, tortor odio mattis purus, a fringilla mauris velit eu nisi. Vivamus laoreet tincidunt diam, sit amet tristique purus lobortis ac. Etiam commodo placerat elit. In aliquam dapibus felis, molestie molestie purus scelerisque sit amet. Donec vitae varius arcu. Aliquam dapibus dolor magna, nec posuere felis. Nullam in suscipit massa. Duis nec nulla nec urna sollicitudin fringilla. Proin at rutrum mi. Maecenas vitae urna ante, ac gravida tortor.</p>
 
@@ -162,4 +162,6 @@
   <script type="text/javascript" src="eventlog.js"></script>
   <script type="text/javascript" src="application.js"></script>
   <script type="text/javascript" src="jquery.mobile-1.0a4pre.js"></script>
+  <script type="text/javascript" src="jquery.easing.1.3.js"></script>
+  <script type="text/javascript" src="jquery.mobile.scrollview.js"></script>
 </html>
