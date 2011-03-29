@@ -78,6 +78,7 @@
         else {
           var transition=$this.data('transition') || undefined,
               direction = $this.data("direction"),
+              hash=$currPanel.data('hash'),
               reverse = (direction && direction === "reverse") ||
                         // deprecated - remove by 1.0
                         $this.data( "back" );
@@ -107,13 +108,16 @@
             // need to define more data attributes in panels to allow custom panel behaviour
             from=$currPanelActivePage;
             $.mobile.pageContainer=$currPanel;
-            $.mobile.changePage([from,url], transition, reverse, false, undefined);
+            var hashChange= (hash == 'false' || hash == 'crumbs')? false : true;
+            $.mobile.changePage([from,url], transition, reverse, hashChange, undefined);
             //FIX: temporary fix for a data-back="crumbs" - need to work on its todo below later
-            var backBtn = $('div[data-url="'+url+'"]').find('a[data-rel="back"]')
-            backBtn.removeAttr('data-rel')
-                   .attr('href', '#'+from.attr('data-url'))
-                   .attr('data-direction', 'reverse');
-            backBtn.find('.ui-btn-text').html(from.find('div[data-role="header"] .ui-title').html());
+            if (hash == 'crumbs') {
+              var backBtn = $('div[data-url="'+url+'"]').find('a[data-rel="back"]')
+              backBtn.removeAttr('data-rel')
+                     .attr('href', '#'+from.attr('data-url'))
+                     .attr('data-direction', 'reverse');
+              backBtn.find('.ui-btn-text').html(from.find('div[data-role="header"] .ui-title').html());
+            }
             //active page must always point to the active page in main - for history purposes.
             $.mobile.activePage=$('div[data-id="main"] > div.'+$.mobile.activePageClass);
           }
