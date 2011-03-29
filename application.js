@@ -1,69 +1,222 @@
+//TODO: need to set panel widths according to media width - is this necessary?
+//ISSUE: activeBtnClass not removed when a new link is given this class - causing a lot of active buttons.
+//ISSUE: history doesn't change when links in main panel is clicked, and the back button points to
+//       the previous page which don't make sense. idea: use data-history="false,crumb" on panel div
+//ISSUE: clicking on a navbar link twice ruins the entire hash history. need to see what happened. 
+//ISSUE: line 1872 in jqm, in transitionPages adds a history entry anyways - does this affect the transition path for history? 
+
 (function($,window,undefined){
   $( window.document ).bind('mobileinit', function(){
     if ($.mobile.media("screen and (min-width: 768px)")) {
       $('div[data-role="panel"]').addClass('ui-mobile-viewport');
-      $('div[data-id="menu"]').addClass('sticky-left border-right').css('width', '25%');
-      $('div[data-id="main"]').addClass('sticky-right').css('width', '75%');
-      $.mobile.firstPage=$('div[data-id="main"] > div[data-role="page"]:first').page().addClass($.mobile.activePageClass) 
-      $.mobile.firstPage.children('div[data-role="footer"]').hide();
-      //TODO: need to push the 1st page into urlHistory somewhere here
+      $('div[data-id="menu"]').addClass('sticky-left border-right').css('width', '30%');
+      $('div[data-id="main"]').addClass('sticky-right').css('width', '70%');
+      //BUG: when loading deep-links, this causes two pages to have the activePageClass, causing an error during changePage
+      if( !$.mobile.hashListeningEnabled || !$.mobile.path.stripHash( location.hash ) ){
+        var firstPage=$('div[data-id="main"] > div[data-role="page"]:first').page().addClass($.mobile.activePageClass) 
+        firstPage.children('div[data-role="footer"]').hide();
+      }
       $(function() {
         $(document).unbind('.toolbar');
         $('.ui-page').die('.toolbar');
       });
 
+      //DONE: link click event binding for changePage
       $("a").die('click');
+      //this will mostly be a copy of the original handler with some modifications
       $("a").live('click', function(event){
         var $this=$(this),
+            href = $this.attr( "href" ) || "#",
+            hadProtocol = $.mobile.path.hasProtocol( href ),
+            url = $.mobile.path.clean( href ),
+            isRelExternal = $this.is( "[rel='external']" ),
+            isEmbeddedPage = $.mobile.path.isEmbeddedPage( url ),
+            isExternal = $.mobile.path.isExternal( url ) || (isRelExternal && !isEmbeddedPage),
+            hasTarget = $this.is( "[target]" ),
+            hasAjaxDisabled = $this.is( "[data-ajax='false']" ),
+            
             $targetPanel=$this.attr('data-panel'),
             $targetContainer=$('div[data-id='+$targetPanel+']'),
             $targetPanelActivePage=$targetContainer.children('div.'+$.mobile.activePageClass),
             $currPanel=$this.parents('div[data-role="panel"]'),
-            $currContainer=$.mobile.pageContainer,
+            //not sure we need this. if you want the container of the element that triggered this event, $currPanel 
+            $currContainer=$.mobile.pageContainer, 
             $currPanelActivePage=$currPanel.children('div.'+$.mobile.activePageClass),
-            transition=$this.data('transition') || undefined,
-            direction=($this.data('direction') == 'reverse') ? true : undefined,
-            to=$this.attr('href'),
-            to_href=to.replace(/^#/, "" ),
             from = null;
 
-        //if link refers to an already active panel, stop propagation and default action and return
-        if ($targetPanelActivePage.attr('data-url') == to_href || $currPanelActivePage.attr('data-url') == to_href) {
-          event.stopPropagation();
+        if( $this.is( "[data-rel='back']" ) ){
+          window.history.back();
+          return false;
+        }
+
+        if( url.replace($.mobile.path.get(), "") == "#"  ){
           event.preventDefault();
           return;
         }
-        //if link refers to a page on another panel, changePage on that panel
-        if ($targetPanel && $targetPanel!=$this.parents('div[data-role="panel"]')) {
-          from=$targetPanelActivePage;
-          $.mobile.pageContainer=$targetContainer;
-          //TODO: figure out how to let user define the transition for this
-          transition = (transition == undefined) ? 'fade' : transition  
-          $.mobile.changePage([from,to], 'fade', direction, true, undefined);
-          //$.mobile.activePage=$('div[data-url="'+to_href+'"]');
-          //$.mobile.pageContainer=$currContainer;
-          event.stopPropagation();
-          event.preventDefault();
+
+        //temporary fix to remove activeBtnClass
+        $(".ui-btn."+$.mobile.activeBtnClass).removeClass($.mobile.activeBtnClass);
+        $activeClickedLink = $this.closest( ".ui-btn" ).addClass( $.mobile.activeBtnClass );
+
+        if( isExternal || hasAjaxDisabled || hasTarget || !$.mobile.ajaxEnabled ||
+          // TODO: deprecated - remove at 1.0
+          !$.mobile.ajaxLinksEnabled ){
+          //remove active link class if external (then it won't be there if you come back)
+          //BUG: removeActiveLinkClass not defined. crap :)
+          window.setTimeout(function() {removeActiveLinkClass(true);}, 200);
+
+          if( hasTarget ){
+            window.open( url );
+          }
+          else if( hasAjaxDisabled ){
+            return;
+          }
+          else{
+            location.href = url;
+          }
         }
-        //if link refers to a page inside the same panel, changePage on that panel 
         else {
-          from=$currPanelActivePage;
-          $.mobile.pageContainer=$currPanel;
-          $.mobile.changePage([from,to], transition, direction, false, undefined);
-          //FIX: temporary fix for a data-back="crumbs" - need to work on its todo below later
-          var backBtn = $('div[data-url="'+to_href+'"]').find('a[data-rel="back"]')
-          backBtn.removeAttr('data-rel')
-                 .attr('href', from.attr('data-url'))
-                 .attr('data-direction', 'reverse');
-          backBtn.find('.ui-btn-text').html(from.find('div[data-role="header"] .ui-title').html());
-          //$.mobile.activePage= TODO:link this to the activePage in main container;
-          //$.mobile.pageContainer=$currContainer;
-          event.stopPropagation();
-          event.preventDefault();
+          var transition=$this.data('transition') || undefined,
+              direction = $this.data("direction"),
+              reverse = (direction && direction === "reverse") ||
+                        // deprecated - remove by 1.0
+                        $this.data( "back" );
+          
+          $.mobile.nextPageRole = $this.attr( "data-rel" );
+
+          if( $.mobile.path.isRelative( url ) && !hadProtocol ){
+            url = $.mobile.path.makeAbsolute( url );
+          }
+
+          url = $.mobile.path.stripHash( url );
+          
+          //if link refers to an already active panel, stop default action and return
+          if ($targetPanelActivePage.attr('data-url') == url || $currPanelActivePage.attr('data-url') == url) {
+            event.preventDefault();
+            return;
+          }
+          //if link refers to a page on another panel, changePage on that panel
+          else if ($targetPanel && $targetPanel!=$this.parents('div[data-role="panel"]')) {
+            from=$targetPanelActivePage;
+            $.mobile.pageContainer=$targetContainer;
+            $.mobile.changePage([from,url], transition, reverse, true, undefined);
+          }
+          //if link refers to a page inside the same panel, changePage on that panel 
+          else {
+            //BUG: this setting is panel insensitive - so links in main panel also behave as specified below
+            // need to define more data attributes in panels to allow custom panel behaviour
+            from=$currPanelActivePage;
+            $.mobile.pageContainer=$currPanel;
+            $.mobile.changePage([from,url], transition, reverse, false, undefined);
+            //FIX: temporary fix for a data-back="crumbs" - need to work on its todo below later
+            var backBtn = $('div[data-url="'+url+'"]').find('a[data-rel="back"]')
+            backBtn.removeAttr('data-rel')
+                   .attr('href', '#'+from.attr('data-url'))
+                   .attr('data-direction', 'reverse');
+            backBtn.find('.ui-btn-text').html(from.find('div[data-role="header"] .ui-title').html());
+            //active page must always point to the active page in main - for history purposes.
+            $.mobile.activePage=$('div[data-id="main"] > div.'+$.mobile.activePageClass);
+          }
+        }
+        event.preventDefault();
+      });
+
+      //DONE: bind form submit with this plugin
+      $("form").die('submit');
+      $("form").live('submit', function(){
+        if( !$.mobile.ajaxEnabled ||
+          //TODO: deprecated - remove at 1.0
+          !$.mobile.ajaxFormsEnabled ||
+          $(this).is( "[data-ajax='false']" ) ){ return; }
+
+        var type = $(this).attr("method"),
+            url = $.mobile.path.clean( $(this).attr( "action" ) ),
+            $currPanel=$this.parents('div[data-role="panel"]'),
+            $currPanelActivePage=$currPanel.children('div.'+$.mobile.activePageClass);
+
+        if( $.mobile.path.isExternal( url ) ){
+          return;
+        }
+
+        if( $.mobile.path.isRelative( url ) ){
+          url = $.mobile.path.makeAbsolute( url );
+        }
+
+        //temporarily put this here- eventually shud just set it immediately instead of an interim var.
+        $.mobile.activePage=$currPanelActivePage;
+        $.mobile.pageContainer=$currPanel;
+        $.mobile.changePage({
+            url: url,
+            type: type || "get",
+            data: $(this).serialize()
+          },
+          undefined,
+          undefined,
+          true
+        );
+        event.preventDefault();
+      });
+
+      //DONE: bind hashchange with this plugin
+      //hashchanges are defined only for the main panel - other panels should not support hashchanges to avoid ambiguity
+      $(window).unbind("hashchange");
+      $(window).bind( "hashchange", function( e, triggered ) {
+        var to = $.mobile.path.stripHash( location.hash ),
+            transition = $.mobile.urlHistory.stack.length === 0 ? false : undefined,
+            $mainPanel=$('div[data-id="main"]'),
+            $mainPanelFirstPage=$mainPanel.children('div[data-role="page"]').first(),
+            $mainPanelActivePage=$mainPanel.children('div.ui-page-active'),
+            $menuPanel=$('div[data-id="menu"]'),
+            $menuPanelFirstPage=$menuPanel.children('div[data-role="page"]').first(),
+            $menuPanelActivePage=$menuPanel.children('div.ui-page-active'),
+            //FIX: temp var for dialogHashKey
+            dialogHashKey = "&ui-state=dialog";
+
+        if( !$.mobile.hashListeningEnabled || !$.mobile.urlHistory.ignoreNextHashChange ){
+          if( !$.mobile.urlHistory.ignoreNextHashChange ){
+            $.mobile.urlHistory.ignoreNextHashChange = true;
+          }
+          return;
+        }
+
+        if( $.mobile.urlHistory.stack.length > 1 &&
+            to.indexOf( dialogHashKey ) > -1 &&
+            !$.mobile.activePage.is( ".ui-dialog" ) ){
+
+          $.mobile.urlHistory.directHashChange({
+            currentUrl: to,
+            isBack: function(){ window.history.back(); },
+            isForward: function(){ window.history.forward(); }
+          });
+
+          return;
+        }
+
+        //if to is defined, load it
+        if ( to ){
+          $.mobile.pageContainer=$menuPanel;
+          //if this is initial deep-linked page setup, then changePage sidemenu as well
+          if (!$('div.ui-page-active').length) {
+            $.mobile.changePage($menuPanelFirstPage, transition, true, false, true);
+          }
+          $.mobile.pageContainer=$mainPanel;
+          $.mobile.activePage=$mainPanelActivePage.length? $mainPanelActivePage : undefined;
+          $.mobile.changePage(to, transition, undefined, false, true );
+        }
+        //there's no hash, go to the first page in the dom, and set all other panels to its first page.
+        else {
+          //temp fix - need to get an array of panels and set their first pages to show.
+          $.mobile.pageContainer=$mainPanel;
+          $.mobile.activePage=$mainPanelActivePage? $mainPanelActivePage : undefined;
+          //temp: set false for fromHashChange due to isPageTransitioning causing pageContainer settings to be overriden
+          $.mobile.changePage($mainPanelFirstPage, 'none', true, false, false ); 
+          $.mobile.pageContainer=$menuPanel;
+          $.mobile.activePage=$menuPanelActivePage? $menuPanelActivePage : undefined;
+          $.mobile.changePage($menuPanelFirstPage, 'none', false, false, false);
         }
       });
 
-      //pageshow binding for scrollview
+      //DONE: pageshow binding for scrollview
       $('div[data-role="page"]').live('pageshow', function(event){
         var $page = $(this);
         $page.find('div[data-role="content"]').attr('data-scroll', 'true');
@@ -96,8 +249,6 @@
         }
       });
 
-      //TODO: bind hashchange with this plugin
-      //TODO: bind form submit with this plugin
 
       //TODO: bind orientationchange and resize
       //In order to do this, we need to:
@@ -109,6 +260,9 @@
 
       //temporary toolbar mods to present better in tablet/desktop view
       //TODO: API this so that people can specify using data- attributes how they want their toolbars displayed
+      //potential toolbar behaviour:
+      // 1) has a data-display="top, bottom, inline" attribute
+      // 2) 
       $('div[data-id="menu"] div[data-role="page"]').live('pagebeforeshow.splitview', function() {
         $(this).find('div[data-role="footer"] > h2').hide(); 
       });
@@ -117,7 +271,8 @@
       });
 
       //TODO: define data-backbtn="crumbs" - a method that creates a 'back' button that points to the previous page, 
-      //not go back in urlHistory
+      //not go back in urlHistory. also include data-history="crumbs" for more general panel area behaviour
+
       //TODO: define css scaling and columnizing using the cssgrid.net 1140px 12 column scalable grid css
     }
   });

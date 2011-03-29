@@ -1860,6 +1860,7 @@ $.widget( "mobile.page", $.mobile.widget, {
 			to.data( "page" )._trigger( "beforeshow", null, { prevPage: from || $("") } );
 
 			function loadComplete(){
+				var urlPanelHistory=$('div[data-url="'+url+'"]').parents('div[data-role="panel"]').data('history');
 
 				if( changeHash !== false && url ){
 					//disable hash listening temporarily
@@ -1869,7 +1870,9 @@ $.widget( "mobile.page", $.mobile.widget, {
 				}
 
 				//add page to history stack if it's not back or forward
-				if( !back && !forward ){
+				//Asyraf Added here
+				if( (!back && !forward) || urlPanelHistory !== 'crumbs'
+				    || urlPanelHistory !== 'false') {
 					urlHistory.addNew( url, transition );
 				}
 
