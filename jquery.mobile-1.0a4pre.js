@@ -1871,8 +1871,7 @@ $.widget( "mobile.page", $.mobile.widget, {
 
 				//add page to history stack if it's not back or forward
 				//Asyraf Added here
-				if( (!back && !forward) || urlPanelHistory !== 'crumbs'
-				    || urlPanelHistory !== 'false') {
+				if(!back && !forward) {
 					urlHistory.addNew( url, transition );
 				}
 
