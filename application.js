@@ -9,9 +9,10 @@
   $( window.document ).bind('mobileinit', function(){
     if ($.mobile.media("screen and (min-width: 768px)")) {
       $('div[data-role="panel"]').addClass('ui-mobile-viewport');
-      $('div[data-id="menu"]').addClass('sticky-left border-right').css('width', '30%');
-      $('div[data-id="main"]').addClass('sticky-right').css('width', '70%');
-      //BUG: when loading deep-links, this causes two pages to have the activePageClass, causing an error during changePage
+      $('div[data-id="menu"]').addClass('sticky-left border-right').css({'width':'25%', 'min-width':'250px'});
+      $('div[data-id="main"]').addClass('sticky-right').css('width', function(index){
+        return $(window).width()-$('div[data-id="menu"]').width();  
+      });
       if( !$.mobile.hashListeningEnabled || !$.mobile.path.stripHash( location.hash ) ){
         var firstPage=$('div[data-id="main"] > div[data-role="page"]:first').page().addClass($.mobile.activePageClass) 
         firstPage.children('div[data-role="footer"]').hide();
