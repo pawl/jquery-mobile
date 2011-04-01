@@ -28,8 +28,8 @@ $.fixedToolbars = (function(){
 		toolbarSelector = '.ui-header-fixed:first, .ui-footer-fixed:not(.ui-footer-duplicate):last',
 		stickyFooter, //for storing quick references to duplicate footers
 		supportTouch = $.support.touch,
-		touchStartEvent = supportTouch ? "touchstart" : "mousedown",
-		touchStopEvent = supportTouch ? "touchend" : "mouseup",
+		touchStartEvent = supportTouch ? "touchstart.toolbar" : "mousedown.toolbar",
+		touchStopEvent = supportTouch ? "touchend.toolbar" : "mouseup.toolbar",
 		stateBefore = null,
 		scrollTriggered = false,
         touchToggleEnabled = true;
@@ -54,12 +54,12 @@ $.fixedToolbars = (function(){
 
 	$(function() {
 		$(document)
-			.bind( "vmousedown",function(event){
+			.bind( "vmousedown.toolbar",function(event){
 				if( touchToggleEnabled ) {
 					stateBefore = currentstate;
 				}
 			})
-			.bind( "vclick",function(event){
+			.bind( "vclick.toolbar",function(event){
 				if( touchToggleEnabled ) {
 					if( $(event.target).closest(ignoreTargets).length ){ return; }
 					if( !scrollTriggered ){
@@ -68,7 +68,7 @@ $.fixedToolbars = (function(){
 					}
 				}
 			})
-			.bind('scrollstart',function(event){
+			.bind('scrollstart.toolbar',function(event){
 				scrollTriggered = true;
 				if(stateBefore == null){ stateBefore = currentstate; }
 
@@ -85,7 +85,7 @@ $.fixedToolbars = (function(){
 					}
 				}
 			})
-			.bind('scrollstop',function(event){
+			.bind('scrollstop.toolbar',function(event){
 				if( $(event.target).closest(ignoreTargets).length ){ return; }
 				scrollTriggered = false;
 				if (autoHideMode) {
@@ -94,13 +94,13 @@ $.fixedToolbars = (function(){
 				}
 				stateBefore = null;
 			})
-			.bind('silentscroll', showEventCallback);
+			.bind('silentscroll.toolbar', showEventCallback);
 
-			$(window).bind('resize', showEventCallback);
+			$(window).bind('resize.toolbar', showEventCallback);
 	});
 		
 	//before page is shown, check for duplicate footer
-	$('.ui-page').live('pagebeforeshow', function(event, ui){
+	$('.ui-page').live('pagebeforeshow.toolbar', function(event, ui){
 		var page = $(event.target),
 			footer = page.find( ":jqmData(role='footer')" ),
 			id = footer.data('id'),
@@ -116,7 +116,7 @@ $.fixedToolbars = (function(){
 	});
 
 	//after page is shown, append footer to new page
-	$('.ui-page').live('pageshow', function(event, ui){
+	$('.ui-page').live('pageshow.toolbar', function(event, ui){
 		var $this = $(this);
 		
 		if( stickyFooter && stickyFooter.length ){	
