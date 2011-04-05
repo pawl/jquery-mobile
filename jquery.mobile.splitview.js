@@ -323,7 +323,7 @@
         }
 
         if(event.orientation){
-          if(event.orientation == 'potrait'){
+          if(event.orientation == 'portrait'){
             popover();            
           } 
           else if(event.orientation == 'landscape') {
