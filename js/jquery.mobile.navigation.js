@@ -120,7 +120,7 @@
 				}
 
 				urlHistory.stack.push( {url : url, transition: transition, title: title, page: storedTo } );
-				
+
 				urlHistory.activeIndex = urlHistory.stack.length - 1;
 			},
 
@@ -307,7 +307,7 @@
 			duplicateCachedPage = null,
 			currPage = urlHistory.getActive(),
 			back = false,
-			forward = false
+			forward = false,
 			pageTitle = document.title;
 
 
@@ -363,7 +363,9 @@
 		if(base){ base.reset(); }
 
 		//kill the keyboard
-		$( window.document.activeElement ).add( "input:focus, textarea:focus, select:focus" ).blur();
+		if( window.document.activeElement ){
+			$( window.document.activeElement || "" ).add( "input:focus, textarea:focus, select:focus" ).blur();
+		}
 
 		function defaultTransition(){
 			if(transition === undefined){
@@ -408,9 +410,9 @@
 					//update hash and history
 					path.set( url );
 				}
-				
+
 				//if title element wasn't found, try the page div data attr too
-				var newPageTitle = to.attr( ":jqmData(title)" ) || to.find(".ui-header .ui-title" ).text();
+				var newPageTitle = to.jqmData("title") || to.find(".ui-header .ui-title" ).text();
 				if( !!newPageTitle && pageTitle == document.title ){
 					pageTitle = newPageTitle;
 				}
@@ -419,7 +421,7 @@
 				if( !back && !forward ){
 					urlHistory.addNew( url, transition, pageTitle, to );
 				}
-				
+
 				//set page title
 				document.title = urlHistory.getActive().title;
 
@@ -551,19 +553,20 @@
 				url: fileUrl,
 				type: type,
 				data: data,
+				dataType: "html",
 				success: function( html ) {
 					//pre-parse html to check for a data-url,
 					//use it as the new fileUrl, base path, etc
 					var all = $("<div></div>"),
 							redirectLoc,
-							
+
 							//page title regexp
 							newPageTitle = html.match( /<title[^>]*>([^<]*)/ ) && RegExp.$1,
-							
+
 							// TODO handle dialogs again
 							pageElemRegex = new RegExp(".*(<[^>]+\\bdata-" + $.mobile.ns + "role=[\"']?page[\"']?[^>]*>).*"),
 							dataUrlRegex = new RegExp("\\bdata-" + $.mobile.ns + "url=[\"']?([^\"'>]*)[\"']?");
-							
+
 
 					// data-url must be provided for the base tag so resource requests can be directed to the
 					// correct url. loading into a temprorary element makes these requests immediately
@@ -586,11 +589,11 @@
 					//workaround to allow scripts to execute when included in page divs
 					all.get(0).innerHTML = html;
 					to = all.find( ":jqmData(role='page'), :jqmData(role='dialog')" ).first();
-					
+
 					//finally, if it's defined now, set the page title for storage in urlHistory
 					if( newPageTitle ){
 						pageTitle = newPageTitle;
-					}					
+					}
 
 					//rewrite src and href attrs to use a base url
 					if( !$.support.dynamicBaseTag ){
@@ -598,7 +601,7 @@
 						to.find( "[src], link[href], a[rel='external'], :jqmData(ajax='false'), a[target]" ).each(function(){
 							var thisAttr = $(this).is('[href]') ? 'href' : 'src',
 								thisUrl = $(this).attr(thisAttr);
-														
+
 
 							//if full path exists and is same, chop it - helps IE out
 							thisUrl = thisUrl.replace( location.protocol + '//' + location.host + location.pathname, '' );
@@ -684,11 +687,8 @@
 	});
 
 
-	//temporary fix for allowing 3rd party onclick handlers to still function.
-	var preventClickDefault = false, stopClickPropagation = false;
-
 	//click routing - direct to HTTP or Ajax, accordingly
-	$( "a" ).live( "vclick", function(event) {
+	$( "a" ).live( "click", function(event) {
 
 		var $this = $(this),
 
@@ -729,27 +729,17 @@
 			//if data-ajax attr is set to false, use the default behavior of a link
 			hasAjaxDisabled = $this.is( ":jqmData(ajax='false')" );
 
-		//reset our prevDefault value because I'm paranoid.
-		preventClickDefault = stopClickPropagation = false;
-
 		//if there's a data-rel=back attr, go back in history
 		if( $this.is( ":jqmData(rel='back')" ) ){
 			window.history.back();
-			preventClickDefault = stopClickPropagation = true;
-			return;
+			return false;
 		}
 
 		//prevent # urls from bubbling
 		//path.get() is replaced to combat abs url prefixing in IE
 		if( url.replace(path.get(), "") == "#"  ){
 			//for links created purely for interaction - ignore
-			//don't call preventDefault on the event here, vclick
-			//may have been triggered by a touchend, before any moues
-			//click event was dispatched and we want to make sure
-			//3rd party onclick handlers get triggered. If and when
-			//a mouse click event is generated, our live("click") handler
-			//will get triggered and do the preventDefault.
-			preventClickDefault = true;
+			event.preventDefault();
 			return;
 		}
 
@@ -783,18 +773,7 @@
 		url = path.stripHash( url );
 
 		$.mobile.changePage( url, transition, reverse);
-		preventClickDefault = true;
-	});
-
-	$( "a" ).live( "click", function(event) {
-		if (preventClickDefault){
-			event.preventDefault();
-			preventClickDefault = false;
-		}
-		if (stopClickPropagation){
-			event.stopPropagation();
-			stopClickPropagation = false;
-		}
+		event.preventDefault();
 	});
 
 	//hashchange event handler
