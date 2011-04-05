@@ -7,12 +7,16 @@
 
 (function($,window,undefined){
   $( window.document ).bind('mobileinit', function(){
-    if ($.mobile.media("screen and (min-width: 768px)")) {
+    if ($.mobile.media("screen and (min-width:768px)")) {
+      function setMainWidth(){
+        return $(window).width()-$('div[data-id="menu"]').outerWidth();  
+      };
+
       $('div[data-role="panel"]').addClass('ui-mobile-viewport');
-      $('div[data-id="menu"]').addClass('sticky-left border-right').css({'width':'25%', 'min-width':'250px'});
-      $('div[data-id="main"]').addClass('sticky-right').css('width', function(index){
-        return $(window).width()-$('div[data-id="menu"]').width();  
-      });
+      $('div[data-id="menu"]').addClass('sticky-left border-right')
+                              .css({'width':'25%', 'min-width':'250px'});
+      $('div[data-id="main"]').addClass('sticky-right')
+                              .width(setMainWidth());
       if( !$.mobile.hashListeningEnabled || !$.mobile.path.stripHash( location.hash ) ){
         var firstPage=$('div[data-id="main"] > div[data-role="page"]:first').page().addClass($.mobile.activePageClass) 
         firstPage.children('div[data-role="footer"]').hide();
@@ -134,8 +138,9 @@
           !$.mobile.ajaxFormsEnabled ||
           $(this).is( "[data-ajax='false']" ) ){ return; }
 
-        var type = $(this).attr("method"),
-            url = $.mobile.path.clean( $(this).attr( "action" ) ),
+        var $this = $(this);
+            type = $this.attr("method"),
+            url = $.mobile.path.clean( $this.attr( "action" ) ),
             $currPanel=$this.parents('div[data-role="panel"]'),
             $currPanelActivePage=$currPanel.children('div.'+$.mobile.activePageClass);
 
@@ -153,7 +158,7 @@
         $.mobile.changePage({
             url: url,
             type: type || "get",
-            data: $(this).serialize()
+            data: $this.serialize()
           },
           undefined,
           undefined,
@@ -254,6 +259,23 @@
         }
       });
 
+      //popover button click handler - from http://www.cagintranet.com/archive/create-an-ipad-like-dropdown-popover/
+      $('#popover-btn').live('click', function(e){ 
+        e.preventDefault(); 
+        $('.panel-popover').fadeToggle('fast'); 
+        if ($('#popover-btn').hasClass($.mobile.activeBtnClass)) { 
+            $('#popover-btn').removeClass($.mobile.activeBtnClass); 
+        } else { 
+            $('#popover-btn').addClass($.mobile.activeBtnClass); 
+        } 
+      });
+
+      $('body').bind('click', function(event) { 
+        if (!$(event.target).closest('.panel-popover').length && !$(event.target).closest('#popover-btn').length) { 
+            $(".panel-popover").stop(true, true).hide(); 
+            $('#popover-btn').removeClass($.mobile.activeBtnClass); 
+        }; 
+      });
 
       //TODO: bind orientationchange and resize
       //In order to do this, we need to:
@@ -262,6 +284,59 @@
       //3. wrap design divs around menu panel
       //4. add menu button to top left of main panel
       //5. bind show() menu panel onclick of menu button
+      $(window).bind('orientationchange resize', function(event){
+        var $menu=$('div[data-id="menu"]'),
+            $main=$('div[data-id="main"]'),
+            $mainHeader=$main.find('div.'+$.mobile.activePageClass+'> div[data-role="header"]');
+
+
+        function popover(){
+          $menu.addClass('panel-popover')
+               .removeClass('sticky-left border-right')     
+          if(!$menu.children('.popover_triangle').length){ 
+            $menu.prepend('<div class="popover_triangle"></div>'); 
+          }
+          $main.removeClass('sticky-right')
+               .css('width', '');
+          $mainHeader.attr('data-backbtn', 'false');
+          if(!$mainHeader.children('#popover-btn').length){
+            if($mainHeader.children('a.ui-btn-left').length){
+              $mainHeader.children('a.ui-btn-left').replaceWith('<a id="popover-btn">Navigation</a>');
+              $('a#popover-btn').addClass('ui-btn-left').buttonMarkup();
+            }
+            else{
+              $mainHeader.prepend('<a id="popover-btn">Navigation</a>');
+              $('a#popover-btn').addClass('ui-btn-left').buttonMarkup()          
+            }
+          }
+        };
+
+        function splitView(){
+          $menu.removeClass('panel-popover')
+               .addClass('sticky-left border-right')
+               .css('display', '');
+          $menu.children('.popover_triangle').remove();
+          $main.addClass('sticky-right')
+               .width(setMainWidth());
+          $mainHeader.attr('data-backbtn', '');
+          $mainHeader.children('#popover-btn').remove();
+        }
+
+        if(event.orientation){
+          if(event.orientation == 'potrait'){
+            popover();            
+          } 
+          else if(event.orientation == 'landscape') {
+            splitView;
+          } 
+        }
+        else if($.mobile.media('screen and (min-width:480px) and (max-width: 768px)')){
+          popover();
+        }
+        else if($.mobile.media('screen and (min-width:768px)')){
+          splitView();
+        }
+      });
 
       //temporary toolbar mods to present better in tablet/desktop view
       //TODO: API this so that people can specify using data- attributes how they want their toolbars displayed
