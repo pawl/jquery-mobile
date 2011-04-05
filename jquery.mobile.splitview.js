@@ -263,7 +263,7 @@
         } 
       });
 
-      $('body').bind('vclick', function(event) { 
+      $('body').live('vclick', function(event) { 
         if (!$(event.target).closest('.panel-popover').length && !$(event.target).closest('#popover-btn').length) { 
             $(".panel-popover").stop(true, true).hide(); 
             $('#popover-btn').removeClass($.mobile.activeBtnClass); 
@@ -298,7 +298,8 @@
 
         function popover(){
           $menu.addClass('panel-popover')
-               .removeClass('sticky-left border-right')     
+               .removeClass('sticky-left border-right')
+               .css({'width':'25%', 'min-width':'250px', 'display':''});     
           if(!$menu.children('.popover_triangle').length){ 
             $menu.prepend('<div class="popover_triangle"></div>'); 
           }
