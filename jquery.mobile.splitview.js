@@ -26,6 +26,7 @@
       $(function() {
         $(document).unbind('.toolbar');
         $('.ui-page').die('.toolbar');
+        $('div[data-id="main"]').css('width', setMainWidth());
       });
 
       //DONE: link click event binding for changePage
