@@ -9,7 +9,7 @@
   $( window.document ).bind('mobileinit', function(){
     if ($.mobile.media("screen and (min-width:768px)")) {
       function setMainWidth(){
-        return $(window).width()-$('div[data-id="menu"]').outerWidth();  
+        return $(window).width()-$('div[data-id="menu"]').width();  
       };
 
       $('div[data-role="panel"]').addClass('ui-mobile-viewport');
