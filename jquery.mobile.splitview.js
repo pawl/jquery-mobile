@@ -7,7 +7,7 @@
 
 (function($,window,undefined){
   $( window.document ).bind('mobileinit', function(){
-    if ($.mobile.media("screen and (min-width:768px)")) {
+    if ($.mobile.media("screen and (min-width:480px)")) {
       $('div[data-role="panel"]').addClass('ui-mobile-viewport');
       if( !$.mobile.hashListeningEnabled || !$.mobile.path.stripHash( location.hash ) ){
         var firstPage=$('div[data-id="main"] > div[data-role="page"]:first').page().addClass($.mobile.activePageClass) 
@@ -220,7 +220,7 @@
       });
 
       //DONE: pageshow binding for scrollview
-      $('div[data-role="page"]').live('pageshow', function(event){
+      $('div[data-role="page"]').live('pagebeforeshow', function(event){
         var $page = $(this);
         $page.find('div[data-role="content"]').attr('data-scroll', 'true');
         if ($.support.touch) {
