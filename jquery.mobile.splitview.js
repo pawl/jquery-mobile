@@ -287,7 +287,8 @@
       $(window).bind('orientationchange resize', function(event){
         var $menu=$('div[data-id="menu"]'),
             $main=$('div[data-id="main"]'),
-            $mainHeader=$main.find('div.'+$.mobile.activePageClass+'> div[data-role="header"]');
+            $mainHeader=$main.find('div.'+$.mobile.activePageClass+'> div[data-role="header"]'),
+            $window=$(window);
 
 
         function popover(){
@@ -330,10 +331,10 @@
             splitView;
           } 
         }
-        else if($.mobile.media('screen and (min-width:480px) and (max-width: 768px)')){
+        else if($window.width() < 768 && $window.width() > 480){
           popover();
         }
-        else if($.mobile.media('screen and (min-width:768px)')){
+        else if($window.width() > 768){
           splitView();
         }
       });
