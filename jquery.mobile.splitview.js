@@ -8,17 +8,7 @@
 (function($,window,undefined){
   $( window.document ).bind('mobileinit', function(){
     if ($.mobile.media("screen and (min-width:768px)")) {
-      function setMainWidth(){
-        return $(window).width()-$('div[data-id="menu"]').width();  
-      };
-
       $('div[data-role="panel"]').addClass('ui-mobile-viewport');
-      $('div[data-id="menu"]').addClass('sticky-left border-right')
-                              .css({'width':'25%', 'min-width':'250px'});
-      $('div[data-id="main"]').addClass('sticky-right')
-                              .css('width', function(index){
-                                return $(window).width()-$('div[data-id="menu"]').width();  
-                              });
       if( !$.mobile.hashListeningEnabled || !$.mobile.path.stripHash( location.hash ) ){
         var firstPage=$('div[data-id="main"] > div[data-role="page"]:first').page().addClass($.mobile.activePageClass) 
         firstPage.children('div[data-role="footer"]').hide();
@@ -26,7 +16,7 @@
       $(function() {
         $(document).unbind('.toolbar');
         $('.ui-page').die('.toolbar');
-        $('div[data-id="main"]').css('width', setMainWidth());
+        $(window).trigger('orientationchange');
       });
 
       //DONE: link click event binding for changePage
@@ -273,7 +263,7 @@
         } 
       });
 
-      $('body').bind('click', function(event) { 
+      $('body').bind('vclick', function(event) { 
         if (!$(event.target).closest('.panel-popover').length && !$(event.target).closest('#popover-btn').length) { 
             $(".panel-popover").stop(true, true).hide(); 
             $('#popover-btn').removeClass($.mobile.activeBtnClass); 
@@ -292,7 +282,19 @@
             $main=$('div[data-id="main"]'),
             $mainHeader=$main.find('div.'+$.mobile.activePageClass+'> div[data-role="header"]'),
             $window=$(window);
-
+        
+        function popoverBtn(header) {
+          if(!header.children('#popover-btn').length){
+            if(header.children('a.ui-btn-left').length){
+              header.children('a.ui-btn-left').replaceWith('<a id="popover-btn">Navigation</a>');
+              header.children('a#popover-btn').addClass('ui-btn-left').buttonMarkup();
+            }
+            else{
+              header.prepend('<a id="popover-btn">Navigation</a>');
+              header.children('a#popover-btn').addClass('ui-btn-left').buttonMarkup()          
+            }
+          }
+        }
 
         function popover(){
           $menu.addClass('panel-popover')
@@ -302,28 +304,26 @@
           }
           $main.removeClass('sticky-right')
                .css('width', '');
-          $mainHeader.attr('data-backbtn', 'false');
-          if(!$mainHeader.children('#popover-btn').length){
-            if($mainHeader.children('a.ui-btn-left').length){
-              $mainHeader.children('a.ui-btn-left').replaceWith('<a id="popover-btn">Navigation</a>');
-              $('a#popover-btn').addClass('ui-btn-left').buttonMarkup();
-            }
-            else{
-              $mainHeader.prepend('<a id="popover-btn">Navigation</a>');
-              $('a#popover-btn').addClass('ui-btn-left').buttonMarkup()          
-            }
-          }
+          popoverBtn($mainHeader);
+
+          $main.delegate('div[data-role="page"]','pageshow.popover', function(){
+            var $thisHeader=$(this).children('div[data-role="header"]');
+            popoverBtn($thisHeader);
+          });
         };
 
         function splitView(){
           $menu.removeClass('panel-popover')
                .addClass('sticky-left border-right')
-               .css('display', '');
+               .css({'width':'25%', 'min-width':'250px', 'display':''});
           $menu.children('.popover_triangle').remove();
           $main.addClass('sticky-right')
-               .width(setMainWidth());
-          $mainHeader.attr('data-backbtn', '');
+               .width(function(){
+                 return $(window).width()-$('div[data-id="menu"]').width();  
+               });
           $mainHeader.children('#popover-btn').remove();
+          $('div[data-role="page"]').die('.popover');
+
         }
 
         if(event.orientation){
@@ -331,7 +331,7 @@
             popover();            
           } 
           else if(event.orientation == 'landscape') {
-            splitView;
+            splitView();
           } 
         }
         else if($window.width() < 768 && $window.width() > 480){
