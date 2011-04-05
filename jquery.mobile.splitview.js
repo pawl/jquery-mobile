@@ -16,7 +16,7 @@
       $('div[data-id="menu"]').addClass('sticky-left border-right')
                               .css({'width':'25%', 'min-width':'250px'});
       $('div[data-id="main"]').addClass('sticky-right')
-                              .width(setMainWidth());
+                              .css('width', setMainWidth());
       if( !$.mobile.hashListeningEnabled || !$.mobile.path.stripHash( location.hash ) ){
         var firstPage=$('div[data-id="main"] > div[data-role="page"]:first').page().addClass($.mobile.activePageClass) 
         firstPage.children('div[data-role="footer"]').hide();
