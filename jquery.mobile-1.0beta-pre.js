@@ -322,7 +322,7 @@ $.mobile.media = (function() {
 		fakeBody = $( "<body>" ).append( testDiv );
 
 	return function( query ) {
-		// if ( !( query in cache ) ) {
+		if ( !( query in cache ) ) {
 			var styleBlock = document.createElement('style'),
         		cssrule = "@media " + query + " { #jquery-mediatest { position:absolute; } }";
 	        //must set type for IE!	
@@ -337,7 +337,7 @@ $.mobile.media = (function() {
 			$html.prepend( fakeBody ).prepend( styleBlock );
 			cache[ query ] = testDiv.css( "position" ) === "absolute";
 			fakeBody.add( styleBlock ).remove();
-		// }
+		}
 		return cache[ query ];
 	};
 })();
