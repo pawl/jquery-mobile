@@ -323,7 +323,7 @@
                  return $(window).width()-$('div[data-id="menu"]').width();  
                });
           $mainHeader.children('#popover-btn').remove();
-          $('div[data-role="page"]').die('.popover');
+          $main.undelegate('div[data-role="page"]', 'pageshow.popover');
 
         }
 

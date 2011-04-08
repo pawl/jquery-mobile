@@ -61,6 +61,7 @@
   cursor: auto;
   position: absolute;
   top:55px;
+  left:10px;
   background-color: white;
   z-index:5000000;
   border: 3px solid black;
