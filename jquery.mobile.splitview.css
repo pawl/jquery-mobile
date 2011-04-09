@@ -21,19 +21,19 @@
   margin: 0;
 }
 
-.min-width-768px .ui-page{
+.min-width-480px .ui-page{
   bottom: 0;
 }
 
-.min-width-768px .ui-header {
+.min-width-480px .ui-header {
   position:absolute;
   top:0;
-  bottom:auto;
+  bottom:auto; 
   left:0;
   right:0;
 }
 
-.min-width-768px .ui-footer {
+.min-width-480px .ui-footer {
   position:absolute;
   top:auto;
   bottom:0;
@@ -41,10 +41,10 @@
   right:0;
 }
 
-.min-width-768px .ui-content {
+.min-width-480px .ui-content {
   position:absolute;
-  top:40px;
-  bottom:0px;
+  top:40px;   /*TODO: need to dynamically set this and bottom when we use dynamic toolbars later*/
+  bottom:0;
   left:0;
   right:0;
   overflow: auto;
@@ -77,11 +77,6 @@
   transition: opacity 0.25s linear; 
   overflow-x:visible;
   height:80%;
-  min-height:80%;
-}
-
-.panel-popover div[data-role="page"] {
-  position: static;
 }
 
 .panel-popover > .popover_triangle {
