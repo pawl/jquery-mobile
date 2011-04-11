@@ -307,7 +307,7 @@
                .css('width', '');
           popoverBtn($mainHeader);
 
-          $main.delegate('div[data-role="page"]','pageshow.popover', function(){
+          $main.delegate('div[data-role="page"]','pagecreate.popover', function(){
             var $thisHeader=$(this).children('div[data-role="header"]');
             popoverBtn($thisHeader);
           });
