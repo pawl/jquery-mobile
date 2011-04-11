@@ -13,6 +13,9 @@
         $(window).trigger('orientationchange');
       });
 
+//----------------------------------------------------------------------------------
+//Main event bindings: click, form submits, hashchange and orientationchange/resize
+//----------------------------------------------------------------------------------
       //DONE: link click event binding for changePage
       $("a").die('click');
       //this will mostly be a copy of the original handler with some modifications
@@ -206,64 +209,7 @@
         }
       });
 
-      //DONE: pageshow binding for scrollview
-      $('div[data-role="page"]').live('pagebeforeshow', function(event){
-        var $page = $(this);
-        $page.find('div[data-role="content"]').attr('data-scroll', 'true');
-        if ($.support.touch) {
-          $page.find("[data-scroll]:not(.ui-scrollview-clip)").each(function(){
-            var $this = $(this);
-            // XXX: Remove this check for ui-scrolllistview once we've
-            //      integrated list divider support into the main scrollview class.
-            if ($this.hasClass("ui-scrolllistview"))
-              $this.scrolllistview();
-            else
-            {
-              var st = $this.data("scroll") + "";
-              var paging = st && st.search(/^[xy]p$/) != -1;
-              var dir = st && st.search(/^[xy]/) != -1 ? st.charAt(0) : null;
-
-              var opts = {};
-              if (dir)
-                opts.direction = dir;
-              if (paging)
-                opts.pagingEnabled = true;
-
-              var method = $this.data("scroll-method");
-              if (method)
-                opts.scrollMethod = method;
-
-              $this.scrollview(opts);
-            }
-          });
-        }
-      });
-
-      //popover button click handler - from http://www.cagintranet.com/archive/create-an-ipad-like-dropdown-popover/
-      $('.popover-btn').live('click', function(e){ 
-        e.preventDefault(); 
-        $('.panel-popover').fadeToggle('fast'); 
-        if ($('.popover-btn').hasClass($.mobile.activeBtnClass)) { 
-            $('.popover-btn').removeClass($.mobile.activeBtnClass); 
-        } else { 
-            $('.popover-btn').addClass($.mobile.activeBtnClass); 
-        } 
-      });
-
-      $('body').live('vclick', function(event) { 
-        if (!$(event.target).closest('.panel-popover').length && !$(event.target).closest('.popover-btn').length) { 
-            $(".panel-popover").stop(true, true).hide(); 
-            $('.popover-btn').removeClass($.mobile.activeBtnClass); 
-        }; 
-      });
-
-      //TODO: bind orientationchange and resize
-      //In order to do this, we need to:
-      //1. hide and resize menu panel
-      //2. make main panel fullscreen
-      //3. wrap design divs around menu panel
-      //4. add menu button to top left of main panel
-      //5. bind show() menu panel onclick of menu button
+      //DONE: bind orientationchange and resize
       $(window).bind('orientationchange resize', function(event){
         var $menu=$('div[data-id="menu"]'),
             $main=$('div[data-id="main"]'),
@@ -335,6 +281,63 @@
           splitView();
         }
       });
+
+//----------------------------------------------------------------------------------
+//Other event bindings: scrollview, popover buttons, and toolbar hacks
+//----------------------------------------------------------------------------------
+
+      //DONE: pageshow binding for scrollview
+      $('div[data-role="page"]').live('pagebeforeshow', function(event){
+        var $page = $(this);
+        $page.find('div[data-role="content"]').attr('data-scroll', 'true');
+        if ($.support.touch) {
+          $page.find("[data-scroll]:not(.ui-scrollview-clip)").each(function(){
+            var $this = $(this);
+            // XXX: Remove this check for ui-scrolllistview once we've
+            //      integrated list divider support into the main scrollview class.
+            if ($this.hasClass("ui-scrolllistview"))
+              $this.scrolllistview();
+            else
+            {
+              var st = $this.data("scroll") + "";
+              var paging = st && st.search(/^[xy]p$/) != -1;
+              var dir = st && st.search(/^[xy]/) != -1 ? st.charAt(0) : null;
+
+              var opts = {};
+              if (dir)
+                opts.direction = dir;
+              if (paging)
+                opts.pagingEnabled = true;
+
+              var method = $this.data("scroll-method");
+              if (method)
+                opts.scrollMethod = method;
+
+              $this.scrollview(opts);
+            }
+          });
+        }
+      });
+
+      //popover button click handler - from http://www.cagintranet.com/archive/create-an-ipad-like-dropdown-popover/
+      $('.popover-btn').live('click', function(e){ 
+        e.preventDefault(); 
+        $('.panel-popover').fadeToggle('fast'); 
+        if ($('.popover-btn').hasClass($.mobile.activeBtnClass)) { 
+            $('.popover-btn').removeClass($.mobile.activeBtnClass); 
+        } else { 
+            $('.popover-btn').addClass($.mobile.activeBtnClass); 
+        } 
+      });
+
+      $('body').live('vclick', function(event) { 
+        if (!$(event.target).closest('.panel-popover').length && !$(event.target).closest('.popover-btn').length) { 
+            $(".panel-popover").stop(true, true).hide(); 
+            $('.popover-btn').removeClass($.mobile.activeBtnClass); 
+        }; 
+      });
+
+      
 
       //temporary toolbar mods to present better in tablet/desktop view
       //TODO: API this so that people can specify using data- attributes how they want their toolbars displayed
