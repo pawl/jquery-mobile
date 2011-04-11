@@ -8,7 +8,6 @@
 (function($,window,undefined){
   $( window.document ).bind('mobileinit', function(){
     if ($.mobile.media("screen and (min-width:480px)")) {
-      $('html').addClass( "ui-mobile ui-mobile-rendering" );
       $('div[data-role="panel"]').addClass('ui-mobile-viewport');
       if( !$.mobile.hashListeningEnabled || !$.mobile.path.stripHash( location.hash ) ){
         var firstPage=$('div[data-id="main"] > div[data-role="page"]:first').page().addClass($.mobile.activePageClass) 
@@ -18,7 +17,6 @@
         $(document).unbind('.toolbar');
         $('.ui-page').die('.toolbar');
         $(window).trigger('orientationchange');
-        $('html').removeClass('ui-mobile-rendering');
       });
 
       //DONE: link click event binding for changePage
