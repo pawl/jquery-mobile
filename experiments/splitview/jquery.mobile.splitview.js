@@ -1,10 +1,4 @@
-//TODO: need to set panel widths according to media width - is this necessary?
 //ISSUE: activeBtnClass not removed when a new link is given this class - causing a lot of active buttons.
-//ISSUE: history doesn't change when links in main panel is clicked, and the back button points to
-//       the previous page which don't make sense. idea: use data-history="false,crumb" on panel div
-//ISSUE: clicking on a navbar link twice ruins the entire hash history. need to see what happened. 
-//ISSUE: line 1872 in jqm, in transitionPages adds a history entry anyways - does this affect the transition path for history? 
-
 (function($,window,undefined){
   $( window.document ).bind('mobileinit', function(){
     if ($.mobile.media("screen and (min-width:480px)")) {
@@ -19,6 +13,9 @@
         $(window).trigger('orientationchange');
       });
 
+//----------------------------------------------------------------------------------
+//Main event bindings: click, form submits, hashchange and orientationchange/resize
+//----------------------------------------------------------------------------------
       //DONE: link click event binding for changePage
       $("a").die('click');
       //this will mostly be a copy of the original handler with some modifications
@@ -52,7 +49,7 @@
           return;
         }
 
-        //temporary fix to remove activeBtnClass
+        //TODO: temporary fix to remove activeBtnClass
         $(".ui-btn."+$.mobile.activeBtnClass).removeClass($.mobile.activeBtnClass);
         $activeClickedLink = $this.closest( ".ui-btn" ).addClass( $.mobile.activeBtnClass );
 
@@ -102,8 +99,6 @@
           }
           //if link refers to a page inside the same panel, changePage on that panel 
           else {
-            //BUG: this setting is panel insensitive - so links in main panel also behave as specified below
-            // need to define more data attributes in panels to allow custom panel behaviour
             from=$currPanelActivePage;
             $.mobile.pageContainer=$currPanel;
             var hashChange= (hash == 'false' || hash == 'crumbs')? false : true;
@@ -206,18 +201,90 @@
           $.mobile.activePage=$mainPanelActivePage.length? $mainPanelActivePage : undefined;
           $.mobile.changePage(to, transition, undefined, false, true );
         }
-        //there's no hash, go to the first page in the dom, and set all other panels to its first page.
+        //there's no hash, go to the first page in the main panel.
         else {
-          //temp fix - need to get an array of panels and set their first pages to show.
           $.mobile.pageContainer=$mainPanel;
           $.mobile.activePage=$mainPanelActivePage? $mainPanelActivePage : undefined;
-          //temp: set false for fromHashChange due to isPageTransitioning causing pageContainer settings to be overriden
-          $.mobile.changePage($mainPanelFirstPage, 'none', true, false, false ); 
-          $.mobile.pageContainer=$menuPanel;
-          $.mobile.activePage=$menuPanelActivePage? $menuPanelActivePage : undefined;
-          $.mobile.changePage($menuPanelFirstPage, 'none', false, false, false);
+          $.mobile.changePage($mainPanelFirstPage, transition, undefined, false, true ); 
         }
       });
+
+      //DONE: bind orientationchange and resize
+      $(window).bind('orientationchange resize', function(event){
+        var $menu=$('div[data-id="menu"]'),
+            $main=$('div[data-id="main"]'),
+            $mainHeader=$main.find('div.'+$.mobile.activePageClass+'> div[data-role="header"]'),
+            $window=$(window);
+        
+        function popoverBtn(header) {
+          if(!header.children('.popover-btn').length){
+            if(header.children('a.ui-btn-left').length){
+              header.children('a.ui-btn-left').replaceWith('<a class="popover-btn">Navigation</a>');
+              header.children('a.popover-btn').addClass('ui-btn-left').buttonMarkup();
+            }
+            else{
+              header.prepend('<a class="popover-btn">Navigation</a>');
+              header.children('a.popover-btn').addClass('ui-btn-left').buttonMarkup()          
+            }
+          }
+        }
+
+        function popover(){
+          $menu.addClass('panel-popover')
+               .removeClass('sticky-left border-right')
+               .css({'width':'25%', 'min-width':'250px', 'display':''});     
+          if(!$menu.children('.popover_triangle').length){ 
+            $menu.prepend('<div class="popover_triangle"></div>'); 
+          }
+          $main.removeClass('sticky-right')
+               .css('width', '');
+          popoverBtn($mainHeader);
+
+          $main.undelegate('div[data-role="page"]', 'pagebeforeshow.splitview');
+          $main.delegate('div[data-role="page"]','pagebeforeshow.popover', function(){
+            var $thisHeader=$(this).children('div[data-role="header"]');
+            popoverBtn($thisHeader);
+          });
+        };
+
+        function splitView(){
+          $menu.removeClass('panel-popover')
+               .addClass('sticky-left border-right')
+               .css({'width':'25%', 'min-width':'250px', 'display':''});
+          $menu.children('.popover_triangle').remove();
+          $main.addClass('sticky-right')
+               .width(function(){
+                 return $(window).width()-$('div[data-id="menu"]').width();  
+               });
+          $mainHeader.children('.popover-btn').remove();
+
+          $main.undelegate('div[data-role="page"]', 'pagebeforeshow.popover');
+          $main.delegate('div[data-role="page"]', 'pagebeforeshow.splitview', function(){
+            var $thisHeader=$(this).children('div[data-role="header"]');
+            $thisHeader.children('.popover-btn').remove();
+          });
+
+        }
+
+        if(event.orientation){
+          if(event.orientation == 'portrait'){
+            popover();            
+          } 
+          else if(event.orientation == 'landscape') {
+            splitView();
+          } 
+        }
+        else if($window.width() < 768 && $window.width() > 480){
+          popover();
+        }
+        else if($window.width() > 768){
+          splitView();
+        }
+      });
+
+//----------------------------------------------------------------------------------
+//Other event bindings: scrollview, popover buttons, and toolbar hacks
+//----------------------------------------------------------------------------------
 
       //DONE: pageshow binding for scrollview
       $('div[data-role="page"]').live('pagebeforeshow', function(event){
@@ -253,95 +320,24 @@
       });
 
       //popover button click handler - from http://www.cagintranet.com/archive/create-an-ipad-like-dropdown-popover/
-      $('#popover-btn').live('click', function(e){ 
+      $('.popover-btn').live('click', function(e){ 
         e.preventDefault(); 
         $('.panel-popover').fadeToggle('fast'); 
-        if ($('#popover-btn').hasClass($.mobile.activeBtnClass)) { 
-            $('#popover-btn').removeClass($.mobile.activeBtnClass); 
+        if ($('.popover-btn').hasClass($.mobile.activeBtnClass)) { 
+            $('.popover-btn').removeClass($.mobile.activeBtnClass); 
         } else { 
-            $('#popover-btn').addClass($.mobile.activeBtnClass); 
+            $('.popover-btn').addClass($.mobile.activeBtnClass); 
         } 
       });
 
       $('body').live('vclick', function(event) { 
-        if (!$(event.target).closest('.panel-popover').length && !$(event.target).closest('#popover-btn').length) { 
+        if (!$(event.target).closest('.panel-popover').length && !$(event.target).closest('.popover-btn').length) { 
             $(".panel-popover").stop(true, true).hide(); 
-            $('#popover-btn').removeClass($.mobile.activeBtnClass); 
+            $('.popover-btn').removeClass($.mobile.activeBtnClass); 
         }; 
       });
 
-      //TODO: bind orientationchange and resize
-      //In order to do this, we need to:
-      //1. hide and resize menu panel
-      //2. make main panel fullscreen
-      //3. wrap design divs around menu panel
-      //4. add menu button to top left of main panel
-      //5. bind show() menu panel onclick of menu button
-      $(window).bind('orientationchange resize', function(event){
-        var $menu=$('div[data-id="menu"]'),
-            $main=$('div[data-id="main"]'),
-            $mainHeader=$main.find('div.'+$.mobile.activePageClass+'> div[data-role="header"]'),
-            $window=$(window);
-        
-        function popoverBtn(header) {
-          if(!header.children('#popover-btn').length){
-            if(header.children('a.ui-btn-left').length){
-              header.children('a.ui-btn-left').replaceWith('<a id="popover-btn">Navigation</a>');
-              header.children('a#popover-btn').addClass('ui-btn-left').buttonMarkup();
-            }
-            else{
-              header.prepend('<a id="popover-btn">Navigation</a>');
-              header.children('a#popover-btn').addClass('ui-btn-left').buttonMarkup()          
-            }
-          }
-        }
-
-        function popover(){
-          $menu.addClass('panel-popover')
-               .removeClass('sticky-left border-right')
-               .css({'width':'25%', 'min-width':'250px', 'display':''});     
-          if(!$menu.children('.popover_triangle').length){ 
-            $menu.prepend('<div class="popover_triangle"></div>'); 
-          }
-          $main.removeClass('sticky-right')
-               .css('width', '');
-          popoverBtn($mainHeader);
-
-          $main.delegate('div[data-role="page"]','pagecreate.popover', function(){
-            var $thisHeader=$(this).children('div[data-role="header"]');
-            popoverBtn($thisHeader);
-          });
-        };
-
-        function splitView(){
-          $menu.removeClass('panel-popover')
-               .addClass('sticky-left border-right')
-               .css({'width':'25%', 'min-width':'250px', 'display':''});
-          $menu.children('.popover_triangle').remove();
-          $main.addClass('sticky-right')
-               .width(function(){
-                 return $(window).width()-$('div[data-id="menu"]').width();  
-               });
-          $mainHeader.children('#popover-btn').remove();
-          $main.undelegate('div[data-role="page"]', 'pageshow.popover');
-
-        }
-
-        if(event.orientation){
-          if(event.orientation == 'portrait'){
-            popover();            
-          } 
-          else if(event.orientation == 'landscape') {
-            splitView();
-          } 
-        }
-        else if($window.width() < 768 && $window.width() > 480){
-          popover();
-        }
-        else if($window.width() > 768){
-          splitView();
-        }
-      });
+      
 
       //temporary toolbar mods to present better in tablet/desktop view
       //TODO: API this so that people can specify using data- attributes how they want their toolbars displayed
