@@ -49,6 +49,9 @@
   right:0;
   overflow: auto;
 }
+.ui-crumbs {
+  max-width: 75px;
+}
 
 /*popover css for portrait orientation, modified from http://www.cagintranet.com/archive/create-an-ipad-like-dropdown-popover/
 */

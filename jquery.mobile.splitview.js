@@ -6,6 +6,7 @@
       if( !$.mobile.hashListeningEnabled || !$.mobile.path.stripHash( location.hash ) ){
         var firstPage=$('div[data-id="main"] > div[data-role="page"]:first').page().addClass($.mobile.activePageClass) 
         firstPage.children('div[data-role="footer"]').hide();
+        firstPage.children('div[data-role="content"]').attr('data-scroll', 'y');
       }
       $(function() {
         $(document).unbind('.toolbar');
@@ -103,14 +104,6 @@
             $.mobile.pageContainer=$currPanel;
             var hashChange= (hash == 'false' || hash == 'crumbs')? false : true;
             $.mobile.changePage([from,url], transition, reverse, hashChange, undefined);
-            //FIX: temporary fix for a data-back="crumbs" - need to work on its todo below later
-            if (hash == 'crumbs') {
-              var backBtn = $('div[data-url="'+url+'"]').find('a[data-rel="back"]')
-              backBtn.removeAttr('data-rel')
-                     .attr('href', '#'+from.attr('data-url'))
-                     .attr('data-direction', 'reverse');
-              backBtn.find('.ui-btn-text').html(from.find('div[data-role="header"] .ui-title').html());
-            }
             //active page must always point to the active page in main - for history purposes.
             $.mobile.activePage=$('div[data-id="main"] > div.'+$.mobile.activePageClass);
           }
@@ -287,10 +280,10 @@
 //----------------------------------------------------------------------------------
 
       //DONE: pageshow binding for scrollview
-      $('div[data-role="page"]').live('pagebeforeshow', function(event){
-        var $page = $(this);
-        $page.find('div[data-role="content"]').attr('data-scroll', 'true');
+      $('div[data-role="page"]').live('pagebeforeshow.scroll', function(event){
         if ($.support.touch) {
+          var $page = $(this);
+          $page.find('div[data-role="content"]').attr('data-scroll', 'y');
           $page.find("[data-scroll]:not(.ui-scrollview-clip)").each(function(){
             var $this = $(this);
             // XXX: Remove this check for ui-scrolllistview once we've
@@ -316,6 +309,20 @@
               $this.scrollview(opts);
             }
           });
+        }
+      });
+
+      //data-hash 'crumbs' handler
+      //NOTE: if you set data-backbtn to false this WILL not work! will find time to work this thru better.
+      $('div[data-role="page"]').live('pagebeforeshow.crumbs', function(event, data){
+        var $this = $(this),
+            backBtn = $this.find('a[data-rel="back"]');
+        if (backBtn.length && ($this.data('hash') == 'crumbs' || $this.parents('div[data-role="panel"]').data('hash') == 'crumbs')) {
+          backBtn.removeAttr('data-rel')
+                 .attr('href','#'+data.prevPage.attr('data-url'))
+                 .jqmData('direction','reverse')
+                 .addClass('ui-crumbs');
+          backBtn.find('.ui-btn-text').html(data.prevPage.find('div[data-role="header"] .ui-title').html());
         }
       });
 
@@ -350,11 +357,6 @@
       $('div[data-id="main"] div[data-role="page"]').live('pagebeforeshow.splitview', function() {
         $(this).find('div[data-role="footer"]').hide();
       });
-
-      //TODO: define data-backbtn="crumbs" - a method that creates a 'back' button that points to the previous page, 
-      //not go back in urlHistory. also include data-history="crumbs" for more general panel area behaviour
-
-      //TODO: define css scaling and columnizing using the cssgrid.net 1140px 12 column scalable grid css
     }
   });
 })(jQuery,window);
