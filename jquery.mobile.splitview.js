@@ -94,16 +94,16 @@
           }
           //if link refers to a page on another panel, changePage on that panel
           else if ($targetPanel && $targetPanel!=$this.parents('div[data-role="panel"]')) {
-            from=$targetPanelActivePage;
+            var from=$targetPanelActivePage;
             $.mobile.pageContainer=$targetContainer;
-            $.mobile.changePage([from,url], transition, reverse, true, undefined);
+            $.mobile.changePage([from,url], transition, reverse, true, undefined, $targetContainer);
           }
           //if link refers to a page inside the same panel, changePage on that panel 
           else {
-            from=$currPanelActivePage;
+            var from=$currPanelActivePage;
             $.mobile.pageContainer=$currPanel;
             var hashChange= (hash == 'false' || hash == 'crumbs')? false : true;
-            $.mobile.changePage([from,url], transition, reverse, hashChange, undefined);
+            $.mobile.changePage([from,url], transition, reverse, hashChange, undefined, $currPanel);
             //active page must always point to the active page in main - for history purposes.
             $.mobile.activePage=$('div[data-id="main"] > div.'+$.mobile.activePageClass);
           }
@@ -323,6 +323,20 @@
                  .jqmData('direction','reverse')
                  .addClass('ui-crumbs');
           backBtn.find('.ui-btn-text').html(data.prevPage.find('div[data-role="header"] .ui-title').html());
+        }
+      });
+
+      //data-default handler - a page with a link that has a data-default attribute will load that page after this page loads
+      //this still needs work - pageTransitionQueue messes everything up.
+      $('div:jqmData(role="page")').live('pageshow.default', function(){
+        var defaultSelector = $(this).jqmData('default');
+        if(defaultSelector){
+          var link=$(this).find(defaultSelector),
+              to=link.attr('href'),
+              url=$.mobile.path.stripHash(to),
+              from=$('div:jqmData(id="main")').find('.'+$.mobile.activePageClass),
+              container=$('div[data-id="'+link.jqmData('panel')+'"]');
+          $.mobile.changePage([from,url], undefined, undefined, true, false, container);
         }
       });
 
