@@ -291,13 +291,13 @@
 	$.mobile.allowCrossDomainPages = false;
 
 	// changepage function
-	$.mobile.changePage = function( to, transition, reverse, changeHash, fromHashChange ){
+	$.mobile.changePage = function( targetPage, transition, reverse, changeHash, fromHashChange, container){
 		//from is always the currently viewed page
-		var toIsArray = $.type(to) === "array",
-			toIsObject = $.type(to) === "object",
-			from = toIsArray ? to[0] : $.mobile.activePage;
+		var toIsArray = $.type(targetPage) === "array",
+			toIsObject = $.type(targetPage) === "object",
+			from = toIsArray ? targetPage[0] : $.mobile.activePage;
 
-			to = toIsArray ? to[1] : to;
+			to = toIsArray ? targetPage[1] : targetPage;
 
 		var url = $.type(to) === "string" ? path.stripHash( to ) : "",
 			fileUrl = url,
@@ -309,6 +309,8 @@
 			back = false,
 			forward = false,
 			pageTitle = document.title;
+			
+		$.mobile.pageContainer=container? container : $.mobile.pageContainer;
 
 
 		// If we are trying to transition to the same page that we are currently on ignore the request.
