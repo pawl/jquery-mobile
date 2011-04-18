@@ -328,15 +328,13 @@
 
       //data-default handler - a page with a link that has a data-default attribute will load that page after this page loads
       //this still needs work - pageTransitionQueue messes everything up.
-      $('div:jqmData(role="page")').live('pageshow.default', function(){
-        var defaultSelector = $(this).jqmData('default');
-        if(defaultSelector){
-          var link=$(this).find(defaultSelector),
-              to=link.attr('href'),
-              url=$.mobile.path.stripHash(to),
-              from=$('div:jqmData(id="main")').find('.'+$.mobile.activePageClass),
-              container=$('div[data-id="'+link.jqmData('panel')+'"]');
-          $.mobile.changePage([from,url], undefined, undefined, true, false, container);
+      $('div:jqmData(role="page")').live('pageshow.context', function(){
+        var $this=$(this),
+            panelDefaultSelector = $this.parents('div[data-role="panel"]').jqmData('context'),
+            pageDefaultSelector = $this.jqmData('context'),
+            defaultSelector= pageDefaultSelector ? pageDefaultSelector : panelDefaultSelector;
+        if(defaultSelector && $this.find(defaultSelector).length){
+          $(defaultSelector).trigger('click');
         }
       });
 

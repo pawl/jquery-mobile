@@ -429,7 +429,7 @@ $(function(){
 var fakeBody = $( "<body>" ).prependTo( "html" ),
 	fbCSS = fakeBody[0].style,
 	vendors = ['webkit','moz','o'],
-	webos = window.palmGetResource || window.PalmServiceBridge, //only used to rule out scrollTop 
+	webos = "palmGetResource" in window, //only used to rule out scrollTop 
 	bb = window.blackberry; //only used to rule out box shadow, as it's filled opaque on BB
 
 //thx Modernizr
@@ -527,6 +527,7 @@ var dataPropertyName = "virtualMouseBindings",
 	didScroll = false,
 	clickBlockList = [],
 	blockMouseTriggers = false,
+	blockTouchTriggers = false,
 	eventCaptureSupported = $.support.eventCapture,
 	$document = $(document),
 	nextTouchID = 1,
@@ -612,34 +613,12 @@ function getClosestElementWithVirtualBinding(element, eventType)
 
 function enableTouchBindings()
 {
-	if (!activeDocHandlers["touchbindings"]){
-		$document.bind("touchend", handleTouchEnd)
-		
-			// On touch platforms, touching the screen and then dragging your finger
-			// causes the window content to scroll after some distance threshold is
-			// exceeded. On these platforms, a scroll prevents a click event from being
-			// dispatched, and on some platforms, even the touchend is suppressed. To
-			// mimic the suppression of the click event, we need to watch for a scroll
-			// event. Unfortunately, some platforms like iOS don't dispatch scroll
-			// events until *AFTER* the user lifts their finger (touchend). This means
-			// we need to watch both scroll and touchmove events to figure out whether
-			// or not a scroll happenens before the touchend event is fired.
-		
-			.bind("touchmove", handleTouchMove)
-			.bind("scroll", handleScroll);
-
-		activeDocHandlers["touchbindings"] = 1;
-	}
+	blockTouchTriggers = false;
 }
 
 function disableTouchBindings()
 {
-	if (activeDocHandlers["touchbindings"]){
-		$document.unbind("touchmove", handleTouchMove)
-			.unbind("touchend", handleTouchEnd)
-			.unbind("scroll", handleScroll);
-		activeDocHandlers["touchbindings"] = 0;
-	}
+	blockTouchTriggers = true;
 }
 
 function enableMouseBindings()
@@ -726,6 +705,10 @@ function handleTouchStart(event)
 
 function handleScroll(event)
 {
+	if (blockTouchTriggers){
+		return;
+	}
+
 	if (!didScroll){
 		triggerVirtualEvent("vmousecancel", event, getVirtualBindingFlags(event.target));
 	}
@@ -736,6 +719,10 @@ function handleScroll(event)
 
 function handleTouchMove(event)
 {
+	if (blockTouchTriggers){
+		return;
+	}
+
 	var t = getNativeEvent(event).touches[0];
 
 	var didCancel = didScroll,
@@ -753,6 +740,10 @@ function handleTouchMove(event)
 
 function handleTouchEnd(event)
 {
+	if (blockTouchTriggers){
+		return;
+	}
+
 	disableTouchBindings();
 
 	var flags = getVirtualBindingFlags(event.target);
@@ -833,7 +824,22 @@ function getSpecialEventObject(eventType)
 	
 				activeDocHandlers["touchstart"] = (activeDocHandlers["touchstart"] || 0) + 1;
 				if (activeDocHandlers["touchstart"] === 1) {
-					$document.bind("touchstart", handleTouchStart);
+					$document.bind("touchstart", handleTouchStart)
+
+						.bind("touchend", handleTouchEnd)
+					
+						// On touch platforms, touching the screen and then dragging your finger
+						// causes the window content to scroll after some distance threshold is
+						// exceeded. On these platforms, a scroll prevents a click event from being
+						// dispatched, and on some platforms, even the touchend is suppressed. To
+						// mimic the suppression of the click event, we need to watch for a scroll
+						// event. Unfortunately, some platforms like iOS don't dispatch scroll
+						// events until *AFTER* the user lifts their finger (touchend). This means
+						// we need to watch both scroll and touchmove events to figure out whether
+						// or not a scroll happenens before the touchend event is fired.
+					
+						.bind("touchmove", handleTouchMove)
+						.bind("scroll", handleScroll);			
 				}
 			}
 		},
@@ -853,7 +859,10 @@ function getSpecialEventObject(eventType)
 	
 				--activeDocHandlers["touchstart"];
 				if (!activeDocHandlers["touchstart"]) {
-					$document.unbind("touchstart", handleTouchStart);
+					$document.unbind("touchstart", handleTouchStart)
+						.unbind("touchmove", handleTouchMove)
+						.unbind("touchend", handleTouchEnd)
+						.unbind("scroll", handleScroll);
 				}
 			}
 
@@ -2031,8 +2040,9 @@ $.widget( "mobile.page", $.mobile.widget, {
 				return url.replace( /^#/, "" );
 			},
 
+			//remove the preceding hash, any query params, and dialog notations
 			cleanHash: function( hash ){
-				return path.stripHash( hash.replace( /\?.*$/, "" ) );
+				return path.stripHash( hash.replace( /\?.*$/, "" ).replace( dialogHashKey, "") );
 			},
 
 			//check whether a url is referencing the same domain, or an external domain or different protocol
@@ -2269,10 +2279,10 @@ $.widget( "mobile.page", $.mobile.widget, {
 	// changepage function
 	$.mobile.changePage = function( targetPage, transition, reverse, changeHash, fromHashChange, container){
 		//from is always the currently viewed page
-		var toIsArray = $.type(targetPage) === "array",
-			toIsObject = $.type(targetPage) === "object",
+		var toType = $.type(targetPage),
+			toIsArray = toType === "array",
+			toIsObject = toType === "object",
 			from = toIsArray ? targetPage[0] : $.mobile.activePage;
-
 			to = toIsArray ? targetPage[1] : targetPage;
 
 		var url = $.type(to) === "string" ? path.stripHash( to ) : "",
@@ -2281,7 +2291,7 @@ $.widget( "mobile.page", $.mobile.widget, {
 			type = 'get',
 			isFormRequest = false,
 			duplicateCachedPage = null,
-			currPage = urlHistory.getActive(),
+			active = urlHistory.getActive(),
 			back = false,
 			forward = false,
 			pageTitle = document.title;
@@ -2292,7 +2302,9 @@ $.widget( "mobile.page", $.mobile.widget, {
 		// If we are trying to transition to the same page that we are currently on ignore the request.
 		// an illegal same page request is defined by the current page being the same as the url, as long as there's history
 		// and to is not an array or object (those are allowed to be "same")
-		if( currPage && urlHistory.stack.length >= 1 && currPage.url === url && !toIsArray && !toIsObject ) {
+		if( urlHistory.stack.length > 0
+				&& active.page.jqmData("url") === url
+				&& !toIsArray && !toIsObject ) {
 			return;
 		}
 		else if(isPageTransitioning) {
@@ -2310,7 +2322,7 @@ $.widget( "mobile.page", $.mobile.widget, {
 				isBack: function(){
 					forward = !(back = true);
 					reverse = true;
-					transition = transition || currPage.transition;
+					transition = transition || active.transition;
 				},
 				isForward: function(){
 					forward = !(back = false);
@@ -2443,9 +2455,11 @@ $.widget( "mobile.page", $.mobile.widget, {
 
 				pageContainerClasses = [];
 			}
-
+			
+			//clear page loader
+			$.mobile.pageLoading( true );
+			
 			if(transition && (transition !== 'none')){
-			    $.mobile.pageLoading( true );
 				if( $.inArray(transition, perspectiveTransitions) >= 0 ){
 					addContainerClass('ui-mobile-viewport-perspective');
 				}
@@ -2469,7 +2483,6 @@ $.widget( "mobile.page", $.mobile.widget, {
 				});
 			}
 			else{
-			    $.mobile.pageLoading( true );
 			    if( from ){
 					from.removeClass( $.mobile.activePageClass );
 				}
@@ -4581,10 +4594,7 @@ $.widget( "mobile.listview", $.mobile.widget, {
 			$list.addClass( "ui-listview-inset ui-corner-all ui-shadow" );
 		}
 
-		this._itemApply( $list, $list );
-		
-		this.refresh( true );
-
+		this.refresh();
 	},
 
 	_itemApply: function( $list, item ) {
@@ -4596,8 +4606,7 @@ $.widget( "mobile.listview", $.mobile.widget, {
 
 		item.find( "p, dl" ).addClass( "ui-li-desc" );
 
-		var children = item.children();
-		children.filter("img:eq(0)").add(children.eq(0).children("img:eq(0)")).addClass( "ui-li-thumb" ).each(function() {
+		item.find("img:first-child:eq(0)").addClass( "ui-li-thumb" ).each(function() {
 			item.addClass( $(this).is( ".ui-li-icon" ) ? "ui-li-has-icon" : "ui-li-has-thumb" );
 		});
 
