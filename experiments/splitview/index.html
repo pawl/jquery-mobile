@@ -2,7 +2,8 @@
 <html> 
 	<head> 
 	<title>Jquery Mobile Splitview</title> 
-	<link rel="stylesheet" href="jquery.mobile-1.0beta-pre.css" />
+  <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+	<link rel="stylesheet" href="jquery.mobile-1.0a4.1.css" />
 	<link rel="stylesheet" href="jquery.mobile.splitview.css" />
   <link rel="stylesheet"  href="jquery.mobile.scrollview.css" /-->
 </head> 
@@ -16,7 +17,7 @@
       		<h1>Main</h1>
       	</div><!-- /header -->
 
-      	<div data-role="content"  data-scroll="true">	
+      	<div data-role="content">	
       		<ul data-role="listview" data-theme="g">
             <li>About
               <ul>
@@ -50,14 +51,16 @@
 
 
       <!-- Start of 2nd page -->
-      <div data-role="page" id="demo">
+      <div data-role="page" id="demo" data-default="a#default">
 
         <div data-role="header" data-backbtn="false">
           <h1>Demos</h1>
         </div><!-- /header -->
 
-        <div data-role="content"  data-scroll="true"> 
+        <div data-role="content"> 
           <ul data-role="listview" data-theme="g">
+            <li><a href="#bar" data-panel="main" id="default">Bar</a></li>
+            <li><a href="#badz" data-panel="main">badz</a></li>
             <li>First level list
               <ul>
                 <li>Second level list
@@ -95,8 +98,6 @@
                 <li><a href="#badz" data-panel="main">badz</a></li>
               </ul>
             </li>
-            <li><a href="#bar" data-panel="main">Bar</a></li>
-            <li><a href="#badz" data-panel="main">badz</a></li>
           </ul>
         </div><!-- /content -->
 
@@ -121,7 +122,7 @@
           <h1>About SplitView</h1>
         </div><!-- /header -->
 
-        <div data-role="content"  data-scroll="true"> 
+        <div data-role="content"> 
           <p>We first started to look into jQuery Mobile when had a project that needed us to build web applications that would work great on all platforms: Desktop, Tablets(iPad), and Mobile</p>
 
           <p>Although jQuery Mobile was still in alpha 1 at that time, we felt that it provided the most in terms of what we needed. so we set ahead trying to see if we could help others who had the same interest as we did: get it to work well on the Desktop/iPad - as a SplitView</p>
@@ -151,7 +152,7 @@
           <h1>About Us</h1>
         </div><!-- /header -->
 
-        <div data-role="content"  data-scroll="true"> 
+        <div data-role="content"> 
           <h3>CS8</h3>
           <p>We're a bunch of guys who love to code. Ruby on Rails, Wordpress, Drupal, and OpenERP - we love 'em all... and we'll soon be introducing our own open-source project, based on jQueryMobile, and Ruby on Rails.</p>
 
@@ -180,7 +181,7 @@
           <h1>Panels</h1>
         </div><!-- /header -->
 
-        <div data-role="content"  data-scroll="true"> 
+        <div data-role="content"> 
           <p>In order for splitview to work, we defined two more <b>&lt;div&gt;</b> tags to enclose the pages - one called 'main', the right hand panel, and 'menu' which is the left sidebar panel</p>
 
           <p>This provides us with a few advantages:</p>
@@ -215,7 +216,7 @@
           <h1>Orientation and Resize</h1>
         </div><!-- /header -->
 
-        <div data-role="content"  data-scroll="true"> 
+        <div data-role="content"> 
           <p>Very simply put, SplitView dynamically lays out the pages based on your tablet's (iPad, etc) orientation, as well as your desktop's screen size. Try it out, resize your browser, or turn your iPad to see it in portrait and landscape modes!</p>
 
           <p>NOTE: you may have to refresh the view if you scale the browser window down to a mobile size - less than 480px - Splitview determines upon page load if it should lay the pages out in splitview mode or mobile mode (the default jQmobile implementation)</p>
@@ -239,7 +240,7 @@
           <h1>Scrolling</h1>
         </div><!-- /header -->
 
-        <div data-role="content"  data-scroll="true"> 
+        <div data-role="content"> 
           <p>Splitview detects if your device is touch enabled or not. it will then implement the proper scrolling mechanism for your device. This is possible thanks to the jQuery Mobile team's experimental momentum scroll implementation, which the team promptly pointed us to. Thanks!
         </div><!-- /content -->
 
@@ -261,7 +262,7 @@
           <h1>Credits</h1>
         </div><!-- /header -->
 
-        <div data-role="content"  data-scroll="true"> 
+        <div data-role="content"> 
           <p>We could not have made Splitview possible without the work of the following folks:</p>
 
           <h3><a href="http://www.jquerymobile.com">The jQuery Mobile team</a></h3>
@@ -294,7 +295,7 @@
           <h1>Source@Github</h1>
         </div><!-- /header -->
 
-        <div data-role="content"  data-scroll="true"> 
+        <div data-role="content"> 
           <p>Get our source at our fork of jquery-mobile at github:<p>
 
           <p style="padding-left: 30px;"><a href="https://github.com/asyraf9/jquery-mobile/">https://github.com/asyraf9/jquery-mobile/</a></p>
@@ -324,7 +325,7 @@
           <h1>Bar</h1>
         </div><!-- /header -->
 
-        <div data-role="content"  data-scroll="true"> 
+        <div data-role="content"> 
           <p>I'm first in the source order so I'm shown as the page.</p>    
           <p><a href="#badz">Back to badz</a></p> 
         </div><!-- /content -->
@@ -348,7 +349,7 @@
           <h1>badz</h1>
         </div><!-- /header -->
 
-        <div data-role="content"  data-scroll="true"> 
+        <div data-role="content"> 
           <p>I'm first in the source order so I'm shown as the page.</p>
           <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque consectetur, ligula quis convallis gravida, tortor odio mattis purus, a fringilla mauris velit eu nisi. Vivamus laoreet tincidunt diam, sit amet tristique purus lobortis ac. Etiam commodo placerat elit. In aliquam dapibus felis, molestie molestie purus scelerisque sit amet. Donec vitae varius arcu. Aliquam dapibus dolor magna, nec posuere felis. Nullam in suscipit massa. Duis nec nulla nec urna sollicitudin fringilla. Proin at rutrum mi. Maecenas vitae urna ante, ac gravida tortor.</p>
 
@@ -380,7 +381,7 @@
   </body>
   <script type="text/javascript" src="jquery-1.5.2.min.js"></script>
   <script type="text/javascript" src="jquery.mobile.splitview.js"></script>
-  <script type="text/javascript" src="jquery.mobile-1.0beta-pre.js"></script>
+  <script type="text/javascript" src="jquery.mobile-1.0a4.1.js"></script>
   <script type="text/javascript" src="jquery.easing.1.3.js"></script>
   <script type="text/javascript" src="jquery.mobile.scrollview.js"></script>
 </html>

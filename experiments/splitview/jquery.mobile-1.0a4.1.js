@@ -1,5 +1,5 @@
 /*!
- * jQuery Mobile v1.0beta-pre
+ * jQuery Mobile v1.0a4.1
  * http://jquerymobile.com/
  *
  * Copyright 2010, jQuery Project
@@ -524,12 +524,9 @@ var dataPropertyName = "virtualMouseBindings",
 	resetTimerID = 0,
 	startX = 0,
 	startY = 0,
-	startScrollX = 0,
-	startScrollY = 0,
 	didScroll = false,
 	clickBlockList = [],
 	blockMouseTriggers = false,
-	scrollTopSupported = $.support.scrollTop,
 	eventCaptureSupported = $.support.eventCapture,
 	$document = $(document),
 	nextTouchID = 1,
@@ -569,10 +566,12 @@ function createVirtualEvent(event, eventType)
 	}
 	
 	if (t.search(/^touch/) !== -1){
-		var ne = getNativeEvent(oe);
-		if (typeof ne.touches !== "undefined" && ne.touches[0]){
-			var touch = ne.touches[0];
-			for (var i = 0; i < touchEventProps.length; i++){
+		var ne = getNativeEvent(oe),
+			t = ne.touches,
+			ct = ne.changedTouches,
+			touch = (t && t.length) ? t[0] : ((ct && ct.length) ? ct[0] : undefined);
+		if (touch){
+			for (var i = 0, len = touchEventProps.length; i < len; i++){
 				var prop = touchEventProps[i];
 				event[prop] = touch[prop];
 			}
@@ -719,11 +718,6 @@ function handleTouchStart(event)
 			startX = t.pageX;
 			startY = t.pageY;
 		
-			if (scrollTopSupported){
-				startScrollX = window.pageXOffset;
-				startScrollY = window.pageYOffset;
-			}
-		
 			triggerVirtualEvent("vmouseover", event, flags);
 			triggerVirtualEvent("vmousedown", event, flags);
 		}
@@ -747,7 +741,6 @@ function handleTouchMove(event)
 	var didCancel = didScroll,
 		moveThreshold = $.vmouse.moveDistanceThreshold;
 	didScroll = didScroll
-		|| (scrollTopSupported && (startScrollX !== window.pageXOffset || startScrollY !== window.pageYOffset))
 		|| (Math.abs(t.pageX - startX) > moveThreshold || Math.abs(t.pageY - startY) > moveThreshold);
 
 	var flags = getVirtualBindingFlags(event.target);
@@ -1028,7 +1021,7 @@ $.event.special.tap = {
 				function clearTapHandlers() {
 					touching = false;
 					clearTimeout(timer);
-					$(this).unbind("vmouseclick", clickHandler).unbind("vmousecancel", clearTapHandlers);
+					$this.unbind("vclick", clickHandler).unbind("vmousecancel", clearTapHandlers);
 				}
 				
 				function clickHandler(event) {
@@ -1999,14 +1992,29 @@ $.widget( "mobile.page", $.mobile.widget, {
 			//prefix a relative url with the current path
 			// TODO rename to reflect conditional functionality
 			makeAbsolute: function( url ){
-				// only create an absolute path when the hash can be used as one
-				return path.isPath(window.location.hash) ? path.get() + url : url;
+				var hash = window.location.hash,
+						isHashPath = path.isPath( hash );
+
+				if(path.isQuery( url )){
+					// if the path is a list of query params and the hash is a path
+					// append the query params to the paramless version of it.
+					// otherwise use the pathname and append the query params
+					return ( isHashPath ? path.cleanHash( hash ) : location.pathname ) + url;
+				}
+
+				// otherwise use the hash as the path prefix with the file and
+				// extension removed by path.get if it is indeed a path
+				return ( isHashPath ? path.get() : "" ) + url;
 			},
 
 			// test if a given url (string) is a path
 			// NOTE might be exceptionally naive
 			isPath: function( url ){
 				return /\//.test(url);
+			},
+
+			isQuery: function( url ){
+				return /^\?/.test(url);
 			},
 
 			//return a url path with the window's location protocol/hostname/pathname removed
@@ -2021,6 +2029,10 @@ $.widget( "mobile.page", $.mobile.widget, {
 			//just return the url without an initial #
 			stripHash: function( url ){
 				return url.replace( /^#/, "" );
+			},
+
+			cleanHash: function( hash ){
+				return path.stripHash( hash.replace( /\?.*$/, "" ) );
 			},
 
 			//check whether a url is referencing the same domain, or an external domain or different protocol
@@ -2193,12 +2205,20 @@ $.widget( "mobile.page", $.mobile.widget, {
 
 	//direct focus to the page title, or otherwise first focusable element
 	function reFocus( page ){
-		var pageTitle = page.find( ".ui-title:eq(0)" );
-		if( pageTitle.length ){
-			pageTitle.focus();
+		var lastClicked = page.jqmData( "lastClicked" );
+
+		if( lastClicked && lastClicked.length ){
+			lastClicked.focus();
 		}
-		else{
-			page.find( focusable ).eq(0).focus();
+		else {
+			var pageTitle = page.find( ".ui-title:eq(0)" );
+
+			if( pageTitle.length ){
+				pageTitle.focus();
+			}
+			else{
+				page.find( focusable ).eq(0).focus();
+			}
 		}
 	}
 
@@ -2247,13 +2267,13 @@ $.widget( "mobile.page", $.mobile.widget, {
 	$.mobile.allowCrossDomainPages = false;
 
 	// changepage function
-	$.mobile.changePage = function( to, transition, reverse, changeHash, fromHashChange ){
+	$.mobile.changePage = function( targetPage, transition, reverse, changeHash, fromHashChange, container){
 		//from is always the currently viewed page
-		var toIsArray = $.type(to) === "array",
-			toIsObject = $.type(to) === "object",
-			from = toIsArray ? to[0] : $.mobile.activePage;
+		var toIsArray = $.type(targetPage) === "array",
+			toIsObject = $.type(targetPage) === "object",
+			from = toIsArray ? targetPage[0] : $.mobile.activePage;
 
-			to = toIsArray ? to[1] : to;
+			to = toIsArray ? targetPage[1] : targetPage;
 
 		var url = $.type(to) === "string" ? path.stripHash( to ) : "",
 			fileUrl = url,
@@ -2265,12 +2285,14 @@ $.widget( "mobile.page", $.mobile.widget, {
 			back = false,
 			forward = false,
 			pageTitle = document.title;
+			
+		$.mobile.pageContainer=container? container : $.mobile.pageContainer;
 
 
 		// If we are trying to transition to the same page that we are currently on ignore the request.
 		// an illegal same page request is defined by the current page being the same as the url, as long as there's history
 		// and to is not an array or object (those are allowed to be "same")
-		if( currPage && urlHistory.stack.length > 1 && currPage.url === url && !toIsArray && !toIsObject ) {
+		if( currPage && urlHistory.stack.length >= 1 && currPage.url === url && !toIsArray && !toIsObject ) {
 			return;
 		}
 		else if(isPageTransitioning) {
@@ -2319,9 +2341,7 @@ $.widget( "mobile.page", $.mobile.widget, {
 		if(base){ base.reset(); }
 
 		//kill the keyboard
-		if( window.document.activeElement ){
-			$( window.document.activeElement || "" ).add( "input:focus, textarea:focus, select:focus" ).blur();
-		}
+		$( window.document.activeElement || "" ).add( "input:focus, textarea:focus, select:focus" ).blur();
 
 		function defaultTransition(){
 			if(transition === undefined){
@@ -2352,13 +2372,15 @@ $.widget( "mobile.page", $.mobile.widget, {
 
 			if( from ){
 				//set as data for returning to that spot
-				from.jqmData( "lastScroll", currScroll);
+				from
+					.jqmData( "lastScroll", currScroll)
+					.jqmData( "lastClicked", $activeClickedLink);
 				//trigger before show/hide events
 				from.data( "page" )._trigger( "beforehide", null, { nextPage: to } );
 			}
 			to.data( "page" )._trigger( "beforeshow", null, { prevPage: from || $("") } );
 
-			function loadComplete(){
+			function pageChangeComplete(){
 
 				if( changeHash !== false && url ){
 					//disable hash listening temporarily
@@ -2442,7 +2464,7 @@ $.widget( "mobile.page", $.mobile.widget, {
 					if( from ){
 						from.removeClass( $.mobile.activePageClass );
 					}
-					loadComplete();
+					pageChangeComplete();
 					removeContainerClasses();
 				});
 			}
@@ -2452,7 +2474,7 @@ $.widget( "mobile.page", $.mobile.widget, {
 					from.removeClass( $.mobile.activePageClass );
 				}
 				to.addClass( $.mobile.activePageClass );
-				loadComplete();
+				pageChangeComplete();
 			}
 		}
 
@@ -2642,6 +2664,11 @@ $.widget( "mobile.page", $.mobile.widget, {
 		event.preventDefault();
 	});
 
+	//add active state on vclick
+	$( "a" ).live( "vclick", function(){
+		$(this).closest( ".ui-btn" ).not( ".ui-disabled" ).addClass( $.mobile.activeBtnClass );
+	});
+
 
 	//click routing - direct to HTTP or Ajax, accordingly
 	$( "a" ).live( "click", function(event) {
@@ -2693,13 +2720,13 @@ $.widget( "mobile.page", $.mobile.widget, {
 
 		//prevent # urls from bubbling
 		//path.get() is replaced to combat abs url prefixing in IE
-		if( url.replace(path.get(), "") == "#"  ){
+		if( url.replace(path.get(), "") == "#" ){
 			//for links created purely for interaction - ignore
 			event.preventDefault();
 			return;
 		}
 
-		$activeClickedLink = $this.closest( ".ui-btn" ).addClass( $.mobile.activeBtnClass );
+		$activeClickedLink = $this.closest( ".ui-btn" );
 
 		if( isExternal || hasAjaxDisabled || hasTarget || !$.mobile.ajaxEnabled ||
 			// TODO: deprecated - remove at 1.0
@@ -2890,10 +2917,9 @@ $.fixedToolbars = (function(){
 		var page = $(event.target),
 			footer = page.find( ":jqmData(role='footer')" ),
 			id = footer.data('id'),
-			prevPage = ui.prevPage;
-		
-		prevFooter = prevPage && prevPage.find( ":jqmData(role='footer')" );
-		var prevFooterMatches = prevFooter.jqmData( "id" ) === id;
+			prevPage = ui.prevPage,
+			prevFooter = prevPage && prevPage.find( ":jqmData(role='footer')" ),
+			prevFooterMatches = prevFooter.length && prevFooter.jqmData( "id" ) === id;
 		
 		if( id && prevFooterMatches ){
 			stickyFooter = footer;
@@ -3148,8 +3174,10 @@ $.widget( "mobile.checkboxradio", $.mobile.widget, {
 	},
 
 	_updateAll: function(){
+		var self = this;
+
 		this._getInputSet().each(function(){
-			if( $(this).is(":checked") || this.inputtype === "checkbox" ){
+			if( $(this).is(":checked") || self.inputtype === "checkbox" ){
 				$(this).trigger("change");
 			}
 		})
@@ -4183,7 +4211,8 @@ $.widget( "mobile.slider", $.mobile.widget, {
 		this.handle
 			.bind( "vmousedown", function(){
 				$(this).focus();
-			});
+			})
+			.bind( "vclick", false );
 
 		this.handle
 			.bind( "keydown", function( event ) {
@@ -4458,15 +4487,16 @@ $.widget( "mobile.collapsible", $.mobile.widget, {
 		}
 					
 		collapsibleHeading
-			.bind("vclick", function(e){ 
-					if( collapsibleHeading.is('.ui-collapsible-heading-collapsed') ){
-						collapsibleContain.trigger('expand'); 
-					}	
-					else {
-						collapsibleContain.trigger('collapse'); 
-					}
-					e.preventDefault();
-				});
+			.bind("vmouseup", function(e){ 
+				if( collapsibleHeading.is('.ui-collapsible-heading-collapsed') ){
+					collapsibleContain.trigger('expand'); 
+				}	
+				else {
+					collapsibleContain.trigger('collapse'); 
+				}
+				e.preventDefault();
+			})
+			.bind("vclick",false );
 	}
 });
 })( jQuery );/*
@@ -4566,21 +4596,15 @@ $.widget( "mobile.listview", $.mobile.widget, {
 
 		item.find( "p, dl" ).addClass( "ui-li-desc" );
 
-		$list.find( "li" ).find( ">img:eq(0), >:first>img:eq(0)" ).addClass( "ui-li-thumb" ).each(function() {
-			$( this ).closest( "li" ).addClass( $(this).is( ".ui-li-icon" ) ? "ui-li-has-icon" : "ui-li-has-thumb" );
+		var children = item.children();
+		children.filter("img:eq(0)").add(children.eq(0).children("img:eq(0)")).addClass( "ui-li-thumb" ).each(function() {
+			item.addClass( $(this).is( ".ui-li-icon" ) ? "ui-li-has-icon" : "ui-li-has-thumb" );
 		});
 
-		var aside = item.find( ".ui-li-aside" );
-
-		if ( aside.length ) {
-            aside.each(function(i, el) {
-			    $(el).prependTo( $(el).parent() ); //shift aside to front for css float
-            });
-		}
-
-		if ( $.support.cssPseudoElement || !$.nodeName( item[0], "ol" ) ) {
-			return;
-		}
+		item.find( ".ui-li-aside" ).each(function() {
+			var $this = $(this);
+			$this.prependTo( $this.parent() ); //shift aside to front for css float
+		});
 	},
 	
 	_removeCorners: function(li){
@@ -4596,6 +4620,8 @@ $.widget( "mobile.listview", $.mobile.widget, {
 			$list = this.element,
 			self = this,
 			dividertheme = $list.jqmData( "dividertheme" ) || o.dividerTheme,
+			listsplittheme = $list.jqmData( "splittheme" ),
+			listspliticon = $list.jqmData( "spliticon" ),
 			li = $list.children( "li" ),
 			counter = $.support.cssPseudoElement || !$.nodeName( $list[0], "ol" ) ? 0 : 1;
 
@@ -4603,18 +4629,19 @@ $.widget( "mobile.listview", $.mobile.widget, {
 			$list.find( ".ui-li-dec" ).remove();
 		}
 
-		li.each(function( pos ) {
-			var item = $( this ),
+		var numli = li.length;
+		for (var pos = 0; pos < numli; pos++) {
+			var item = li.eq(pos),
 				itemClass = "ui-li";
 
 			// If we're creating the element, we update it regardless
 			if ( !create && item.hasClass( "ui-li" ) ) {
-				return;
+				continue;
 			}
 
 			var itemTheme = item.jqmData("theme") || o.theme;
 
-			var a = item.find( ">a" );
+			var a = item.children( "a" );
 				
 			if ( a.length ) {	
 				var icon = item.jqmData("icon");
@@ -4635,7 +4662,7 @@ $.widget( "mobile.listview", $.mobile.widget, {
 					itemClass += " ui-li-has-alt";
 
 					var last = a.last(),
-						splittheme = $list.jqmData( "splittheme" ) || last.jqmData( "theme" ) || o.splitTheme;
+						splittheme = listsplittheme || last.jqmData( "theme" ) || o.splitTheme;
 					
 					last
 						.appendTo(item)
@@ -4655,7 +4682,7 @@ $.widget( "mobile.listview", $.mobile.widget, {
 								corners: true,
 								theme: splittheme,
 								iconpos: "notext",
-								icon: $list.jqmData( "spliticon" ) || last.jqmData( "icon" ) ||  o.splitIcon
+								icon: listspliticon || last.jqmData( "icon" ) ||  o.splitIcon
 							} ) );
 				}
 
@@ -4721,7 +4748,7 @@ $.widget( "mobile.listview", $.mobile.widget, {
 			if ( !create ) {
 				self._itemApply( $list, item );
 			}
-		});
+		}
 	},
 	
 	//create a string for ID/subpage url creation
@@ -4734,6 +4761,7 @@ $.widget( "mobile.listview", $.mobile.widget, {
 			parentPage = parentList.closest( ".ui-page" ),
 			parentId = parentPage.jqmData( "url" ),
 			o = this.options,
+			dns = "data-" + $.mobile.ns,
 			self = this,
 			persistentFooterID = parentPage.find( ":jqmData(role='footer')" ).jqmData( "id" );
 
@@ -4746,14 +4774,12 @@ $.widget( "mobile.listview", $.mobile.widget, {
 				id = parentId + "&" + $.mobile.subPageUrlKey + "=" + self._idStringEscape(title + " " + i),
 				theme = list.jqmData( "theme" ) || o.theme,
 				countTheme = list.jqmData( "counttheme" ) || parentList.jqmData( "counttheme" ) || o.countTheme,
-				newPage = list.wrap( "<div data-" + $.mobile.ns + "role='page'><div data-" + $.mobile.ns + "role='content'></div></div>" )
+				newPage = list.detach()
+							.wrap( "<div " + dns + "role='page'" +  dns + "url='" + id + "' " + dns + "theme='" + theme + "' " + dns + "count-theme='" + countTheme + "'><div " + dns + "role='content'></div></div>" )
 							.parent()
-								.before( "<div data-" + $.mobile.ns + "role='header' data-" + $.mobile.ns + "theme='" + o.headerTheme + "'><div class='ui-title'>" + title + "</div></div>" )
-								.after( persistentFooterID ? $( "<div data-" + $.mobile.ns + "role='footer'  data-" + $.mobile.ns + "id='"+ persistentFooterID +"'>") : "" )
+								.before( "<div " + dns + "role='header' " + dns + "theme='" + o.headerTheme + "'><div class='ui-title'>" + title + "</div></div>" )
+								.after( persistentFooterID ? $( "<div " + dns + "role='footer' " + dns + "id='"+ persistentFooterID +"'>") : "" )
 								.parent()
-									.attr( "data-" + $.mobile.ns + "url", id )
-									.attr( "data-" + $.mobile.ns + "theme", theme )
-									.attr( "data-" + $.mobile.ns + "count-theme", countTheme )
 									.appendTo( $.mobile.pageContainer );
 
 				newPage.page();		
