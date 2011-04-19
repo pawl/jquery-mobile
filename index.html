@@ -30,6 +30,7 @@
                   <li><a href="#panels" data-panel="main">Panels</a></li>
                   <li><a href="#orientation" data-panel="main">Orientation</a></li>
                   <li><a href="#scroll" data-panel="main">Scroll</a></li>
+                  <li><a href="#context" data-panel="main">Context Loading</a></li>
               </ul>
             </li>
             <li><a href="#credits" data-panel="main">Credits</a></li>
@@ -132,6 +133,8 @@
           <p>There are still a lot of things to do, but we hope you enjoy using this plugin, and contribute back to it by reporting bugs, requesting features, and best of all, submitting your own code contributions. Thanks!</p>
         
           <p><b>NOTE:</b> keep in mind that I added some namespacing to event handlers in jQMobile core. use the version of jQuerymobile found in the experiments/splitview/ folder of my fork.</p>
+        
+
         </div><!-- /content -->
 
         <div data-role="footer" data-position="fixed" data-id="ew-footer">
@@ -304,7 +307,42 @@
 
           <p>To report bugs (and there are still a few of them!), file an issue under our fork of jquery-mobile at github. Thanks!</p>
         
-          <p><b>NOTE:</b> keep in mind that I added some namespacing to event handlers in jQMobile core. use the version of jQuerymobile found in the experiments/splitview/ folder of my fork.</p>
+          <p><b>NOTE:</b> keep in mind that I added some namespacing to event handlers in jQMobile core. use the version of jQuerymobile found in the experiments/compiled/ folder of my fork.</p>
+        </div><!-- /content -->
+
+        <div data-role="footer" data-position="fixed" data-id="ew-footer">
+          <div data-role="navbar">
+            <ul>
+              <li><a href="#main" class="ui-btn-active" data-transition="slideup">Main</a></li>
+              <li><a href="#demo" data-transition="slideup">Demos</a></li>
+            </ul>
+          </div><!-- /navbar -->
+          <h2>Engineworks &copy CS8</h2>
+        </div><!-- /footer -->
+      </div><!-- /page -->
+
+      <div data-role="page" id="context">
+
+        <div data-role="header">
+          <h1>Context Loading</h1>
+        </div><!-- /header -->
+
+        <div data-role="content"> 
+          <p>When you navigate on to some menus on the 'menu' panel, you'll find that it is more intuitive for users that the main panel also transitions to a related page. This is what we call context page loading<p>
+
+          <p>Splitview now supports this. you need to define a data-context attribute on the panel with a value of the selector of the link you'd like the main page to transition to. this link has to be inside the page that is transitioning into view in the menu panel, and it has to reference the main panel using the data-panel attribute. Example:</p>
+
+          <p style="padding-left:30px;"><b>data-context="a#default"</b></p>
+
+          <p>This will look for a link with id="default" on the newly transitioned page, and trigger a click event on it, changing the main panel to that page (<b>NOTE:</b> the link needs to refer to the main panel using the data-panel="main" attribute!)</p>
+
+          <p>To see this in action, click on the demo button at the bottom of the menu panel on the left</p>
+
+          <p>Also, you can also define a data-context attribute on a page itself - this will override any data-context attributes defined on the panels</p>
+
+          <p>There are still a few things i need to do to make sense of context for both pages, e.g. when hitting back on history, what happens etc, but they will have to wait for now :)</p>
+          
+          <p><b>ANOTHER NOTE:</b> To make this happen, I made some small changes to the changePage method in jQMobile core. use the version of jQuerymobile found in the experiments/compiled/ folder of my fork. It will not break any changePage calls you've made on your own js code</p>
         </div><!-- /content -->
 
         <div data-role="footer" data-position="fixed" data-id="ew-footer">
