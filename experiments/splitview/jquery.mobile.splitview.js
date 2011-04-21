@@ -1,7 +1,13 @@
 //ISSUE: activeBtnClass not removed when a new link is given this class - causing a lot of active buttons.
 (function($,window,undefined){
   $( window.document ).bind('mobileinit', function(){
+    //some class for css to detect touchscreens
+    if($.support.touch){
+      $('html').addClass('touch');
+    }
+
     if ($.mobile.media("screen and (min-width:480px)")) {
+      $('html').addClass('splitview');
       $('div[data-role="panel"]').addClass('ui-mobile-viewport');
       if( !$.mobile.hashListeningEnabled || !$.mobile.path.stripHash( location.hash ) ){
         var firstPage=$('div[data-id="main"] > div[data-role="page"]:first').page().addClass($.mobile.activePageClass) 
@@ -334,7 +340,7 @@
             pageDefaultSelector = $this.jqmData('context'),
             defaultSelector= pageDefaultSelector ? pageDefaultSelector : panelDefaultSelector;
         if(defaultSelector && $this.find(defaultSelector).length){
-          $(defaultSelector).trigger('click');
+          $this.find(defaultSelector).trigger('click');
         }
       });
 

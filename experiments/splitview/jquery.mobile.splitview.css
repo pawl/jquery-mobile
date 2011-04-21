@@ -17,15 +17,15 @@
   z-index: 100;
 }
 
-.min-width-480px body {
+.splitview.min-width-480px body {
   margin: 0;
 }
 
-.min-width-480px .ui-page{
+.splitview.min-width-480px .ui-page{
   bottom: 0;
 }
 
-.min-width-480px .ui-header {
+.splitview.min-width-480px .ui-header {
   position:absolute;
   top:0;
   bottom:auto; 
@@ -33,7 +33,7 @@
   right:0;
 }
 
-.min-width-480px .ui-footer {
+.splitview.min-width-480px .ui-footer {
   position:absolute;
   top:auto;
   bottom:0;
@@ -41,9 +41,9 @@
   right:0;
 }
 
-.min-width-480px .ui-content {
+.splitview.min-width-480px .ui-content {
   position:absolute;
-  top:40px;   /*TODO: need to dynamically set this and bottom when we use dynamic toolbars later*/
+  top:43px;   /*TODO: need to dynamically set this and bottom when we use dynamic toolbars later*/
   bottom:0;
   left:0;
   right:0;
