@@ -1,3 +1,7 @@
+body {
+  visibility: hidden;
+}
+
 .sticky-left {
   position:absolute;
   left:0;

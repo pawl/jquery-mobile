@@ -18,6 +18,7 @@
         $(document).unbind('.toolbar');
         $('.ui-page').die('.toolbar');
         $(window).trigger('orientationchange');
+        $('body').css('visibility','visible');
       });
 
 //----------------------------------------------------------------------------------
