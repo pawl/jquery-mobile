@@ -2,23 +2,27 @@ body {
   visibility: hidden;
 }
 
-.sticky-left {
+.ui-panel-left {
   position:absolute;
   left:0;
   top:0;
   bottom:0;
 }
 
-.sticky-right {
+.ui-panel-right {
   position:absolute;
   right:0;
   top:0;
   bottom:0;
 }
 
-.border-right {
+.ui-border-right {
   border-right: 1px solid;
   z-index: 100;
+}
+
+.splitview .ui-splitview-hidden {
+  display:none;
 }
 
 .splitview.min-width-480px body {
@@ -54,8 +58,10 @@ body {
   overflow: auto;
 }
 
-/*popover css for portrait orientation, modified from http://www.cagintranet.com/archive/create-an-ipad-like-dropdown-popover/
-*/
+/************************************************************************************************************
+popover css for portrait orientation, modified from 
+http://www.cagintranet.com/archive/create-an-ipad-like-dropdown-popover/
+************************************************************************************************************/
 .panel-popover .popover_triangle {left:25px;}
 .panel-popover {
   color: black;

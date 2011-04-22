@@ -11,7 +11,7 @@
       $('div[data-role="panel"]').addClass('ui-mobile-viewport');
       if( !$.mobile.hashListeningEnabled || !$.mobile.path.stripHash( location.hash ) ){
         var firstPage=$('div[data-id="main"] > div[data-role="page"]:first').page().addClass($.mobile.activePageClass) 
-        firstPage.children('div[data-role="footer"]').hide();
+        // firstPage.children('div[data-role="footer"]').hide();
         firstPage.children('div[data-role="content"]').attr('data-scroll', 'y');
       }
       $(function() {
@@ -231,12 +231,12 @@
 
         function popover(){
           $menu.addClass('panel-popover')
-               .removeClass('sticky-left border-right')
+               .removeClass('ui-panel-left ui-border-right')
                .css({'width':'25%', 'min-width':'250px', 'display':''});     
           if(!$menu.children('.popover_triangle').length){ 
             $menu.prepend('<div class="popover_triangle"></div>'); 
           }
-          $main.removeClass('sticky-right')
+          $main.removeClass('ui-panel-right')
                .css('width', '');
           popoverBtn($mainHeader);
 
@@ -249,10 +249,10 @@
 
         function splitView(){
           $menu.removeClass('panel-popover')
-               .addClass('sticky-left border-right')
+               .addClass('ui-panel-left ui-border-right')
                .css({'width':'25%', 'min-width':'250px', 'display':''});
           $menu.children('.popover_triangle').remove();
-          $main.addClass('sticky-right')
+          $main.addClass('ui-panel-right')
                .width(function(){
                  return $(window).width()-$('div[data-id="menu"]').width();  
                });
@@ -361,20 +361,6 @@
             $(".panel-popover").stop(true, true).hide(); 
             $('.popover-btn').removeClass($.mobile.activeBtnClass); 
         }; 
-      });
-
-      
-
-      //temporary toolbar mods to present better in tablet/desktop view
-      //TODO: API this so that people can specify using data- attributes how they want their toolbars displayed
-      //potential toolbar behaviour:
-      // 1) has a data-display="top, bottom, inline" attribute
-      // 2) 
-      $('div[data-id="menu"] div[data-role="page"]').live('pagebeforeshow.splitview', function() {
-        $(this).find('div[data-role="footer"] > h2').hide(); 
-      });
-      $('div[data-id="main"] div[data-role="page"]').live('pagebeforeshow.splitview', function() {
-        $(this).find('div[data-role="footer"]').hide();
       });
     }
   });
