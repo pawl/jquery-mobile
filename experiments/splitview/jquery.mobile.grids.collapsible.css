@@ -2,10 +2,8 @@
 /* ==================================================================================================================== */
 /* ! The 1140px Grid V2 by Andy Taylor \ http://cssgrid.net \ http://www.twitter.com/andytlr \ http://www.andytlr.com   */
 /* ==================================================================================================================== */
-.row {
+.row, .fixedrow {
 width: 100%;
-/*max-width: 1140px;
-min-width: 755px;*/
 margin: 0 auto;
 overflow: hidden;
 }

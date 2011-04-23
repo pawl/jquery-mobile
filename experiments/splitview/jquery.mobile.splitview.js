@@ -5,20 +5,17 @@
     if($.support.touch){
       $('html').addClass('touch');
     }
-
-    if ($.mobile.media("screen and (min-width:480px)")) {
+    if ($.mobile.media("screen and (min-width:480px)")||($.mobile.browser.ie && $(this).width() >= 480)) {
       $('html').addClass('splitview');
       $('div[data-role="panel"]').addClass('ui-mobile-viewport');
       if( !$.mobile.hashListeningEnabled || !$.mobile.path.stripHash( location.hash ) ){
         var firstPage=$('div[data-id="main"] > div[data-role="page"]:first').page().addClass($.mobile.activePageClass) 
-        // firstPage.children('div[data-role="footer"]').hide();
         firstPage.children('div[data-role="content"]').attr('data-scroll', 'y');
       }
       $(function() {
         $(document).unbind('.toolbar');
         $('.ui-page').die('.toolbar');
         $(window).trigger('orientationchange');
-        $('body').css('visibility','visible');
       });
 
 //----------------------------------------------------------------------------------

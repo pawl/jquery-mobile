@@ -2,6 +2,10 @@ body {
   visibility: hidden;
 }
 
+.ui-mobile body {
+  visibility: visible;
+}
+
 .ui-panel-left {
   position:absolute;
   left:0;
@@ -51,7 +55,7 @@ body {
 
 .splitview.min-width-480px .ui-content {
   position:absolute;
-  top:43px;   /*TODO: need to dynamically set this and bottom when we use dynamic toolbars later*/
+  top:40px;   /*TODO: need to dynamically set this and bottom when we use dynamic toolbars later*/
   bottom:0;
   left:0;
   right:0;
