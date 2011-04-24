@@ -216,15 +216,22 @@
         function popoverBtn(header) {
           if(!header.children('.popover-btn').length){
             if(header.children('a.ui-btn-left').length){
-              header.children('a.ui-btn-left').replaceWith('<a class="popover-btn">Navigation</a>');
+              header.children('a.ui-btn-left').replaceWith('<a class="popover-btn">Menu</a>');
               header.children('a.popover-btn').addClass('ui-btn-left').buttonMarkup();
             }
             else{
-              header.prepend('<a class="popover-btn">Navigation</a>');
+              header.prepend('<a class="popover-btn">Menu</a>');
               header.children('a.popover-btn').addClass('ui-btn-left').buttonMarkup()          
             }
           }
         }
+
+        function replaceBackBtn(header) {
+          if($.mobile.urlstack.length > 1 && !header.children('a:jqmData(rel="back")').length){ 
+            header.prepend("<a href='#' class='ui-btn-left' data-"+ $.mobile.ns +"rel='back' data-"+ $.mobile.ns +"icon='arrow-l'>Back</a>" );
+            header.children('a:jqmData(rel="back")').buttonMarkup();
+          }
+        };
 
         function popover(){
           $menu.addClass('panel-popover')
@@ -254,11 +261,14 @@
                  return $(window).width()-$('div[data-id="menu"]').width();  
                });
           $mainHeader.children('.popover-btn').remove();
+          
+          replaceBackBtn($mainHeader);
 
           $main.undelegate('div[data-role="page"]', 'pagebeforeshow.popover');
           $main.delegate('div[data-role="page"]', 'pagebeforeshow.splitview', function(){
             var $thisHeader=$(this).children('div[data-role="header"]');
             $thisHeader.children('.popover-btn').remove();
+            replaceBackBtn($thisHeader);
           });
 
         }
