@@ -40,22 +40,21 @@
 				path.origin = path.get( location.protocol + '//' + location.host + location.pathname );
 			},
 
-			//prefix a relative url with the current path
-			// TODO rename to reflect conditional functionality
+			// prefix a relative url with the current path
+			// TODO force old relative deeplinks into new absolute path
 			makeAbsolute: function( url ){
-				var hash = window.location.hash,
-						isHashPath = path.isPath( hash );
+				var isHashPath = path.isPath( location.hash );
 
 				if(path.isQuery( url )){
 					// if the path is a list of query params and the hash is a path
-					// append the query params to the paramless version of it.
+					// append the query params to the hash (without params or dialog keys).
 					// otherwise use the pathname and append the query params
-					return ( isHashPath ? path.cleanHash( hash ) : location.pathname ) + url;
+					return ( isHashPath ? path.cleanHash( location.hash ) : location.pathname ) + url;
 				}
 
-				// otherwise use the hash as the path prefix with the file and
-				// extension removed by path.get if it is indeed a path
-				return ( isHashPath ? path.get() : "" ) + url;
+				// If the hash is a path, even if its not absolute, use it to prepend to the url
+				// otherwise use the path with the trailing segement removed
+				return ( isHashPath ? path.get() : path.get( location.pathname ) ) + url;
 			},
 
 			// test if a given url (string) is a path
@@ -70,10 +69,9 @@
 
 			//return a url path with the window's location protocol/hostname/pathname removed
 			clean: function( url ){
-				// Replace the protocol, host, and pathname only once at the beginning of the url to avoid
+				// Replace the protocol host only once at the beginning of the url to avoid
 				// problems when it's included as a part of a param
-				// Also, since all urls are absolute in IE, we need to remove the pathname as well.
-				var leadingUrlRootRegex = new RegExp("^" + location.protocol + "//" + location.host + location.pathname);
+				var leadingUrlRootRegex = new RegExp("^" + location.protocol + "//" + location.host );
 				return url.replace(leadingUrlRootRegex, "");
 			},
 
@@ -461,8 +459,7 @@
 
 				//jump to top or prev scroll, sometimes on iOS the page has not rendered yet.  I could only get by this with a setTimeout, but would like to avoid that.
 				$.mobile.silentScroll( to.jqmData( "lastScroll" ) );
-
-				reFocus( to );
+				$(document).one("silentscroll", function(){ reFocus( to ); });
 
 				//trigger show/hide events
 				if( from ){
@@ -497,10 +494,10 @@
 
 				pageContainerClasses = [];
 			}
-			
+
 			//clear page loader
 			$.mobile.pageLoading( true );
-			
+
 			if(transition && (transition !== 'none')){
 				if( $.inArray(transition, perspectiveTransitions) >= 0 ){
 					addContainerClass('ui-mobile-viewport-perspective');
@@ -719,19 +716,40 @@
 		event.preventDefault();
 	});
 
+	function findClosestLink(ele)
+	{
+		while (ele){
+			if (ele.nodeName.toLowerCase() == "a"){
+				break;
+			}
+			ele = ele.parentNode;
+		}
+		return ele;
+	}
+
 	//add active state on vclick
-	$( "a" ).live( "vclick", function(){
-		$(this).closest( ".ui-btn" ).not( ".ui-disabled" ).addClass( $.mobile.activeBtnClass );
+	$( document).bind( "vclick", function(event){
+		var link = findClosestLink(event.target);
+		if (link){
+			var  url = path.clean(link.getAttribute("href") || "#");
+			if (url !== "#" && url.replace(path.get(), "") !== "#"){
+				$(link).closest( ".ui-btn" ).not( ".ui-disabled" ).addClass( $.mobile.activeBtnClass );
+			}
+		}
 	});
 
 
 	//click routing - direct to HTTP or Ajax, accordingly
-	$( "a" ).live( "click", function(event) {
+	$( document ).bind( "click", function(event) {
+		var link = findClosestLink(event.target);
+		if (!link){
+			return;
+		}
 
-		var $this = $(this),
+		var $link = $(link),
 
 			//get href, if defined, otherwise fall to null #
-			href = $this.attr( "href" ) || "#",
+			href = $link.attr( "href" ) || "#",
 
 			//cache a check for whether the link had a protocol
 			//if this is true and the link was same domain, we won't want
@@ -743,7 +761,7 @@
 			url = path.clean( href ),
 
 			//rel set to external
-			isRelExternal = $this.is( "[rel='external']" ),
+			isRelExternal = $link.is( "[rel='external']" ),
 
 			//rel set to external
 			isEmbeddedPage = path.isEmbeddedPage( url ),
@@ -762,13 +780,13 @@
 			isExternal = (path.isExternal(url) && !isCrossDomainPageLoad) || (isRelExternal && !isEmbeddedPage),
 
 			//if target attr is specified we mimic _blank... for now
-			hasTarget = $this.is( "[target]" ),
+			hasTarget = $link.is( "[target]" ),
 
 			//if data-ajax attr is set to false, use the default behavior of a link
-			hasAjaxDisabled = $this.is( ":jqmData(ajax='false')" );
+			hasAjaxDisabled = $link.is( ":jqmData(ajax='false')" );
 
 		//if there's a data-rel=back attr, go back in history
-		if( $this.is( ":jqmData(rel='back')" ) ){
+		if( $link.is( ":jqmData(rel='back')" ) ){
 			window.history.back();
 			return false;
 		}
@@ -781,7 +799,7 @@
 			return;
 		}
 
-		$activeClickedLink = $this.closest( ".ui-btn" );
+		$activeClickedLink = $link.closest( ".ui-btn" );
 
 		if( isExternal || hasAjaxDisabled || hasTarget || !$.mobile.ajaxEnabled ||
 			// TODO: deprecated - remove at 1.0
@@ -794,14 +812,14 @@
 		}
 
 		//use ajax
-		var transition = $this.jqmData( "transition" ),
-			direction = $this.jqmData("direction"),
+		var transition = $link.jqmData( "transition" ),
+			direction = $link.jqmData("direction"),
 			reverse = (direction && direction === "reverse") ||
 			// deprecated - remove by 1.0
-			$this.jqmData( "back" );
+			$link.jqmData( "back" );
 
 		//this may need to be more specific as we use data-rel more
-		nextPageRole = $this.attr( "data-" + $.mobile.ns + "rel" );
+		nextPageRole = $link.attr( "data-" + $.mobile.ns + "rel" );
 
 		//if it's a relative href, prefix href with base url
 		if( path.isRelative( url ) && !hadProtocol ){
@@ -810,7 +828,7 @@
 
 		url = path.stripHash( url );
 
-		$.mobile.changePage( url, transition, reverse);
+		$.mobile.changePage( url, transition, reverse );
 		event.preventDefault();
 	});
 
