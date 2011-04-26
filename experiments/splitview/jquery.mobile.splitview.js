@@ -99,13 +99,13 @@
           //if link refers to a page on another panel, changePage on that panel
           else if ($targetPanel && $targetPanel!=$this.parents('div[data-role="panel"]')) {
             var from=$targetPanelActivePage;
-            $.mobile.pageContainer=$targetContainer;
+            // $.mobile.pageContainer=$targetContainer;
             $.mobile.changePage([from,url], transition, reverse, true, undefined, $targetContainer);
           }
           //if link refers to a page inside the same panel, changePage on that panel 
           else {
             var from=$currPanelActivePage;
-            $.mobile.pageContainer=$currPanel;
+            // $.mobile.pageContainer=$currPanel;
             var hashChange= (hash == 'false' || hash == 'crumbs')? false : true;
             $.mobile.changePage([from,url], transition, reverse, hashChange, undefined, $currPanel);
             //active page must always point to the active page in main - for history purposes.
@@ -139,7 +139,7 @@
 
         //temporarily put this here- eventually shud just set it immediately instead of an interim var.
         $.mobile.activePage=$currPanelActivePage;
-        $.mobile.pageContainer=$currPanel;
+        // $.mobile.pageContainer=$currPanel;
         $.mobile.changePage({
             url: url,
             type: type || "get",
@@ -147,7 +147,8 @@
           },
           undefined,
           undefined,
-          true
+          true,
+          $currPanel
         );
         event.preventDefault();
       });
@@ -194,15 +195,15 @@
           if (!$('div.ui-page-active').length) {
             $.mobile.changePage($menuPanelFirstPage, transition, true, false, true);
           }
-          $.mobile.pageContainer=$mainPanel;
+          // $.mobile.pageContainer=$mainPanel;
           $.mobile.activePage=$mainPanelActivePage.length? $mainPanelActivePage : undefined;
-          $.mobile.changePage(to, transition, undefined, false, true );
+          $.mobile.changePage(to, transition, undefined, false, true, $mainPanel );
         }
         //there's no hash, go to the first page in the main panel.
         else {
-          $.mobile.pageContainer=$mainPanel;
+          // $.mobile.pageContainer=$mainPanel;
           $.mobile.activePage=$mainPanelActivePage? $mainPanelActivePage : undefined;
-          $.mobile.changePage($mainPanelFirstPage, transition, undefined, false, true ); 
+          $.mobile.changePage($mainPanelFirstPage, transition, undefined, false, true, $mainPanel ); 
         }
       });
 

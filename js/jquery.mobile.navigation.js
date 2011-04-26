@@ -338,7 +338,7 @@
 			forward = false,
 			pageTitle = document.title;
 			
-		$.mobile.pageContainer=container? container : $.mobile.pageContainer;
+		$.mobile.pageContainer= container ? $.mobile.pageContainer : container;
 
 
 		// If we are trying to transition to the same page that we are currently on ignore the request.
