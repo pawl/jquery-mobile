@@ -414,7 +414,7 @@
         } 
       });
 
-      $('body').live('vclick', function(event) { 
+      $('body').live('click', function(event) { 
         if (!$(event.target).closest('.panel-popover').length && !$(event.target).closest('.popover-btn').length) { 
             $(".panel-popover").stop(true, true).hide(); 
             $('.popover-btn').removeClass($.mobile.activeBtnClass); 
