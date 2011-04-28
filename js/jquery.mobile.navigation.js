@@ -334,9 +334,12 @@
 			active = urlHistory.getActive(),
 			back = false,
 			forward = false,
-			pageTitle = document.title;
+			pageTitle = document.title,
+			//Test to see if an array is passed for targetPage and if the from and to in the array are the same - this means 
+			//that it is an intentional call to changePage for a page refresh
+			isPageRefresh = (toIsArray && from == to) ? true : false;
 			
-		$.mobile.pageContainer= container ? $.mobile.pageContainer : container;
+		$.mobile.pageContainer= container === undefined ? $.mobile.pageContainer : container;
 
 
 		// If we are trying to transition to the same page that we are currently on ignore the request.
@@ -564,7 +567,7 @@
 		defaultTransition();
 
 		// find the "to" page, either locally existing in the dom or by creating it through ajax
-		if ( to.length && !isFormRequest ) {
+		if ( to.length && !isFormRequest && !isPageRefresh ) {
 			if( fileUrl && base ){
 				base.set( fileUrl );
 			}
