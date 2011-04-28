@@ -278,7 +278,7 @@
         }
 
         function replaceBackBtn(header) {
-          if($.mobile.urlstack.length > 1 && !header.children('a:jqmData(rel="back")').length){ 
+          if($.mobile.urlstack.length > 1 && !header.children('a:jqmData(rel="back")').length && header.jqmData('backbtn')!=false){ 
             header.prepend("<a href='#' class='ui-btn-left' data-"+ $.mobile.ns +"rel='back' data-"+ $.mobile.ns +"icon='arrow-l'>Back</a>" );
             header.children('a:jqmData(rel="back")').buttonMarkup();
           }
