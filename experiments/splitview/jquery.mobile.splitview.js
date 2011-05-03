@@ -198,6 +198,7 @@
           undefined,
           undefined,
           true,
+          false,
           $currPanel
         );
         event.preventDefault();
