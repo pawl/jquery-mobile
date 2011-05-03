@@ -559,7 +559,9 @@
 		} else {
 
 			//if to exists in DOM, save a reference to it in duplicateCachedPage for removal after page change
-			if( to.length ){
+			//unless method is post - which in REST case it has a url that is the same as a URL that lists all of a resource
+			//but upon creation of a new record, you want to point to that particular record after the fact. 
+			if( to.length && type != 'post'){
 				duplicateCachedPage = to;
 			}
 

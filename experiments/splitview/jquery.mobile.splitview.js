@@ -167,7 +167,7 @@
 
       //DONE: bind form submit with this plugin
       $("form").die('submit');
-      $("form").live('submit', function(){
+      $("form").live('submit', function(event){
         if( !$.mobile.ajaxEnabled ||
           //TODO: deprecated - remove at 1.0
           !$.mobile.ajaxFormsEnabled ||

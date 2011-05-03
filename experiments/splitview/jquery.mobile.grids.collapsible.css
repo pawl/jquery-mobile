@@ -14,51 +14,51 @@ float: left;
 min-height: 1px;
 }
 
-.row .onecol {
+.row .onecol, .fixedrow .onecol {
 width: 4.85%;
 }
 
-.row .twocol {
+.row .twocol, .fixedrow .twocol {
 width: 13.45%;
 }
 
-.row .threecol {
+.row .threecol, .fixedrow .threecol {
 width: 22.05%;
 }
 
-.row .fourcol {
+.row .fourcol, .fixedrow .fourcol {
 width: 30.75%;
 }
 
-.row .fivecol {
+.row .fivecol, .fixedrow .fivecol {
 width: 39.45%;
 }
 
-.row .sixcol {
+.row .sixcol, .fixedrow .sixcol {
 width: 48%;
 }
 
-.row .sevencol {
+.row .sevencol, .fixedrow .sevencol {
 width: 56.75%;
 }
 
-.row .eightcol {
+.row .eightcol, .fixedrow .eightcol {
 width: 65.4%;
 }
 
-.row .ninecol {
+.row .ninecol, .fixedrow .ninecol {
 width: 74.05%;
 }
 
-.row .tencol {
+.row .tencol, .fixedrow .tencol {
 width: 82.7%;
 }
 
-.row .elevencol {
+.row .elevencol, .fixedrow .elevencol {
 width: 91.35%;
 }
 
-.row .twelvecol {
+.row .twelvecol, .fixedrow .twelvecol {
 width: 100%;
 float: left;
 }
