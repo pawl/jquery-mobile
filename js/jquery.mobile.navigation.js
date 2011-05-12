@@ -590,6 +590,7 @@
 					// correct url. loading into a temprorary element makes these requests immediately
 					if(pageElemRegex.test(html) && RegExp.$1 && dataUrlRegex.test(RegExp.$1) && RegExp.$1) {
 						redirectLoc = RegExp.$1;
+						
 					}
 
 					if( redirectLoc ){

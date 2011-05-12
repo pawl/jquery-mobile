@@ -1,4 +1,3 @@
-//ISSUE: activeBtnClass not removed when a new link is given this class - causing a lot of active buttons.
 (function($,window,undefined){
   $( window.document ).bind('mobileinit', function(){
     //some class for css to detect touchscreens
@@ -7,14 +6,14 @@
     }
     if ($.mobile.media("screen and (min-width:480px)")||($.mobile.browser.ie && $(this).width() >= 480)) {
       $('html').addClass('splitview');
-      $('div[data-role="panel"]').addClass('ui-mobile-viewport');
-      if( !$.mobile.hashListeningEnabled || !$.mobile.path.stripHash( location.hash ) ){
-        var firstPage=$('div[data-id="main"] > div[data-role="page"]:first').page().addClass($.mobile.activePageClass) 
-        firstPage.children('div[data-role="content"]').attr('data-scroll', 'y');
-      }
       $(function() {
         $(document).unbind('.toolbar');
         $('.ui-page').die('.toolbar');
+        $('div[data-role="panel"]').addClass('ui-mobile-viewport');
+        if( !$.mobile.hashListeningEnabled || !$.mobile.path.stripHash( location.hash ) ){
+          var firstPage=$('div[data-id="main"] > div[data-role="page"]:first').page().addClass($.mobile.activePageClass); 
+          firstPage.children('div[data-role="content"]').attr('data-scroll', 'y');
+        }
         $(window).trigger('orientationchange');
       });
 
@@ -138,7 +137,7 @@
         //if link refers to an already active panel, stop default action and return
         if ($targetPanelActivePage.attr('data-url') == url || $currPanelActivePage.attr('data-url') == url) {
           if (isRefresh) { //then changePage below because it's a pageRefresh request
-            $.mobile.changePage([url,url], transition, reverse, false, undefined, $targetContainer );
+            $.mobile.changePage([$(':jqmData(url="'+url+'")'),url], 'fade', reverse, false, undefined, $targetContainer );
           }
           else { //else preventDefault and return
             event.preventDefault();
@@ -279,7 +278,7 @@
         }
 
         function replaceBackBtn(header) {
-          if($.mobile.urlstack.length > 1 && !header.children('a:jqmData(rel="back")').length && header.jqmData('backbtn')!=false){ 
+          if($.mobile.urlstack.length > 0 && !header.children('a:jqmData(rel="back")').length && header.jqmData('backbtn')!=false){ 
             header.prepend("<a href='#' class='ui-btn-left' data-"+ $.mobile.ns +"rel='back' data-"+ $.mobile.ns +"icon='arrow-l'>Back</a>" );
             header.children('a:jqmData(rel="back")').buttonMarkup();
           }
@@ -383,7 +382,7 @@
       $('div[data-role="page"]').live('pagebeforeshow.crumbs', function(event, data){
         var $this = $(this),
             backBtn = $this.find('a[data-rel="back"]');
-        if (backBtn.length && ($this.data('hash') == 'crumbs' || $this.parents('div[data-role="panel"]').data('hash') == 'crumbs')) {
+        if (backBtn.length && ($this.data('hash') == 'crumbs' || $this.parents('div[data-role="panel"]').data('hash') == 'crumbs') && $.mobile.urlstack.length > 0) {
           backBtn.removeAttr('data-rel')
                  .attr('href','#'+data.prevPage.attr('data-url'))
                  .jqmData('direction','reverse')
@@ -392,15 +391,15 @@
         }
       });
 
-      //data-default handler - a page with a link that has a data-default attribute will load that page after this page loads
+      //data-context handler - a page with a link that has a data-context attribute will load that page after this page loads
       //this still needs work - pageTransitionQueue messes everything up.
       $('div:jqmData(role="page")').live('pageshow.context', function(){
         var $this=$(this),
-            panelDefaultSelector = $this.parents('div[data-role="panel"]').jqmData('context'),
-            pageDefaultSelector = $this.jqmData('context'),
-            defaultSelector= pageDefaultSelector ? pageDefaultSelector : panelDefaultSelector;
-        if(defaultSelector && $this.find(defaultSelector).length){
-          $this.find(defaultSelector).trigger('click', true);
+            panelContextSelector = $this.parents('div[data-role="panel"]').jqmData('context'),
+            pageContextSelector = $this.jqmData('context'),
+            contextSelector= pageContextSelector ? pageContextSelector : panelContextSelector;
+        if(contextSelector && $this.find(contextSelector).length){
+          $this.find(contextSelector).trigger('click', true);
         }
       });
 
