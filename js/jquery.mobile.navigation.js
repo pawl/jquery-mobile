@@ -335,7 +335,7 @@
 	$.mobile.allowCrossDomainPages = false;
 
 	// changepage function
-	$.mobile.changePage = function( targetPage, transition, reverse, changeHash, fromHashChange, container){
+	$.mobile.changePage = function( targetPage, transition, reverse, changeHash, fromHashChange, container, refresh){
 		//from is always the currently viewed page
 		var toType = $.type(targetPage),
 			toIsArray = toType === "array",
@@ -355,7 +355,7 @@
 			pageTitle = document.title,
 			//Test to see if an array is passed for targetPage and if the from and to in the array are the same - this means 
 			//that it is an intentional call to changePage for a page refresh
-			isPageRefresh = (toIsArray && from == to) ? true : false;
+			isPageRefresh = refresh === undefined ? false : refresh;
 			
 		$.mobile.pageContainer= container === undefined ? $.mobile.pageContainer : container;
 
