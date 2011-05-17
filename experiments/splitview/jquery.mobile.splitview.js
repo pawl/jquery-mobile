@@ -33,7 +33,7 @@
         return ele;
       }
 
-      $(document).unbind("click");
+      $(document).unbind(".linkhandler");
       $(document).bind( "click", function(event, isRefresh) {
         var link = findClosestLink(event.target);
         if (!link){
