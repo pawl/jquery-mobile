@@ -33,8 +33,8 @@
         return ele;
       }
 
-      $(document).unbind("click");
-      $(document).bind( "click", function(event, isRefresh) {
+      $(document).unbind(".linkhandler");
+      $(document).bind( "click", function(event) {
         var link = findClosestLink(event.target);
         if (!link){
           return;
@@ -79,6 +79,7 @@
           //if data-ajax attr is set to false, use the default behavior of a link
           hasAjaxDisabled = $link.is(":jqmData(ajax='false')"),
 
+          isRefresh=$link.jqmData('refresh'),
           $targetPanel=$link.jqmData('panel'),
           $targetContainer=$('div:jqmData(id="'+$targetPanel+'")'),
           $targetPanelActivePage=$targetContainer.children('div.'+$.mobile.activePageClass),
@@ -103,7 +104,9 @@
           return;
         }
 
-        $activeClickedLink = $link.closest( ".ui-btn" );
+        //still need this hack apparently:
+        $('.ui-btn.'+$.mobile.activeBtnClass).removeClass($.mobile.activeBtnClass);
+        $activeClickedLink = $link.closest( ".ui-btn" ).addClass($.mobile.activeBtnClass);
 
         if( isExternal || hasAjaxDisabled || hasTarget || !$.mobile.ajaxEnabled ||
           // TODO: deprecated - remove at 1.0
@@ -137,7 +140,7 @@
         //if link refers to an already active panel, stop default action and return
         if ($targetPanelActivePage.attr('data-url') == url || $currPanelActivePage.attr('data-url') == url) {
           if (isRefresh) { //then changePage below because it's a pageRefresh request
-            $.mobile.changePage([$(':jqmData(url="'+url+'")'),url], 'fade', reverse, false, undefined, $targetContainer );
+            $.mobile.changePage([$(':jqmData(url="'+url+'")'),url], 'fade', reverse, false, undefined, $targetContainer, isRefresh );
           }
           else { //else preventDefault and return
             event.preventDefault();
@@ -398,8 +401,15 @@
             panelContextSelector = $this.parents('div[data-role="panel"]').jqmData('context'),
             pageContextSelector = $this.jqmData('context'),
             contextSelector= pageContextSelector ? pageContextSelector : panelContextSelector;
-        if(contextSelector && $this.find(contextSelector).length){
-          $this.find(contextSelector).trigger('click', true);
+        //if you pass a hash into data-context, you need to specify panel, url and a boolean value for refresh
+        if $.type(contextSelector) === 'object' {
+          var $targetContainer=$(':jqmData(id="'+contextSelector.panel'")'),
+              $targetPanelActivePage==$targetContainer.children('div.'+$.mobile.activePageClass),
+              isRefresh = contextSelector.refresh === undefined ? false : contextSelector.refresh;
+          $.mobile.changePage([$targetPanelActivePage, contextSelector.url],'fade', reverse, false, undefined, $targetContainer, isRefresh);
+        }
+        else if(contextSelector && $this.find(contextSelector).length){
+          $this.find(contextSelector).trigger('click');
         }
       });
 
