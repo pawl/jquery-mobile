@@ -25,18 +25,9 @@
 	//add mobile, initial load "rendering" classes to docEl
 	$html.addClass( "ui-mobile ui-mobile-rendering" );
 
-	//define & prepend meta viewport tag, if content is defined
-	//NOTE: this is now deprecated. We recommend placing the meta viewport element in
-	//the markup from the start.
-	$.mobile.metaViewportContent && !$head.find( "meta[name='viewport']" ).length ? $( "<meta>", { name: "viewport", content: $.mobile.metaViewportContent}).prependTo( $head ) : undefined;
-
 	//loading div which appears during Ajax requests
 	//will not appear if $.mobile.loadingMessage is false
 	var $loader = $.mobile.loadingMessage ?		$( "<div class='ui-loader ui-body-a ui-corner-all'>" + "<span class='ui-icon ui-icon-loading spin'></span>" + "<h1>" + $.mobile.loadingMessage + "</h1>" + "</div>" )	: undefined;
-
-	if(typeof $loader === "undefined"){
-		alert($.mobile.loadingMessage);
-	}
 
 	$.extend($.mobile, {
 		// turn on/off page loading message.
@@ -46,11 +37,6 @@
 			} else {
 				if( $.mobile.loadingMessage ){
 					var activeBtn = $( "." + $.mobile.activeBtnClass ).first();
-
-
-					if(typeof $loader === "undefined"){
-						 alert($.mobile.loadingMessage);
-					}
 
 					$loader
 						.appendTo( $.mobile.pageContainer )
