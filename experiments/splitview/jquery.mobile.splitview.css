@@ -25,6 +25,10 @@ body {
   z-index: 100;
 }
 
+.ui-crumbs {
+  max-width: 25%;
+}
+
 .splitview .ui-splitview-hidden {
   display:none;
 }

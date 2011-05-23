@@ -402,9 +402,9 @@
             pageContextSelector = $this.jqmData('context'),
             contextSelector= pageContextSelector ? pageContextSelector : panelContextSelector;
         //if you pass a hash into data-context, you need to specify panel, url and a boolean value for refresh
-        if $.type(contextSelector) === 'object' {
-          var $targetContainer=$(':jqmData(id="'+contextSelector.panel'")'),
-              $targetPanelActivePage==$targetContainer.children('div.'+$.mobile.activePageClass),
+        if($.type(contextSelector) === 'object') {
+          var $targetContainer=$(':jqmData(id="'+contextSelector.panel+'")'),
+              $targetPanelActivePage=$targetContainer.children('div.'+$.mobile.activePageClass),
               isRefresh = contextSelector.refresh === undefined ? false : contextSelector.refresh;
           $.mobile.changePage([$targetPanelActivePage, contextSelector.url],'fade', reverse, false, undefined, $targetContainer, isRefresh);
         }
