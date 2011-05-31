@@ -442,8 +442,10 @@
 
       $('div:jqmData(role="page")').live('pageshow.contentHeight', function(){
         var $this=$(this),
-            thisHeaderHeight=$this.children(':jqmData(role="header")').outerHeight(),
-            thisFooterHeight=$this.children(':jqmData(role="footer")').outerHeight();
+            $header=$this.children(':jqmData(role="header")'),
+            $footer=$this.children(':jqmData(role="footer")'),
+            thisHeaderHeight=$header.css('display') == 'none' ? 0 : $header.outerHeight(),
+            thisFooterHeight=$footer.css('display') == 'none' ? 0 : $footer.outerHeight();
         $this.children(':jqmData(role="content")').css({'top':thisHeaderHeight, 'bottom':thisFooterHeight});
       })
 
