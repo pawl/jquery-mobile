@@ -18,7 +18,7 @@
           //fails on the back button. it should not create the back button on first page load, but currently it does.
           var firstPageMain=$('div:jqmData(id="main") > div:jqmData(role="page"):first'),
               $container=$('div:jqmData(id="main")');
-          $.mobile.changePage(firstPageMain, 'none', true, false, false, $container );
+          $.mobile.changePage(firstPageMain, options={transition:'none', reverse:true, changeHash:false, pageContainer:$container});
           // $.mobile.urlstack.pop();
           $.mobile.activePage=undefined;
         }
@@ -116,9 +116,7 @@
         $('.ui-btn.'+$.mobile.activeBtnClass).removeClass($.mobile.activeBtnClass);
         $activeClickedLink = $link.closest( ".ui-btn" ).addClass($.mobile.activeBtnClass);
 
-        if( isExternal || hasAjaxDisabled || hasTarget || !$.mobile.ajaxEnabled ||
-          // TODO: deprecated - remove at 1.0
-          !$.mobile.ajaxLinksEnabled ){
+        if( isExternal || hasAjaxDisabled || hasTarget || !$.mobile.ajaxEnabled){
           //remove active link class if external (then it won't be there if you come back)
           window.setTimeout(function() {removeActiveLinkClass(true);}, 200);
 
@@ -127,9 +125,9 @@
         }
 
         //use ajax
-        var transition = $link.jqmData( "transition" ),
+        var transitionVal = $link.jqmData( "transition" ),
           direction = $link.jqmData("direction"),
-          reverse = (direction && direction === "reverse") ||
+          reverseVal = (direction && direction === "reverse") ||
                     // deprecated - remove by 1.0
                     $link.jqmData( "back" ),
           hash = $currPanel.jqmData('hash');
@@ -148,7 +146,7 @@
         //if link refers to an already active panel, stop default action and return
         if ($targetPanelActivePage.attr('data-url') == url || $currPanelActivePage.attr('data-url') == url) {
           if (isRefresh) { //then changePage below because it's a pageRefresh request
-            $.mobile.changePage([$(':jqmData(url="'+url+'")'),url], 'fade', reverse, false, undefined, $targetContainer, isRefresh );
+            $.mobile.changePage(url, options={transition:'fade', reverse:reverseVal, changeHash:false, pageContainer:$targetContainer, reloadPage:isRefresh});
           }
           else { //else preventDefault and return
             event.preventDefault();
@@ -159,14 +157,14 @@
         else if ($targetPanel && $targetPanel!=$link.parents('div[data-role="panel"]')) {
           var from=$targetPanelActivePage;
           // $.mobile.pageContainer=$targetContainer;
-          $.mobile.changePage([from,url], transition, reverse, true, undefined, $targetContainer);
+          $.mobile.changePage(url, options={transition:transitionVal, reverse:reverseVal, pageContainer:$targetContainer});
         }
         //if link refers to a page inside the same panel, changePage on that panel 
         else {
           var from=$currPanelActivePage;
           // $.mobile.pageContainer=$currPanel;
           var hashChange= (hash == 'false' || hash == 'crumbs')? false : true;
-          $.mobile.changePage([from,url], transition, reverse, hashChange, undefined, $currPanel);
+          $.mobile.changePage(url, options={transition:transitionVal, reverse:reverseVal, changeHash:hashChange, pageContainer:$currPanel});
           //active page must always point to the active page in main - for history purposes.
           $.mobile.activePage=$('div[data-id="main"] > div.'+$.mobile.activePageClass);
         }
@@ -200,16 +198,13 @@
         //temporarily put this here- eventually shud just set it immediately instead of an interim var.
         $.mobile.activePage=$currPanelActivePage;
         // $.mobile.pageContainer=$currPanel;
-        $.mobile.changePage({
-            url: url,
-            type: type || "get",
-            data: $this.serialize()
-          },
-          undefined,
-          undefined,
-          true,
-          false,
-          $currPanel
+        $.mobile.changePage(
+            url, 
+            options={
+              type: type || "get",
+              data: $this.serialize(),
+              pageContainer:$currPanel
+            }
         );
         event.preventDefault();
       });
@@ -219,7 +214,7 @@
       $(window).unbind("hashchange");
       $(window).bind( "hashchange", function( e, triggered ) {
         var to = $.mobile.path.stripHash( location.hash ),
-            transition = $.mobile.urlHistory.stack.length === 0 ? false : undefined,
+            transitionVal = $.mobile.urlHistory.stack.length === 0 ? false : undefined,
             $mainPanel=$('div[data-id="main"]'),
             $mainPanelFirstPage=$mainPanel.children('div[data-role="page"]').first(),
             $mainPanelActivePage=$mainPanel.children('div.ui-page-active'),
@@ -254,17 +249,17 @@
           $.mobile.pageContainer=$menuPanel;
           //if this is initial deep-linked page setup, then changePage sidemenu as well
           if (!$('div.ui-page-active').length) {
-            $.mobile.changePage($menuPanelFirstPage, transition, true, false, true);
+            $.mobile.changePage($menuPanelFirstPage, options={transition:transitionVal, reverse:true, changeHash:false});
           }
           // $.mobile.pageContainer=$mainPanel;
           $.mobile.activePage=$mainPanelActivePage.length? $mainPanelActivePage : undefined;
-          $.mobile.changePage(to, transition, undefined, false, true, $mainPanel );
+          $.mobile.changePage(to, options={transition:transitionVal, changeHash:false, pageContainer:$mainPanel});
         }
         //there's no hash, go to the first page in the main panel.
         else {
           // $.mobile.pageContainer=$mainPanel;
           $.mobile.activePage=$mainPanelActivePage? $mainPanelActivePage : undefined;
-          $.mobile.changePage($mainPanelFirstPage, transition, undefined, false, true, $mainPanel ); 
+          $.mobile.changePage($mainPanelFirstPage, options={transition:transitionVal, changeHash:false, pageContainer:$mainPanel} ); 
         }
       });
 
@@ -324,13 +319,13 @@
                });
           $mainHeader.children('.popover-btn').remove();
           
-          replaceBackBtn($mainHeader);
+          // replaceBackBtn($mainHeader);
 
           $main.undelegate('div[data-role="page"]', 'pagebeforeshow.popover');
           $main.delegate('div[data-role="page"]', 'pagebeforeshow.splitview', function(){
             var $thisHeader=$(this).children('div[data-role="header"]');
             $thisHeader.children('.popover-btn').remove();
-            replaceBackBtn($thisHeader);
+            // replaceBackBtn($thisHeader);
           });
 
         }
@@ -349,6 +344,24 @@
         else if($window.width() > 768){
           splitView();
         }
+      });
+
+      //popover button click handler - from http://www.cagintranet.com/archive/create-an-ipad-like-dropdown-popover/
+      $('.popover-btn').live('click', function(e){ 
+        e.preventDefault(); 
+        $('.panel-popover').fadeToggle('fast'); 
+        if ($('.popover-btn').hasClass($.mobile.activeBtnClass)) { 
+            $('.popover-btn').removeClass($.mobile.activeBtnClass); 
+        } else { 
+            $('.popover-btn').addClass($.mobile.activeBtnClass); 
+        } 
+      });
+
+      $('body').live('click', function(event) { 
+        if (!$(event.target).closest('.panel-popover').length && !$(event.target).closest('.popover-btn').length) { 
+            $(".panel-popover").stop(true, true).hide(); 
+            $('.popover-btn').removeClass($.mobile.activeBtnClass); 
+        }; 
       });
 
 //----------------------------------------------------------------------------------
@@ -391,32 +404,39 @@
       });
 
       //data-hash 'crumbs' handler
-      //NOTE: if you set data-backbtn to false this WILL not work! will find time to work this thru better.
+      //now that data-backbtn is no longer defaulting to true, lets set crumbs to create itself even when backbtn is not available
       $('div[data-role="page"]').live('pagebeforeshow.crumbs', function(event, data){
-        var $this = $(this),
-            backBtn = $this.find('a[data-rel="back"]');
-
-        function crumbify(backButton, href, text){
-          backButton.removeAttr('data-rel')
-                    .jqmData('direction','reverse')
-                    .addClass('ui-crumbs')
-                    .attr('href',href);
-          backBtn.find('.ui-btn-text').html(text);
-        }     
+        var $this = $(this);
+        if($this.jqmData('hash') == 'crumbs' || $this.parents('div[data-role="panel"]').data('hash') == 'crumbs'){
+          if($this.jqmData('hash')!=false && $this.find('.ui-crumbs').length < 1){
+            var $header=$this.find('div:jqmData(role="header")');
+              backBtn = $this.find('a[data-rel="back"]');
         
-        if(backBtn.length && ($this.data('hash') == 'crumbs' || $this.parents('div[data-role="panel"]').data('hash') == 'crumbs')){
-          if(data.prevPage.jqmData('url') == $this.jqmData('url')){  //if it's a page refresh
-            var prevCrumb = data.prevPage.find('.ui-crumbs');
-            crumbify(backBtn, prevCrumb.attr('href'), prevCrumb.find('.ui-btn-text').html());
-          }
-          else if($.mobile.urlstack.length > 1) {
-            var text = data.prevPage.find('div:jqmData(role="header") .ui-title').html();
-            crumbify(backBtn, '#'+data.prevPage.jqmData('url'), text);
-          }
-          else if($.mobile.urlstack.length <= 1) {
-            backBtn.remove();
+            if(data.prevPage.jqmData('url') == $this.jqmData('url')){  //if it's a page refresh
+              var prevCrumb = data.prevPage.find('.ui-crumbs');
+              crumbify(backBtn, prevCrumb.attr('href'), prevCrumb.find('.ui-btn-text').html());
+            }
+            else if($.mobile.urlstack.length > 0) {
+              var text = data.prevPage.find('div:jqmData(role="header") .ui-title').html();
+              crumbify(backBtn, '#'+data.prevPage.jqmData('url'), text);
+            }
+            else if(backBtn.length && $.mobile.urlstack.length <= 1) {
+              backBtn.remove();
+            }
           }
         }
+          
+          function crumbify(button, href, text){
+            if(!button.length) {
+              $this.find('div:jqmData(role="header")').prepend('<a class="ui-crumbs ui-btn-left" data-icon="arrow-l"></a>');
+              button=$header.children('.ui-crumbs').buttonMarkup();
+            }
+            button.removeAttr('data-rel')
+                  .jqmData('direction','reverse')
+                  .addClass('ui-crumbs')
+                  .attr('href',href);
+            button.find('.ui-btn-text').html(text);
+          }
       });
 
       //data-context handler - a page with a link that has a data-context attribute will load that page after this page loads
@@ -432,7 +452,7 @@
               $targetPanelActivePage=$targetContainer.children('div.'+$.mobile.activePageClass),
               isRefresh = contextSelector.refresh === undefined ? false : contextSelector.refresh;
           if(($targetPanelActivePage.jqmData('url') == contextSelector.url && contextSelector.refresh)||(!contextSelector.refresh && $targetPanelActivePage.jqmData('url') != contextSelector.url)){    
-              $.mobile.changePage([$targetPanelActivePage, contextSelector.url],'fade', false, false, undefined, $targetContainer, isRefresh);
+              $.mobile.changePage(contextSelector.url, options={transition:'fade', changeHash:false, pageContainer:$targetContainer, reloadPage:isRefresh});
           }
         }
         else if(contextSelector && $this.find(contextSelector).length){
@@ -440,6 +460,8 @@
         }
       });
 
+      //this measures the height of header and footer and sets content to the appropriate height so 
+      // that no content is concealed behind header and footer
       $('div:jqmData(role="page")').live('pageshow.contentHeight', function(){
         var $this=$(this),
             $header=$this.children(':jqmData(role="header")'),
@@ -448,24 +470,7 @@
             thisFooterHeight=$footer.css('display') == 'none' ? 0 : $footer.outerHeight();
         $this.children(':jqmData(role="content")').css({'top':thisHeaderHeight, 'bottom':thisFooterHeight});
       })
-
-      //popover button click handler - from http://www.cagintranet.com/archive/create-an-ipad-like-dropdown-popover/
-      $('.popover-btn').live('click', function(e){ 
-        e.preventDefault(); 
-        $('.panel-popover').fadeToggle('fast'); 
-        if ($('.popover-btn').hasClass($.mobile.activeBtnClass)) { 
-            $('.popover-btn').removeClass($.mobile.activeBtnClass); 
-        } else { 
-            $('.popover-btn').addClass($.mobile.activeBtnClass); 
-        } 
-      });
-
-      $('body').live('click', function(event) { 
-        if (!$(event.target).closest('.panel-popover').length && !$(event.target).closest('.popover-btn').length) { 
-            $(".panel-popover").stop(true, true).hide(); 
-            $('.popover-btn').removeClass($.mobile.activeBtnClass); 
-        }; 
-      });
+      
     }
   });
 })(jQuery,window);
