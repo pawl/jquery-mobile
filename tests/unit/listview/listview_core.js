@@ -63,8 +63,8 @@
 
 			function(){
 				ok($('#nested-list-test').hasClass('ui-page-active'), "makes nested list test page active");
-				ok($(':jqmData(url="nested-list-test&ui-page=More-animals-0")').length == 1, "Adds first UL to the page");
-				ok($(':jqmData(url="nested-list-test&ui-page=Groups-of-animals-1")').length == 1, "Adds second nested UL to the page");
+				ok($(':jqmData(url="nested-list-test&ui-page=0-0")').length == 1, "Adds first UL to the page");
+				ok($(':jqmData(url="nested-list-test&ui-page=0-1")').length == 1, "Adds second nested UL to the page");
 				start();
 			}
 		]);
@@ -82,7 +82,7 @@
 			},
 
 			function(){
-				var $new_page = $(':jqmData(url="nested-list-test&ui-page=More-animals-0")');
+				var $new_page = $(':jqmData(url="nested-list-test&ui-page=0-0")');
 	
 				ok($new_page.hasClass('ui-page-active'), 'Makes the nested page the active page.');
 				ok($('.ui-listview', $new_page).find(":contains('Rhumba of rattlesnakes')").length == 1, "The current page should have the proper text in the list.");
@@ -95,7 +95,7 @@
 	asyncTest( "should go back to top level when the back button is clicked", function() {
 		$.testHelper.pageSequence([
 			function(){
-				$.testHelper.openPage("#nested-list-test&ui-page=More-animals-0");
+				$.testHelper.openPage("#nested-list-test&ui-page=0-0");
 			},
 
 			function(){
@@ -113,7 +113,7 @@
 		ok($('#nested-list-test .linebreaknode').text() === "More animals", 'Text should be "More animals"');
 	});
 
-	asyncTest( "Multiple nested lists on a page", function() {
+	asyncTest( "Multiple nested lists on a page with same labels", function() {
 		$.testHelper.pageSequence([
 			function(){
 				// https://github.com/jquery/jquery-mobile/issues/1617
@@ -121,9 +121,12 @@
 			},
 
 			function(){
+				// Click on the link of the third li element
 				$('.ui-page-active li:eq(2) a:eq(0)').click();
-	
-				equal($('.ui-page-active .ui-content .ui-listview li').text(), "Sub Item 10Sub Item 11Sub Item 12", 'Text should be "Sub Item 10Sub Item 11Sub Item 12"');
+			},
+
+			function(){
+				equal($('.ui-page-active .ui-content .ui-listview li').text(), "Item A-3-0Item A-3-1Item A-3-2", 'Text should be "Item A-3-0Item A-3-1Item A-3-2"');
 				start();
 			}
 		]);
@@ -386,5 +389,101 @@
 			start();
 		}, 1000);
 	});
+
+	module( "Programmatically generated list items", {
+		setup: function(){
+			var item,
+				data = [
+					{
+						id: 1,
+						label: "Item 1"
+					},
+					{
+						id: 2,
+						label: "Item 2"
+					},
+					{
+						id: 3,
+						label: "Item 3"
+					},
+					{
+						id: 4,
+						label: "Item 4"
+					}
+				];
+
+			$( "#programmatically-generated-list-items" ).html("");
+
+			for ( var i = 0, len = data.length; i < len; i++ ) {
+				item = $( '<li id="myItem' + data[i].id + '">' );
+				label = $( "<strong>" + data[i].label + "</strong>").appendTo( item );
+				$( "#programmatically-generated-list-items" ).append( item );
+			}
+		}
+	});
+
+	asyncTest( "Corner styling on programmatically created list items", function() {
+		// https://github.com/jquery/jquery-mobile/issues/1470
+		$.testHelper.pageSequence([
+			function() {
+				$.testHelper.openPage( "#programmatically-generated-list" );
+			},
+			function() {
+				ok(!$( "#programmatically-generated-list-items li:first-child" ).hasClass( "ui-corner-bottom" ), "First list item should not have class ui-corner-bottom" );
+				start();
+			}
+		]);
+	});
+    
+	module("Programmatic list items manipulation");
+
+	asyncTest("Removing list items", 4, function() {
+		$.testHelper.pageSequence([
+			function() {
+				$.testHelper.openPage("#removing-items-from-list-test");
+			},
+
+			function() {
+				var ul = $('#removing-items-from-list-test ul');
+				ul.find("li").first().remove();
+				equal(ul.find("li").length, 3, "There should be only 3 list items left");
+
+				ul.listview('refresh');
+				ok(ul.find("li").first().hasClass("ui-corner-top"), "First list item should have class ui-corner-top");
+
+				ul.find("li").last().remove();
+				equal(ul.find("li").length, 2, "There should be only 2 list items left");
+				
+				ul.listview('refresh');
+				ok(ul.find("li").last().hasClass("ui-corner-bottom"), "Last list item should have class ui-corner-bottom");
+				start();
+			}
+		]);
+	});
+
+	module("Rounded corners");
+
+	asyncTest("Top and bottom corners rounded in inset list", 10, function() {
+		$.testHelper.pageSequence([
+			function() {
+				$.testHelper.openPage("#corner-rounded-test");
+			},
+
+			function() {
+				var ul = $('#corner-rounded-test ul');
+				
+				for( var t = 0; t<5; t++){
+					ul.append("<li>Item " + t + "</li>");
+					ul.listview('refresh');					
+					ok(ul.find("li").first().hasClass("ui-corner-top"), "First list item should have class ui-corner-top in list with " + ul.find("li").length + " item(s)");
+					ok(ul.find("li").last().hasClass("ui-corner-bottom"), "Last list item should have class ui-corner-bottom in list with " + ul.find("li").length + " item(s)");
+				}
+				
+				start();
+			}
+		]);
+	});
+
+
 
 })(jQuery);
