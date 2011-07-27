@@ -99,6 +99,10 @@
 		slider.keyup();
 		same(slider.val(), "200");
 	});
+	
+	test( "input type should degrade to number when slider is created", function(){
+		same($("#range-slider-up").attr( "type" ), "number");
+	});
 
 	// generic switch test function
 	var sliderSwitchTest = function(opts){
@@ -150,5 +154,11 @@
 		onChangeCnt = 0;
 		$( "#onchange" ).slider( "refresh", 50 );
 		equals(onChangeCnt, 1, "onChange should have been called once");
+	});
+	
+	
+	test( "slider controls will create when inside a container that receives a 'create' event", function(){
+		ok( !$("#enhancetest").appendTo(".ui-page-active").find(".ui-slider").length, "did not have enhancements applied" );
+		ok( $("#enhancetest").trigger("create").find(".ui-slider").length, "enhancements applied" );
 	});
 })(jQuery);

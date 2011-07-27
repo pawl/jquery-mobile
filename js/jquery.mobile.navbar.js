@@ -7,10 +7,18 @@
 
 (function( $, undefined ) {
 
+//auto self-init widgets
+var initSelector = ":jqmData(role='navbar')";
+
+$( document ).bind( "pagecreate create", function( e ){
+	$( initSelector, e.target ).navbar();
+});
+
 $.widget( "mobile.navbar", $.mobile.widget, {
 	options: {
 		iconpos: "top",
-		grid: null
+		grid: null,
+		initSelector: initSelector
 	},
 
 	_create: function(){

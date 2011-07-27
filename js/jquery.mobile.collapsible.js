@@ -6,6 +6,13 @@
 */
 (function( $, undefined ) {
 
+//auto self-init widgets
+var initSelector = ":jqmData(role='collapsible')";
+
+$( document ).bind( "pagecreate create", function( e ){
+	$( initSelector, e.target ).collapsible();
+});
+
 $.widget( "mobile.collapsible", $.mobile.widget, {
 	options: {
 		expandCueText: " click to expand contents",
@@ -13,7 +20,8 @@ $.widget( "mobile.collapsible", $.mobile.widget, {
 		collapsed: false,
 		heading: ">:header,>legend",
 		theme: null,
-		iconTheme: "d"
+		iconTheme: "d",
+		initSelector: initSelector
 	},
 	_create: function() {
 

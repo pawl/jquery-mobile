@@ -6,6 +6,14 @@
 */
 
 (function( $, undefined ) {
+
+//auto self-init widgets
+var initSelector = ":jqmData(role='listview')";
+
+$( document ).bind( "pagecreate create", function( e ){
+	$( initSelector, e.target ).listview();
+});
+
 //Keeps track of the number of lists per page UID
 //This allows support for multiple nested list in the same page
 //https://github.com/jquery/jquery-mobile/issues/1617
@@ -19,7 +27,8 @@ $.widget( "mobile.listview", $.mobile.widget, {
 		dividerTheme: "b",
 		splitIcon: "arrow-r",
 		splitTheme: "b",
-		inset: false
+		inset: false,
+		initSelector: initSelector
 	},
 
 	_create: function() {

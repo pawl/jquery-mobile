@@ -561,9 +561,15 @@
 			// page is loaded off the network.
 			dupCachedPage = null,
 
+			// determine the current base url
+			findBaseWithDefault = function(){
+				var closestBase = ( $.mobile.activePage && getClosestBaseUrl( $.mobile.activePage ) );
+				return closestBase || documentBase.hrefNoHash;
+			},
+
 			// The absolute version of the URL passed into the function. This
 			// version of the URL may contain dialog/subpage params in it.
-			absUrl = path.makeUrlAbsolute( url, ( $.mobile.activePage && getClosestBaseUrl( $.mobile.activePage ) ) || documentBase.hrefNoHash);
+			absUrl = path.makeUrlAbsolute( url, findBaseWithDefault() );
 
 
 
@@ -644,6 +650,9 @@
 							&& RegExp.$1 ) {
 						url = fileUrl = path.getFilePath( RegExp.$1 );
 					}
+					else{
+						
+					}
 
 					if ( base ) {
 						base.set( fileUrl );
@@ -652,6 +661,11 @@
 					//workaround to allow scripts to execute when included in page divs
 					all.get( 0 ).innerHTML = html;
 					page = all.find( ":jqmData(role='page'), :jqmData(role='dialog')" ).first();
+					
+					//if page elem couldn't be found, create one and insert the body element's contents
+					if( !page.length ){
+						page = $( "<div data-" + $.mobile.ns + "role='page'>" + html.split( /<\/?body[^>]*>/gmi )[1] + "</div>" );
+					}
 
 					if ( newPageTitle && !page.jqmData( "title" ) ) {
 						page.jqmData( "title", newPageTitle );
@@ -730,7 +744,7 @@
 		data: undefined,
 		reloadPage: false,
 		role: undefined, // By default we rely on the role defined by the @data-role attribute.
-		showLoadMsg: true,
+		showLoadMsg: false,
 		pageContainer: undefined
 	};
 
@@ -930,7 +944,8 @@
 		fromHashChange: false,
 		role: undefined, // By default we rely on the role defined by the @data-role attribute.
 		duplicateCachedPage: undefined,
-		pageContainer: undefined
+		pageContainer: undefined,
+		showLoadMsg: true //loading message shows by default when pages are being fetched during changePage
 	};
 
 /* Event Bindings - hashchange, submit, and click */
@@ -1117,6 +1132,18 @@
 			$.mobile.changePage( href, { transition: transition, reverse: reverse, role: role } );
 			event.preventDefault();
 		});
+		
+		//prefetch pages when anchors with data-prefetch are encountered
+		$( ".ui-page" ).live( "pageshow.prefetch", function(){
+			var urls = [];
+			$( this ).find( "a:jqmData(prefetch)" ).each(function(){
+				var url = $( this ).attr( "href" );
+				if ( url && $.inArray( url, urls ) === -1 ) {
+					urls.push( url );
+					$.mobile.loadPage( url );
+				}
+			});
+		} );
 
 		//hashchange event handler
 		$window.bind( "hashchange", function( e, triggered ) {

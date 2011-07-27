@@ -20,10 +20,6 @@
 		// hash segment before &ui-page= is used to make Ajax request
 		subPageUrlKey: "ui-page",
 
-		// Anchor links with a data-rel, or pages with a	 data-role, that match these selectors will be untrackable in history
-		// (no change in URL, not bookmarkable)
-		nonHistorySelectors: "dialog",
-
 		// Class assigned to page currently in view, and during transitions
 		activePageClass: "ui-page-active",
 
@@ -51,6 +47,9 @@
 
 		// Error response message - appears when an Ajax page request fails
 		pageLoadErrorMessage: "Error Loading Page",
+		
+		//automatically initialize the DOM when it's ready
+		autoInitializePage: true,
 
 		// Support conditions that must be met in order to proceed
 		// default enhanced qualifications are media query support OR IE 7+

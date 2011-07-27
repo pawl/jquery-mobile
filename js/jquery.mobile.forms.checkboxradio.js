@@ -7,9 +7,19 @@
 
 (function( $, undefined ) {
 
+//auto self-init widgets
+var initSelector = "input[type='checkbox'],input[type='radio']";
+
+$( document ).bind( "pagecreate create", function( e ){
+	$( $.mobile.checkboxradio.prototype.options.initSelector, e.target )
+		.not( ":jqmData(role='none'), :jqmData(role='nojs')" )
+		.checkboxradio();
+});
+
 $.widget( "mobile.checkboxradio", $.mobile.widget, {
 	options: {
-		theme: null
+		theme: null,
+		initSelector: initSelector
 	},
 	_create: function() {
 		var self = this,
