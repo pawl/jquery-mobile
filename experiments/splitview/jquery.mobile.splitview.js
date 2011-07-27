@@ -137,8 +137,8 @@
         nextPageRole = $link.attr( "data-" + $.mobile.ns + "rel" );
 
         //if it's a relative href, prefix href with base url
-        if( $.mobile.path.isRelative( url ) && !hadProtocol ){
-          url = $.mobile.path.makeAbsolute( url );
+        if( $.mobile.path.isRelativeUrl( url ) && !hadProtocol ){
+          url = $.mobile.path.makeUrlAbsolute( url );
         }
 
         url = $.mobile.path.stripHash( url );
