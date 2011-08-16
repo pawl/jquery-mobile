@@ -593,11 +593,11 @@
 			dataUrl = path.convertUrlToDataUrl( absUrl );
 
 		// Make sure we have a pageContainer to work with.
-		$.mobile.pageContainer = settings.pageContainer || $.mobile.pageContainer;
+		settings.pageContainer = settings.pageContainer || $.mobile.pageContainer;
 		//settings.pageContainer = settings.pageContainer || $.mobile.pageContainer;
 
 		// Check to see if the page already exists in the DOM.
-		page = $.mobile.pageContainer.children( ":jqmData(url='" + dataUrl + "')" );
+		page = settings.pageContainer.children( ":jqmData(url='" + dataUrl + "')" );
 
 		// Reset base to the default document base.
 		if ( base ) {
@@ -708,7 +708,7 @@
 					//append to page and enhance
 					page
 						.attr( "data-" + $.mobile.ns + "url", path.convertUrlToDataUrl( fileUrl ) )
-						.appendTo( $.mobile.pageContainer );
+						.appendTo( settings.pageContainer );
 
 					// wait for page creation to leverage options defined on widget
 					page.one('pagecreate', function(){
@@ -727,7 +727,7 @@
 					// into the DOM. If the original absUrl refers to a sub-page, that is the
 					// real page we are interested in.
 					if ( absUrl.indexOf( "&" + $.mobile.subPageUrlKey ) > -1 ) {
-						page = $.mobile.pageContainer.children( ":jqmData(url='" + dataUrl + "')" );
+						page = settings.pageContainer.children( ":jqmData(url='" + dataUrl + "')" );
 					}
 
 					//bind pageHide to removePage after it's hidden, if the page options specify to do so
@@ -754,7 +754,7 @@
 						//show error message
 						$( "<div class='ui-loader ui-overlay-shadow ui-body-e ui-corner-all'><h1>"+ $.mobile.pageLoadErrorMessage +"</h1></div>" )
 							.css({ "display": "block", "opacity": 0.96, "top": $window.scrollTop() + 100 })
-							.appendTo( $.mobile.pageContainer )
+							.appendTo( settings.pageContainer )
 							.delay( 800 )
 							.fadeOut( 400, function() {
 								$( this ).remove();
@@ -835,7 +835,7 @@
 		var settings = $.extend( {}, $.mobile.changePage.defaults, options );
 
 		// Make sure we have a pageContainer to work with.
-		$.mobile.pageContainer = settings.pageContainer || $.mobile.pageContainer;
+		settings.pageContainer = settings.pageContainer || $.mobile.pageContainer;
 
 		// If the caller passed us a url, call loadPage()
 		// to make sure it is loaded into the DOM. We'll listen
@@ -864,7 +864,7 @@
 
 		// The caller passed us a real page DOM element. Update our
 		// internal state and then trigger a transition to the page.
-		var mpc = $.mobile.pageContainer,
+		var mpc = settings.pageContainer,
 			fromPage = mpc.find('.'+$.mobile.activePageClass).length ? mpc.find('.'+$.mobile.activePageClass) : undefined,
 			url = toPage.jqmData( "url" ),
 			// The pageUrl var is usually the same as url, except when url is obscured as a dialog url. pageUrl always contains the file path
@@ -1077,7 +1077,7 @@
 		});
 
 		// click routing - direct to HTTP or Ajax, accordingly
-		$( document ).bind( "click.linkhandler", function( event ) {
+		$( document ).bind( "click", function( event ) {
 			var link = findClosestLink( event.target );
 			if ( !link ) {
 				return;
