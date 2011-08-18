@@ -77,8 +77,17 @@
         return pageMin;
       }
 
-      function resetActivePageHeight(){
-        $( "." + $.mobile.activePageClass ).css( "min-height", getScreenHeight() );
+      function newResetActivePageHeight(){
+        var page=$( "." + $.mobile.activePageClass );
+        page.each(function(){
+          if($(this).closest(".panel-popover").length != 1){
+            $(this).css("min-height", getScreenHeight());
+          }
+          else {
+            $(this).css("min-height", "100%")
+          }
+        });
+          
       }
 
       //override _registerInternalEvents to bind to new methods below
@@ -386,8 +395,8 @@
         
 
         //set page min-heights to be device specific
-        $( document ).bind( "pageshow.resetPageHeight", resetActivePageHeight );
-        $( window ).bind( "throttledresize.resetPageHeight", resetActivePageHeight );
+        $( document ).bind( "pageshow.resetPageHeight", newResetActivePageHeight );
+        $( window ).bind( "throttledresize.resetPageHeight", newResetActivePageHeight );
 
       }; //end _registerInternalEvents
 
@@ -425,6 +434,7 @@
           if(!$menu.children('.popover_triangle').length){ 
             $menu.prepend('<div class="popover_triangle"></div>'); 
           }
+          $menu.children('.' + $.activePageClass).css('min-height', '100%');
           $main.removeClass('ui-panel-right')
                .css('width', '');
           popoverBtn($mainHeader);
@@ -435,9 +445,7 @@
             popoverBtn($thisHeader);
           });
           // TODO: unbind resetActivePageHeight for popover pages
-          $( document ).unbind('pageshow.resetPageHeight');
-          $( window ).unbind('throttledresize.resetPageHeight');
-          $main.bind('pageshow', resetActivePageHeight );
+
         };
 
         function splitView(){
