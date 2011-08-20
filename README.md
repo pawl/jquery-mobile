@@ -77,6 +77,8 @@ the anatomy of a splitview page can be seen at the demo page above. Basically, y
 			</body>
 		</html> 
 
+NOTE: although with this beta2 release I've managed to minimize the amount of changes made in jqm core, there are still about 3 lines of code I needed to add. make sure you use the version provided in this fork of jqm by running 'make' in a terminal, and finding the jquerymobile js and css files in the /compiled folder created by 'make'. (also make sure to run this in the beta2 branch, or you won't get the most up to date files)
+
 pages can also be loaded dynamically provided you specify the panel it needs to load into (as explained below). you need to preload two pages - one for each panel, to avoid an empty page on either of your panels.
 
 Panel settings
