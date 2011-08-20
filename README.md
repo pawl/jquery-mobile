@@ -1,52 +1,110 @@
-jQuery Mobile Framework
+jQuery Mobile Splitview plugin
 =====
-http://jquerymobile.com
+demo at: asyraf9.github.com/jquery-mobile/
 
+This is a plugin for jQuery Mobile that detects your device's browser width and renders pages accordingly - e.g. splitview for desktop and tablets, and standard jqm for mobile phones. 
 
-Demos and documentation
+Features
+======================
+1) auto-detection of how to render for the browser you are using.
+2) independent panel scrolling (still a lot more to work on here)
+3) orientation and resize aware - renders the side panel in a popover fashion when in portrait mode
+4) context awareness - can be programmed so that opening a page on the side panel also opens a page on the main panel
+5) deep-link (and history) awareness - linking to a specific page in the main panel works, and hitting on the back and forward button on your browser also works (only for the main panel pages)
+6) panel specific links - links on the side panel can affect pages in the main panel, or in the side panel itself.  
+
+Anatomy of a Splitview page
+===============================
+the anatomy of a splitview page can be seen at the demo page above. Basically, you need to position your pages in the following order:
+
+<!DOCTYPE html> 
+<html> 
+	<head> 
+	<title>Page Title</title> 
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+
+    <link rel="stylesheet" href="stylesheets/jquery.mobile-1.0b2.min.css" />
+    <link rel="stylesheet" href="../../compiled/jquery.mobile-1.0b2pre.css" />
+    <link rel="stylesheet" href="jquery.mobile.splitview.css" />
+    <link rel="stylesheet"  href="jquery.mobile.scrollview.css" />
+    <link rel="stylesheet"  href="jquery.mobile.grids.collapsible.css" />
+    <script type="text/javascript" src="jquery-1.6.2.js"></script>
+    <script type="text/javascript" src="jquery.mobile.splitview.js"></script>
+    <script type="text/javascript" src="../../compiled/jquery.mobile-1.0b2pre.js"></script>
+    <script type="text/javascript" src="jquery.easing.1.3.js"></script>
+    <script type="text/javascript" src="jquery.mobile.scrollview.js"></script>
+</head> 
+<body> 
+	<div data-role="panel" data-id="menu">
+		<!-- Start of first page -->
+		<div data-role="page" id="foo">
+
+			<div data-role="header">
+				<h1>Foo</h1>
+			</div><!-- /header -->
+
+			<div data-role="content">	
+				<p>I'm first in the source order so I'm shown as the page.</p>		
+				<p>View internal page called <a href="#bar">bar</a></p>	
+			</div><!-- /content -->
+
+			<div data-role="footer">
+				<h4>Page Footer</h4>
+			</div><!-- /footer -->
+		</div><!-- /page -->
+		<!-- other side panel pages here -->
+	</div>
+ 	<div data-role="panel" data-id="main">
+		<!-- Start of second page -->
+		<div data-role="page" id="bar">
+
+			<div data-role="header">
+				<h1>Bar</h1>
+			</div><!-- /header -->
+
+			<div data-role="content">	
+				<p>I'm first in the source order so I'm shown as the page.</p>		
+				<p><a href="#foo">Back to foo</a></p>	
+			</div><!-- /content -->
+
+			<div data-role="footer">
+				<h4>Page Footer</h4>
+			</div><!-- /footer -->
+		</div><!-- /page -->
+		<!-- other main panel pages here -->
+	</div>
+</body>
+</html> 
+
+pages can also be loaded dynamically provided you specify the panel it needs to load into (as explained below). you need to preload two pages - one for each panel, to avoid an empty page on either of your panels.
+
+Panel settings
 ===================================
-http://jquerymobile.com/test/
+there are two settings panel divs:
+1) data-hash - takes the following values: true(default), false, and crumbs
+this attribute tells splitview to track history for the panel or not (true and false), or to set a 'crumb' (crumbs) button at the top left portion of the header for each page. 
 
+2) data-context - takes a jQuery selector value, or a hash of the following: url, panel, refresh.
+data-context tells splitview to load another page whose link can be found in the active page by the jQuery selector value, or a page which is pointed to by the hash. example:
 
-How to build your own jQuery Mobile CSS and JS files
+  <div data-role="panel" data-id="menu" data-hash="crumbs" data-context="a#default">
+
+OR  
+  
+  <div data-role="panel" data-id="menu" data-hash="crumbs" data-context='{"url":"#bar", "panel":"main", "refresh":false}'>
+
+NOTE: this attribute, if used on a page, overrides panel data-context attributes. example:
+
+  <div data-role="page" data-context="a#default">
+
+Splitview Links
 ===================================
+splitview links work just like the links in jQuery Mobile. the only difference is, you can define the panel you want the page that link points to load into using the 'data-panel' attribute. for example:
 
-Clone this repo and build the js and css files (you'll need Git and Make installed):
+  <a href="some_other_page" data-panel="main">
 
-    git clone git://github.com/jquery/jquery-mobile.git
-    cd jquery-mobile
-    make
-
-A full, complete version and a minified, complete version of the jQuery Mobile JavaScript and CSS files will be created in a folder named "compiled".
+this method also loads ajax pages. 
 
 
-Submitting bugs
-===================================
-
-If you think you've found a bug, please visit the Issue tracker (https://github.com/jquery/jquery-mobile/issues) and create an issue explaining the problem and expected result. Be sure to include any relevant information for reproducing the issue, such as the browser/device (with version #), and the version of the jQuery Mobile code you're running. It also helps a lot to make sure that the bug still exists on jquerymobile.com/test/, as it's possible we may have fixed it already! It is also best to include code to reproduce the bug. 
-
-
-Submitting patches
-===================================
-
-To contribute code and bug fixes to jQuery Mobile: fork this project on Github, make changes to the code in your fork, and then send a 
-"pull request" to notify the team of updates that are ready to be reviewed for inclusion.
-
-Detailed instructions can be found at https://gist.github.com/726275
-
-
-Running the jQuery Mobile demos & docs locally
-===================================
-
-To preview locally, you'll need to clone a local copy of this repository and point your Apache & PHP webserver at its root directory (a webserver is required, as PHP and .htaccess are used for combining development files).
-
-If you don't currently have a webserver running locally, there are a few options. 
-
-If you have python installed (most Linux distributions) and Mac OSX, you use the built-in simple web server. Open a terminal/shell and change to the jQuery Mobile folder then type 'python -m SimpleHTTPServer', and voila you can then browse via http://localhost:8000. 
-
-If you're on a Mac, you can try dropping jQuery Mobile into your sites folder and turning on Web Sharing via System Prefs. From there, you'll find a URL where you can browse folders in your sites directory from a browser.
-
-Another quick way to get up and running is to download and install MAMP for Mac OSX. Once installed, just open MAMP, click preferences, go to the Apache tab, and select your local jQuery Mobile folder as the root. Then you can open a browser to http://localhost:8888 to preview the code.
-
-Another alternative is XAMPP, which is also available for Windows, though you need to actually modify Apache's httpd.conf to point to your checkout: http://www.apachefriends.org/en/xampp.html
-You need the Rewrite (mod_rewrite.so), Expire (mod_expires.so) and Header (mod_headers.so) modules loaded.
+that's about it! splitview does everything else for you... enjoy it, and let me know if you have any issues with it! thanks!
