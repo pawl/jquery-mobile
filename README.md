@@ -17,92 +17,93 @@ Anatomy of a Splitview page
 ===============================
 the anatomy of a splitview page can be seen at the demo page above. Basically, you need to position your pages in the following order:
 
-<!DOCTYPE html> 
-<html> 
-	<head> 
-	<title>Page Title</title> 
-	
-	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<!DOCTYPE html> 
+		<html> 
+			<head> 
+				<title>Page Title</title> 
+				
+				<meta name="viewport" content="width=device-width, initial-scale=1"> 
 
-    <link rel="stylesheet" href="stylesheets/jquery.mobile-1.0b2.min.css" />
-    <link rel="stylesheet" href="../../compiled/jquery.mobile-1.0b2pre.css" />
-    <link rel="stylesheet" href="jquery.mobile.splitview.css" />
-    <link rel="stylesheet"  href="jquery.mobile.scrollview.css" />
-    <link rel="stylesheet"  href="jquery.mobile.grids.collapsible.css" />
-    <script type="text/javascript" src="jquery-1.6.2.js"></script>
-    <script type="text/javascript" src="jquery.mobile.splitview.js"></script>
-    <script type="text/javascript" src="../../compiled/jquery.mobile-1.0b2pre.js"></script>
-    <script type="text/javascript" src="jquery.easing.1.3.js"></script>
-    <script type="text/javascript" src="jquery.mobile.scrollview.js"></script>
-</head> 
-<body> 
-	<div data-role="panel" data-id="menu">
-		<!-- Start of first page -->
-		<div data-role="page" id="foo">
+			    <link rel="stylesheet" href="stylesheets/jquery.mobile-1.0b2.min.css" />
+			    <link rel="stylesheet" href="../../compiled/jquery.mobile-1.0b2pre.css" />
+			    <link rel="stylesheet" href="jquery.mobile.splitview.css" />
+			    <link rel="stylesheet"  href="jquery.mobile.scrollview.css" />
+			    <link rel="stylesheet"  href="jquery.mobile.grids.collapsible.css" />
+			    <script type="text/javascript" src="jquery-1.6.2.js"></script>
+			    <script type="text/javascript" src="jquery.mobile.splitview.js"></script>
+			    <script type="text/javascript" src="../../compiled/jquery.mobile-1.0b2pre.js"></script>
+			    <script type="text/javascript" src="jquery.easing.1.3.js"></script>
+			    <script type="text/javascript" src="jquery.mobile.scrollview.js"></script>
+			</head> 
+			<body> 
+				<div data-role="panel" data-id="menu">
+					<!-- Start of first page -->
+					<div data-role="page" id="foo">
 
-			<div data-role="header">
-				<h1>Foo</h1>
-			</div><!-- /header -->
+						<div data-role="header">
+							<h1>Foo</h1>
+						</div><!-- /header -->
 
-			<div data-role="content">	
-				<p>I'm first in the source order so I'm shown as the page.</p>		
-				<p>View internal page called <a href="#bar">bar</a></p>	
-			</div><!-- /content -->
+						<div data-role="content">	
+							<p>I'm first in the source order so I'm shown as the page.</p>		
+							<p>View internal page called <a href="#bar">bar</a></p>	
+						</div><!-- /content -->
 
-			<div data-role="footer">
-				<h4>Page Footer</h4>
-			</div><!-- /footer -->
-		</div><!-- /page -->
-		<!-- other side panel pages here -->
-	</div>
- 	<div data-role="panel" data-id="main">
-		<!-- Start of second page -->
-		<div data-role="page" id="bar">
+						<div data-role="footer">
+							<h4>Page Footer</h4>
+						</div><!-- /footer -->
+					</div><!-- /page -->
+					<!-- other side panel pages here -->
+				</div>
+				<div data-role="panel" data-id="main">
+					<!-- Start of second page -->
+					<div data-role="page" id="bar">
 
-			<div data-role="header">
-				<h1>Bar</h1>
-			</div><!-- /header -->
+						<div data-role="header">
+							<h1>Bar</h1>
+						</div><!-- /header -->
 
-			<div data-role="content">	
-				<p>I'm first in the source order so I'm shown as the page.</p>		
-				<p><a href="#foo">Back to foo</a></p>	
-			</div><!-- /content -->
+						<div data-role="content">	
+							<p>I'm first in the source order so I'm shown as the page.</p>		
+							<p><a href="#foo">Back to foo</a></p>	
+						</div><!-- /content -->
 
-			<div data-role="footer">
-				<h4>Page Footer</h4>
-			</div><!-- /footer -->
-		</div><!-- /page -->
-		<!-- other main panel pages here -->
-	</div>
-</body>
-</html> 
+						<div data-role="footer">
+							<h4>Page Footer</h4>
+						</div><!-- /footer -->
+					</div><!-- /page -->
+					<!-- other main panel pages here -->
+				</div>
+			</body>
+		</html> 
 
 pages can also be loaded dynamically provided you specify the panel it needs to load into (as explained below). you need to preload two pages - one for each panel, to avoid an empty page on either of your panels.
 
 Panel settings
 ===================================
-there are two settings panel divs:
-1) data-hash - takes the following values: true(default), false, and crumbs
+there are two settings for panel divs:
+
+1. data-hash - takes the following values: true(default), false, and crumbs
 this attribute tells splitview to track history for the panel or not (true and false), or to set a 'crumb' (crumbs) button at the top left portion of the header for each page. 
 
-2) data-context - takes a jQuery selector value, or a hash of the following: url, panel, refresh.
+2. data-context - takes a jQuery selector value, or a hash of the following: url, panel, refresh.
 data-context tells splitview to load another page whose link can be found in the active page by the jQuery selector value, or a page which is pointed to by the hash. example:
 
-  <div data-role="panel" data-id="menu" data-hash="crumbs" data-context="a#default">
+	<div data-role="panel" data-id="menu" data-hash="crumbs" data-context="a#default">
 
 OR  
   
-  <div data-role="panel" data-id="menu" data-hash="crumbs" data-context='{"url":"#bar", "panel":"main", "refresh":false}'>
+	<div data-role="panel" data-id="menu" data-hash="crumbs" data-context='{"url":"#bar", "panel":"main", "refresh":false}'>
 
 NOTE: this attribute, if used on a page, overrides panel data-context attributes. example:
 
-  <div data-role="page" data-context="a#default">
+	<div data-role="page" data-context="a#default">
 
 Splitview Links
 ===================================
 splitview links work just like the links in jQuery Mobile. the only difference is, you can define the panel you want the page that link points to load into using the 'data-panel' attribute. for example:
 
-  <a href="some_other_page" data-panel="main">
+	<a href="some_other_page" data-panel="main">
 
 this method also loads ajax pages. 
 
