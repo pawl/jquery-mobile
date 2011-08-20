@@ -74,8 +74,8 @@ the anatomy of a splitview page can be seen at the demo page above. Basically, y
 		</div><!-- /page -->
 		<!-- other main panel pages here -->
 	</div>
-</body>
-</html> 
+<\/body>
+<\/html> 
 
 pages can also be loaded dynamically provided you specify the panel it needs to load into (as explained below). you need to preload two pages - one for each panel, to avoid an empty page on either of your panels.
 
