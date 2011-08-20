@@ -9,7 +9,7 @@
       $(function() {
         $(document).unbind('.toolbar');
         $('.ui-page').die('.toolbar');
-        $('div[data-role="panel"]').addClass('ui-mobile-viewport');
+        $('div:jqmData(role="panel")').addClass('ui-mobile-viewport');
         if( !$.mobile.hashListeningEnabled || !$.mobile.path.stripHash( location.hash ) ){
           // var firstPage=$('div[data-id="main"] > div[data-role="page"]:first').page().addClass($.mobile.activePageClass); 
           // firstPage.children('div[data-role="content"]').attr('data-scroll', 'y');
@@ -375,6 +375,7 @@
 
           //if to is defined, load it
           if ( to ){
+            to = ( typeof to === "string" && !$.mobile.path.isPath( to ) ) ? ( '#' + to ) : to;
             $.mobile.pageContainer=$menuPanel;
             //if this is initial deep-linked page setup, then changePage sidemenu as well
             if (!$('div.ui-page-active').length) {
@@ -582,10 +583,11 @@
 
       //data-context handler - a page with a link that has a data-context attribute will load that page after this page loads
       //this still needs work - pageTransitionQueue messes everything up.
-      $('div:jqmData(role="page")').live('pageshow.context', function(){
+      $('div:jqmData(role="panel")').live('changepage.context', function(){
         var $this=$(this),
-            panelContextSelector = $this.parents('div[data-role="panel"]').jqmData('context'),
-            pageContextSelector = $this.jqmData('context'),
+            $currPanelActivePage = $this.children('.' + $.mobile.activePageClass),
+            panelContextSelector = $this.jqmData('context'),
+            pageContextSelector = $currPanelActivePage.jqmData('context'),
             contextSelector= pageContextSelector ? pageContextSelector : panelContextSelector;
         //if you pass a hash into data-context, you need to specify panel, url and a boolean value for refresh
         if($.type(contextSelector) === 'object') {
@@ -596,8 +598,8 @@
               $.mobile.changePage(contextSelector.url, options={transition:'fade', changeHash:false, pageContainer:$targetContainer, reloadPage:isRefresh});
           }
         }
-        else if(contextSelector && $this.find(contextSelector).length){
-          $this.find(contextSelector).trigger('click');
+        else if(contextSelector && $currPanelActivePage.find(contextSelector).length){
+          $currPanelActivePage.find(contextSelector).trigger('click');
         }
       });
 
@@ -611,7 +613,14 @@
             thisFooterHeight=$footer.css('display') == 'none' ? 0 : $footer.outerHeight();
         $this.children(':jqmData(role="content")').css({'top':thisHeaderHeight, 'bottom':thisFooterHeight});
       })
-      
+    }
+    else {
+      $(function(){
+        $('div:jqmData(role="panel")').each(function(){
+          var $this = $(this);
+          $this.replaceWith($this.html());
+        })
+      });
     }
   });
 })(jQuery,window);
