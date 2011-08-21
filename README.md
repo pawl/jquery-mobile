@@ -6,12 +6,12 @@ This is a plugin for jQuery Mobile that detects your device's browser width and 
 
 Features
 ======================
-1) auto-detection of how to render for the browser you are using.
-2) independent panel scrolling (still a lot more to work on here)
-3) orientation and resize aware - renders the side panel in a popover fashion when in portrait mode
-4) context awareness - can be programmed so that opening a page on the side panel also opens a page on the main panel
-5) deep-link (and history) awareness - linking to a specific page in the main panel works, and hitting on the back and forward button on your browser also works (only for the main panel pages)
-6) panel specific links - links on the side panel can affect pages in the main panel, or in the side panel itself.  
+1. auto-detection of how to render for the browser you are using.
+2. independent panel scrolling (still a lot more to work on here)
+3. orientation and resize aware - renders the side panel in a popover fashion when in portrait mode
+4. context awareness - can be programmed so that opening a page on the side panel also opens a page on the main panel
+5. deep-link (and history) awareness - linking to a specific page in the main panel works, and hitting on the back and forward button on your browser also works (only for the main panel pages)
+6. panel specific links - links on the side panel can affect pages in the main panel, or in the side panel itself.  
 
 Anatomy of a Splitview page
 ===============================
