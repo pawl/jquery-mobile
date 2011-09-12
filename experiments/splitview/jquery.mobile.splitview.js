@@ -19,14 +19,13 @@
           var firstPageMain=$('div:jqmData(id="main") > div:jqmData(role="page"):first'),
               $container=$('div:jqmData(id="main")');
           $.mobile.changePage(firstPageMain, options={transition:'none', reverse:true, changeHash:false, pageContainer:$container});
-          // $.mobile.urlstack.pop();
           $.mobile.activePage=undefined;
         }
         $(window).trigger('orientationchange');
       });
 
 //----------------------------------------------------------------------------------
-//Main event bindings: click, form submits, hashchange and orientationchange/resize
+//Main event bindings: click, form submits, hashchange and orientationchange/resize(popover)
 //----------------------------------------------------------------------------------
       //existing base tag?
       var $window = $( window ),
@@ -102,7 +101,7 @@
           var type = $this.attr("method"),
               target = $this.attr("target"),
               url = $this.attr( "action" ),
-              $currPanel=$this.parents('div[data-role="panel"]'),
+              $currPanel=$this.parents('div:jqmData(role="panel")'),
               $currPanelActivePage=$currPanel.children('div.'+$.mobile.activePageClass);
 
           // If no action is specified, browsers default to using the
@@ -299,7 +298,7 @@
             }
           }
           //if link refers to a page on another panel, changePage on that panel
-          else if ($targetPanel && $targetPanel!=$link.parents('div[data-role="panel"]')) {
+          else if ($targetPanel && $targetPanel!=$link.parents('div:jqmData(role="panel")')) {
             var from=$targetPanelActivePage;
             $.mobile.pageContainer=$targetContainer;
             $.mobile.changePage(href, options={transition:transitionVal, reverse:reverseVal, pageContainer:$targetContainer});
@@ -311,7 +310,7 @@
             var hashChange= (hash == 'false' || hash == 'crumbs')? false : true;
             $.mobile.changePage(href, options={transition:transitionVal, reverse:reverseVal, changeHash:hashChange, pageContainer:$currPanel});
             //active page must always point to the active page in main - for history purposes.
-            $.mobile.activePage=$('div[data-id="main"] > div.'+$.mobile.activePageClass);
+            $.mobile.activePage=$('div:jqmData(id="main") > div.'+$.mobile.activePageClass);
           }
           event.preventDefault();
         });
@@ -334,11 +333,11 @@
         $(window).bind( "hashchange", function( e, triggered ) {
           var to = $.mobile.path.stripHash( location.hash ),
               transitionVal = $.mobile.urlHistory.stack.length === 0 ? "none" : undefined,
-              $mainPanel=$('div[data-id="main"]'),
-              $mainPanelFirstPage=$mainPanel.children('div[data-role="page"]').first(),
+              $mainPanel=$('div:jqmData(id="main")'),
+              $mainPanelFirstPage=$mainPanel.children('div:jqmData(role="page")').first(),
               $mainPanelActivePage=$mainPanel.children('div.ui-page-active'),
-              $menuPanel=$('div[data-id="menu"]'),
-              $menuPanelFirstPage=$menuPanel.children('div[data-role="page"]').first(),
+              $menuPanel=$('div:jqmData(id="menu")'),
+              $menuPanelFirstPage=$menuPanel.children('div:jqmData(role="page")').first(),
               $menuPanelActivePage=$menuPanel.children('div.ui-page-active'),
               //FIX: temp var for dialogHashKey
               dialogHashKey = "&ui-state=dialog";
@@ -401,11 +400,11 @@
 
       }; //end _registerInternalEvents
 
-      //DONE: bind orientationchange and resize
+      //DONE: bind orientationchange and resize - the popover
       $(window).bind('orientationchange throttledresize', function(event){
         var $menu=$('div:jqmData(id="menu")'),
             $main=$('div:jqmData(id="main")'),
-            $mainHeader=$main.find('div.'+$.mobile.activePageClass+'> div[data-role="header"]'),
+            $mainHeader=$main.find('div.'+$.mobile.activePageClass+'> div:jqmData(role="header")'),
             $window=$(window);
         
         function popoverBtn(header) {
@@ -440,9 +439,9 @@
                .css('width', '');
           popoverBtn($mainHeader);
 
-          $main.undelegate('div[data-role="page"]', 'pagebeforeshow.splitview');
-          $main.delegate('div[data-role="page"]','pagebeforeshow.popover', function(){
-            var $thisHeader=$(this).children('div[data-role="header"]');
+          $main.undelegate('div:jqmData(role="page")', 'pagebeforeshow.splitview');
+          $main.delegate('div:jqmData(role="page")','pagebeforeshow.popover', function(){
+            var $thisHeader=$(this).children('div:jqmData(role="header")');
             popoverBtn($thisHeader);
           });
           // TODO: unbind resetActivePageHeight for popover pages
@@ -456,15 +455,15 @@
           $menu.children('.popover_triangle').remove();
           $main.addClass('ui-panel-right')
                .width(function(){
-                 return $(window).width()-$('div[data-id="menu"]').width();  
+                 return $(window).width()-$('div:jqmData(id="menu")').width();  
                });
           $mainHeader.children('.popover-btn').remove();
           
           // replaceBackBtn($mainHeader);
 
-          $main.undelegate('div[data-role="page"]', 'pagebeforeshow.popover');
-          $main.delegate('div[data-role="page"]', 'pagebeforeshow.splitview', function(){
-            var $thisHeader=$(this).children('div[data-role="header"]');
+          $main.undelegate('div:jqmData(role="page")', 'pagebeforeshow.popover');
+          $main.delegate('div:jqmData(role="page")', 'pagebeforeshow.splitview', function(){
+            var $thisHeader=$(this).children('div:jqmData(role="header")');
             $thisHeader.children('.popover-btn').remove();
             // replaceBackBtn($thisHeader);
           });
@@ -507,18 +506,20 @@
 
 
 //----------------------------------------------------------------------------------
-//Other event bindings: scrollview, popover buttons, and toolbar hacks
+//Other event bindings: scrollview, crumbs, data-context and content height adjustments
 //----------------------------------------------------------------------------------
 
       //DONE: pageshow binding for scrollview
-      $('div[data-role="page"]').live('pagebeforeshow.scroll', function(event){
+      $('div:jqmData(role="page")').live('pagebeforeshow.scroll', function(event, ui){
         if ($.support.touch) {
+
           var $page = $(this);
-          $page.find('div[data-role="content"]').attr('data-scroll','y');
+            
+          $page.find('div:jqmData(role="content")').attr('data-scroll','y');
           $page.find("[data-scroll]:not(.ui-scrollview-clip)").each(function(){
             var $this = $(this);
-            // XXX: Remove this check for ui-scrolllistview once we've
-            //      integrated list divider support into the main scrollview class.
+            //XXX: Remove this check for ui-scrolllistview once we've
+            //integrated list divider support into the main scrollview class.
             if ($this.hasClass("ui-scrolllistview"))
               $this.scrolllistview();
             else
@@ -541,18 +542,19 @@
 
               $this.scrollview(opts);
             }
+          
           });
         }
       });
 
       //data-hash 'crumbs' handler
       //now that data-backbtn is no longer defaulting to true, lets set crumbs to create itself even when backbtn is not available
-      $('div[data-role="page"]').live('pagebeforeshow.crumbs', function(event, data){
+      $('div:jqmData(role="page")').live('pagebeforeshow.crumbs', function(event, data){
         var $this = $(this);
-        if($this.jqmData('hash') == 'crumbs' || $this.parents('div[data-role="panel"]').data('hash') == 'crumbs'){
+        if($this.jqmData('hash') == 'crumbs' || $this.parents('div:jqmData(role="panel")').data('hash') == 'crumbs'){
           if($this.jqmData('hash')!=false && $this.find('.ui-crumbs').length < 1){
             var $header=$this.find('div:jqmData(role="header")');
-              backBtn = $this.find('a[data-rel="back"]');
+              backBtn = $this.find('a:jqmData(rel="back")');
         
             if(data.prevPage.jqmData('url') == $this.jqmData('url')){  //if it's a page refresh
               var prevCrumb = data.prevPage.find('.ui-crumbs');
@@ -615,6 +617,7 @@
       })
     }
     else {
+      //removes all panels so the page behaves like a single panel jqm
       $(function(){
         $('div:jqmData(role="panel")').each(function(){
           var $this = $(this);
