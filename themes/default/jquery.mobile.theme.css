@@ -658,8 +658,11 @@ a.ui-link-inherit {
 	-webkit-border-radius: 				.6em;
 	border-radius: 						.6em;
 }
-
-
+.ui-corner-none {
+	-moz-border-radius: 				   0;
+	-webkit-border-radius: 				   0;
+	border-radius: 						   0;
+}
 
 /* Interaction cues
 -----------------------------------------------------------------------------------------------------------*/
@@ -803,6 +806,7 @@ a.ui-link-inherit {
 .ui-icon-radio-off {
 	background-color: transparent;	
 }
+.ui-icon-checkbox-on,
 .ui-checkbox-on .ui-icon,
 .ui-radio-on .ui-icon {
 	background-color: #4596ce; /* NOTE: this hex should match the active state color. It's repeated here for cascade */

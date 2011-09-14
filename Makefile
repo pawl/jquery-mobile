@@ -45,6 +45,7 @@ JSFILES = 	  js/jquery.ui.widget.js \
 			  js/jquery.mobile.page.js \
 			  js/jquery.mobile.core.js \
 			  js/jquery.mobile.navigation.js \
+			  js/jquery.mobile.navigation.pushstate.js \
 			  js/jquery.mobile.transition.js \
 			  js/jquery.mobile.degradeInputs.js \
 			  js/jquery.mobile.dialog.js \
@@ -60,11 +61,13 @@ JSFILES = 	  js/jquery.ui.widget.js \
 			  js/jquery.mobile.forms.button.js \
 			  js/jquery.mobile.forms.slider.js \
 			  js/jquery.mobile.forms.textinput.js \
+			  js/jquery.mobile.forms.select.custom.js \
 			  js/jquery.mobile.forms.select.js \
 			  js/jquery.mobile.buttonMarkup.js \
 			  js/jquery.mobile.controlGroup.js \
 			  js/jquery.mobile.links.js \
 			  js/jquery.mobile.fixHeaderFooter.js \
+			  js/jquery.mobile.fixHeaderFooter.native.js \
 			  js/jquery.mobile.media.classes.js \
 			  js/jquery.mobile.init.js
 
@@ -126,7 +129,7 @@ notify:
 	@@echo "The files have been built and are in " $$(pwd)/${OUTPUT}
 
 # Pull the latest commits. This is used for the nightly build but can be used to save some keystrokes
-pull: 
+pull:
 	@@git pull --quiet
 
 # Zip the 4 files and the theme images into one convenient package
@@ -161,7 +164,7 @@ nightly: pull zip
 	# Change the empty paths to the location of this nightly file
 	@@find ${VER} -type f -name '*.html' -exec sed -i 's|href="themes/default/"|href="${NIGHTLY_WEBPATH}/${DIR}.min.css"|g' {} \;
 	@@find ${VER} -type f -name '*.html' -exec sed -i 's|src="js/jquery.js"|src="http://code.jquery.com/jquery-${JQUERY}.min.js"|' {} \;
-	@@find ${VER} -type f -name '*.html' -exec sed -i 's|src="js/"|src="${NIGHTLY_WEBPATH}/${DIR}.min.js"|g' {} \;	
+	@@find ${VER} -type f -name '*.html' -exec sed -i 's|src="js/"|src="${NIGHTLY_WEBPATH}/${DIR}.min.js"|g' {} \;
 
 	# Move the demos into the output folder
 	@@mv ${VER} ${OUTPUT}/demos

@@ -14,14 +14,12 @@ $.widget( "mobile.page", $.mobile.widget, {
 	},
 
 	_create: function() {
-		var $elem = this.element,
-			o = this.options;
 
-		if ( this._trigger( "beforeCreate" ) === false ) {
-			return;
-		}
+		this._trigger( "beforecreate" );
 
-		$elem.addClass( "ui-page ui-body-" + o.theme );
+		this.element
+			.attr( "tabindex", "0" )
+			.addClass( "ui-page ui-body-" + this.options.theme );
 	}
 });
 
