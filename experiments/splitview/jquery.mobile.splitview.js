@@ -290,7 +290,7 @@
           //if link refers to an already active panel, stop default action and return
           if ($targetPanelActivePage.attr('data-url') == url || $currPanelActivePage.attr('data-url') == url) {
             if (isRefresh) { //then changePage below because it's a pageRefresh request
-              $.mobile.changePage(href, options={transition:'fade', reverse:reverseVal, changeHash:false, pageContainer:$targetContainer, reloadPage:isRefresh});
+              $.mobile.changePage(href, options={fromPage:from, transition:'fade', reverse:reverseVal, changeHash:false, pageContainer:$targetContainer, reloadPage:isRefresh});
             }
             else { //else preventDefault and return
               event.preventDefault();
@@ -301,14 +301,14 @@
           else if ($targetPanel && $targetPanel!=$link.parents('div:jqmData(role="panel")')) {
             var from=$targetPanelActivePage;
             $.mobile.pageContainer=$targetContainer;
-            $.mobile.changePage(href, options={transition:transitionVal, reverse:reverseVal, pageContainer:$targetContainer});
+            $.mobile.changePage(href, options={fromPage:from, transition:transitionVal, reverse:reverseVal, pageContainer:$targetContainer});
           }
           //if link refers to a page inside the same panel, changePage on that panel 
           else {
             var from=$currPanelActivePage;
             $.mobile.pageContainer=$currPanel;
             var hashChange= (hash == 'false' || hash == 'crumbs')? false : true;
-            $.mobile.changePage(href, options={transition:transitionVal, reverse:reverseVal, changeHash:hashChange, pageContainer:$currPanel});
+            $.mobile.changePage(href, options={fromPage:from, transition:transitionVal, reverse:reverseVal, changeHash:hashChange, pageContainer:$currPanel});
             //active page must always point to the active page in main - for history purposes.
             $.mobile.activePage=$('div:jqmData(id="main") > div.'+$.mobile.activePageClass);
           }
