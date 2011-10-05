@@ -3,9 +3,9 @@ body {
 }
 
 .ui-panel {
-  -moz-box-shadow: 0 0 5px 1px #888;
-  -webkit-box-shadow: 0 0 5px 1px#888;
-  box-shadow: 0 0 5px 1px #888;
+  -moz-box-shadow: 0 0 12px rgba(0,0,0,.6);
+  -webkit-box-shadow: 0 0 12px rgba(0,0,0,.6);
+  box-shadow: 0 0 12px rgba(0,0,0,.6);
 }
 
 div[data-id="main"] {
