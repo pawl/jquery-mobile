@@ -3,20 +3,24 @@
 	<head> 
 	<title>Jquery Mobile Splitview</title> 
   <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
-	<link rel="stylesheet" href="../../compiled/jquery.mobile-1.0b1pre.css" />
+	<link rel="stylesheet" href="../../compiled/jquery.mobile-1.0rc2pre.css" />
 	<link rel="stylesheet" href="jquery.mobile.splitview.css" />
   <link rel="stylesheet"  href="jquery.mobile.scrollview.css" />
   <link rel="stylesheet"  href="jquery.mobile.grids.collapsible.css" />
-  
+  <script type="text/javascript" src="jquery-1.6.2.js"></script>
+  <script type="text/javascript" src="jquery.mobile.splitview.js"></script>
+  <script type="text/javascript" src="../../compiled/jquery.mobile-1.0rc2pre.js"></script>
+  <script type="text/javascript" src="jquery.easing.1.3.js"></script>
+  <script type="text/javascript" src="jquery.mobile.scrollview.js"></script>
 </head> 
 
   <body> 
 
     <div data-role="panel" data-id="menu" data-hash="crumbs" data-context="a#default">
       <!-- Start of first page -->
-      <div data-role="page" id="main">
+      <div data-role="page" id="main" data-hash="false">
 
-      	<div data-role="header" data-backbtn="false" >
+      	<div data-role="header">
       		<h1>Main</h1>
       	</div><!-- /header -->
 
@@ -54,9 +58,9 @@
 
 
       <!-- Start of 2nd page -->
-      <div data-role="page" id="demo">
+      <div data-role="page" id="demo" data-hash="false">
 
-        <div data-role="header" data-backbtn="false">
+        <div data-role="header">
           <h1>Demos</h1>
         </div><!-- /header -->
 
@@ -387,10 +391,4 @@
 
 
   </body>
-  <script type="text/javascript" src="jquery-1.6.1.min.js"></script>
-  <script type="text/javascript" src="jquery.mobile.splitview.js"></script>
-  <!-- script type="text/javascript" src="jquery.mobile.splitview.toolbar.js"></script -->
-  <script type="text/javascript" src="../../compiled/jquery.mobile-1.0b1pre.js"></script>
-  <script type="text/javascript" src="jquery.easing.1.3.js"></script>
-  <script type="text/javascript" src="jquery.mobile.scrollview.js"></script>
 </html>

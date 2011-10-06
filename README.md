@@ -85,10 +85,10 @@ Panel settings
 ===================================
 there are two settings for panel divs:
 
-1) data-hash - takes the following values: true(default), false, and crumbs
+1. data-hash - takes the following values: true(default), false, and crumbs
 this attribute tells splitview to track history for the panel or not (true and false), or to set a 'crumb' (crumbs) button at the top left portion of the header for each page. 
 
-2) data-context - takes a jQuery selector value, or a hash of the following: url, panel, refresh.
+2. data-context - takes a jQuery selector value, or a hash of the following: url, panel, refresh.
 data-context tells splitview to load another page whose link can be found in the active page by the jQuery selector value, or a page which is pointed to by the hash. example:
 
 	<div data-role="panel" data-id="menu" data-hash="crumbs" data-context="a#default">

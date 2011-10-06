@@ -9,58 +9,57 @@
 
 (function( $, window, undefined ) {
 
-	//jQuery.mobile configurable options
+	// jQuery.mobile configurable options
 	$.extend( $.mobile, {
 
-		//namespace used framework-wide for data-attrs. Default is no namespace
+		// Namespace used framework-wide for data-attrs. Default is no namespace
 		ns: "",
 
-		//define the url parameter used for referencing widget-generated sub-pages.
-		//Translates to to example.html&ui-page=subpageIdentifier
-		//hash segment before &ui-page= is used to make Ajax request
+		// Define the url parameter used for referencing widget-generated sub-pages.
+		// Translates to to example.html&ui-page=subpageIdentifier
+		// hash segment before &ui-page= is used to make Ajax request
 		subPageUrlKey: "ui-page",
 
-		//anchor links with a data-rel, or pages with a	 data-role, that match these selectors will be untrackable in history
-		//(no change in URL, not bookmarkable)
-		nonHistorySelectors: "dialog",
-
-		//class assigned to page currently in view, and during transitions
+		// Class assigned to page currently in view, and during transitions
 		activePageClass: "ui-page-active",
 
-		//class used for "active" button state, from CSS framework
+		// Class used for "active" button state, from CSS framework
 		activeBtnClass: "ui-btn-active",
 
-		//automatically handle clicks and form submissions through Ajax, when same-domain
+		// Automatically handle clicks and form submissions through Ajax, when same-domain
 		ajaxEnabled: true,
 
-		//automatically load and show pages based on location.hash
+		// Automatically load and show pages based on location.hash
 		hashListeningEnabled: true,
 
-		// TODO: deprecated - remove at 1.0
-		//automatically handle link clicks through Ajax, when possible
-		ajaxLinksEnabled: true,
+		// Set default page transition - 'none' for no transitions
+		defaultPageTransition: "slide",
 
-		// TODO: deprecated - remove at 1.0
-		//automatically handle form submissions through Ajax, when possible
-		ajaxFormsEnabled: true,
+		// Minimum scroll distance that will be remembered when returning to a page
+		minScrollBack: 250,
 
-		//set default transition - 'none' for no transitions
-		defaultTransition: "slide",
+		// Set default dialog transition - 'none' for no transitions
+		defaultDialogTransition: "pop",
 
-		//show loading message during Ajax requests
-		//if false, message will not appear, but loading classes will still be toggled on html el
+		// Show loading message during Ajax requests
+		// if false, message will not appear, but loading classes will still be toggled on html el
 		loadingMessage: "loading",
 
-		//error response message - appears when an Ajax page request fails
+		// Error response message - appears when an Ajax page request fails
 		pageLoadErrorMessage: "Error Loading Page",
 
-		//support conditions that must be met in order to proceed
-		//default enhanced qualifications are media query support OR IE 7+
+		//automatically initialize the DOM when it's ready
+		autoInitializePage: true,
+
+		pushStateEnabled: true,
+
+		// Support conditions that must be met in order to proceed
+		// default enhanced qualifications are media query support OR IE 7+
 		gradeA: function(){
 			return $.support.mediaquery || $.mobile.browser.ie && $.mobile.browser.ie >= 7;
 		},
 
-		//TODO might be useful upstream in jquery itself ?
+		// TODO might be useful upstream in jquery itself ?
 		keyCode: {
 			ALT: 18,
 			BACKSPACE: 8,
@@ -96,61 +95,95 @@
 			WINDOWS: 91 // COMMAND
 		},
 
-		//scroll page vertically: scroll to 0 to hide iOS address bar, or pass a Y value
+		// Scroll page vertically: scroll to 0 to hide iOS address bar, or pass a Y value
 		silentScroll: function( ypos ) {
-			ypos = ypos || 0;
+			if ( $.type( ypos ) !== "number" ) {
+				ypos = $.mobile.defaultHomeScroll;
+			}
+
 			// prevent scrollstart and scrollstop events
 			$.event.special.scrollstart.enabled = false;
 
 			setTimeout(function() {
 				window.scrollTo( 0, ypos );
-				$(document).trigger( "silentscroll", { x: 0, y: ypos });
-			},20);
+				$( document ).trigger( "silentscroll", { x: 0, y: ypos });
+			}, 20 );
 
 			setTimeout(function() {
 				$.event.special.scrollstart.enabled = true;
 			}, 150 );
 		},
 
-		// compile the namespace normalization regex once
-		normalizeRegex: /-([a-z])/g,
-
-		// take a data attribute property, prepend the namespace
+		// Take a data attribute property, prepend the namespace
 		// and then camel case the attribute string
-		nsNormalize: function(prop){
-			if(!prop) return;
+		nsNormalize: function( prop ) {
+			if ( !prop ) {
+				return;
+			}
 
 			return $.camelCase( $.mobile.ns + prop );
 		}
 	});
 
-	//mobile version of data and removeData and hasData methods
-	//ensures all data is set and retrieved using jQuery Mobile's data namespace
-	$.fn.jqmData = function( prop, value ){
-		return this.data( prop ? $.mobile.nsNormalize(prop) : prop, value );
+	// Mobile version of data and removeData and hasData methods
+	// ensures all data is set and retrieved using jQuery Mobile's data namespace
+	$.fn.jqmData = function( prop, value ) {
+		var result;
+		if ( typeof prop != "undefined" ) {
+			result = this.data( prop ? $.mobile.nsNormalize( prop ) : prop, value );
+		}
+		return result;
 	};
 
-	$.jqmData = function( elem, prop, value ){
-		return $.data( elem, $.mobile.nsNormalize(prop), value );
+	$.jqmData = function( elem, prop, value ) {
+		var result;
+		if ( typeof prop != "undefined" ) {
+			result = $.data( elem, prop ? $.mobile.nsNormalize( prop ) : prop, value );
+		}
+		return result;
 	};
 
-	$.fn.jqmRemoveData = function( prop ){
-		return this.removeData( $.mobile.nsNormalize(prop) );
+	$.fn.jqmRemoveData = function( prop ) {
+		return this.removeData( $.mobile.nsNormalize( prop ) );
 	};
 
-	$.jqmRemoveData = function( elem, prop ){
-		return $.removeData( elem, $.mobile.nsNormalize(prop) );
+	$.jqmRemoveData = function( elem, prop ) {
+		return $.removeData( elem, $.mobile.nsNormalize( prop ) );
 	};
 
-	$.jqmHasData = function( elem, prop ){
-		return $.hasData( elem, $.mobile.nsNormalize(prop) );
+	$.fn.removeWithDependents = function() {
+		$.removeWithDependents( this );
+	};
+
+	$.removeWithDependents = function( elem ) {
+		var $elem = $( elem );
+
+		( $elem.jqmData('dependents') || $() ).remove();
+		$elem.remove();
+	};
+
+	$.fn.addDependents = function( newDependents ) {
+		$.addDependents( $(this), newDependents );
+	};
+
+	$.addDependents = function( elem, newDependents ) {
+		var dependents = $(elem).jqmData( 'dependents' ) || $();
+
+		$(elem).jqmData( 'dependents', $.merge(dependents, newDependents) );
+	};
+
+	// note that this helper doesn't attempt to handle the callback
+	// or setting of an html elements text, its only purpose is
+	// to return the html encoded version of the text in all cases. (thus the name)
+	$.fn.getEncodedText = function() {
+		return $( "<div/>" ).text( $(this).text() ).html();
 	};
 
 	// Monkey-patching Sizzle to filter the :jqmData selector
 	var oldFind = $.find;
 
 	$.find = function( selector, context, ret, extra ) {
-		selector = selector.replace(/:jqmData\(([^)]*)\)/g, "[data-" + ($.mobile.ns || "") + "$1]");
+		selector = selector.replace(/:jqmData\(([^)]*)\)/g, "[data-" + ( $.mobile.ns || "" ) + "$1]");
 
 		return oldFind.call( this, selector, context, ret, extra );
 	};
@@ -162,6 +195,7 @@
 	};
 
 	$.find.matchesSelector = function( node, expr ) {
-		return $.find( expr, null, null, [node] ).length > 0;
+		return $.find( expr, null, null, [ node ] ).length > 0;
 	};
 })( jQuery, this );
+

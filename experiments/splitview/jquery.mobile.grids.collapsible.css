@@ -81,27 +81,28 @@ img {
 
 
 /* touchscreens */
-
-.touch.min-width-768px body {
+@media (min-width:768px) {
+.touch body {
   font-size: 1em;
   line-height: normal;
   }
 
 
 /* Smaller screens */
-.min-width-768px body {
+body {
   font-size: 0.9em;
   line-height: normal;
   }
+}
 
 /* Mobile */
-
-.max-width-480px body {
+@media (max-width:480px) {
+body {
   font-size: 1em;
   -webkit-text-size-adjust: none;
   }
   
-.max-width-480px .row, .max-width-480px body {
+.row, body {
   width: 100%;
   min-width: 0;
   margin-left: 0px;
@@ -110,7 +111,7 @@ img {
   padding-right: 0px;
   }
   
-.max-width-480px .row .span1, .max-width-480px .row .span2, .max-width-480px .row .span3, .max-width-480px .row .span4, .max-width-480px .row .span5, .max-width-480px .row .span6, .max-width-480px .row .span7, .max-width-480px .row .span8, .max-width-480px .row .span9, .max-width-480px .row .span10, .max-width-480px .row .span11, .max-width-480px .row .span12 {
+.row .span1, .row .span2, .row .span3, .row .span4, .row .span5, .row .span6, .row .span7, .row .span8, .row .span9, .row .span10, .row .span11, .row .span12 {
   width: auto;
   float: none;
   margin-left: 0px;
@@ -118,3 +119,4 @@ img {
   padding-left: 20px;
   padding-right: 20px;
   }
+}
