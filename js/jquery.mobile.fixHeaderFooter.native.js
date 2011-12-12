@@ -1,14 +1,11 @@
 /*
-* jQuery Mobile Framework : "fixHeaderFooter" native plugin - Behavior for "fixed" headers,footers, and scrolling inner content
-* Copyright (c) jQuery Project
-* Dual licensed under the MIT or GPL Version 2 licenses.
-* http://jquery.org/license
+* "fixHeaderFooter" native plugin - Behavior for "fixed" headers,footers, and scrolling inner content
 */
 
 (function( $, undefined ) {
 
 // Enable touch overflow scrolling when it's natively supported
-$.mobile.touchOverflowEnabled = true;
+$.mobile.touchOverflowEnabled = false;
 
 // Enabled zoom when touch overflow is enabled. Can cause usability issues, unfortunately
 $.mobile.touchOverflowZoomEnabled = false;

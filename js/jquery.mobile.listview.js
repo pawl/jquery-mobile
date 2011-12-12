@@ -1,8 +1,5 @@
 /*
-* jQuery Mobile Framework : "listview" plugin
-* Copyright (c) jQuery Project
-* Dual licensed under the MIT or GPL Version 2 licenses.
-* http://jquery.org/license
+* "listview" plugin
 */
 
 (function( $, undefined ) {
@@ -14,7 +11,7 @@ var listCountPerPage = {};
 
 $.widget( "mobile.listview", $.mobile.widget, {
 	options: {
-		theme: "c",
+		theme: null,
 		countTheme: "c",
 		headerTheme: "b",
 		dividerTheme: "b",
@@ -33,25 +30,6 @@ $.widget( "mobile.listview", $.mobile.widget, {
 		});
 
 		t.refresh( true );
-	},
-
-	_itemApply: function( $list, item ) {
-		var $countli = item.find( ".ui-li-count" );
-		if ( $countli.length ) {
-			item.addClass( "ui-li-has-count" );
-		}
-		$countli.addClass( "ui-btn-up-" + ( $list.jqmData( "counttheme" ) || this.options.countTheme ) + " ui-btn-corner-all" );
-
-		// TODO class has to be defined in markup
-		item.find( "h1, h2, h3, h4, h5, h6" ).addClass( "ui-li-heading" ).end()
-			.find( "p, dl" ).addClass( "ui-li-desc" ).end()
-			.find( ">img:eq(0), .ui-link-inherit>img:eq(0)" ).addClass( "ui-li-thumb" ).each(function() {
-				item.addClass( $(this).is( ".ui-li-icon" ) ? "ui-li-has-icon" : "ui-li-has-thumb" );
-			}).end()
-			.find( ".ui-li-aside" ).each(function() {
-				var $this = $(this);
-				$this.prependTo( $this.parent() ); //shift aside to front for css float
-			});
 	},
 
 	_removeCorners: function( li, which ) {
@@ -86,11 +64,15 @@ $.widget( "mobile.listview", $.mobile.widget, {
 			$topli = $visibleli.first()
 				.addClass( "ui-corner-top" );
 
-			$topli.add( $topli.find( ".ui-btn-inner" ) )
-				.find( ".ui-li-link-alt" )
+			$topli.add( $topli.find( ".ui-btn-inner" )
+					.not( ".ui-li-link-alt span:first-child" ) )
+                                .addClass( "ui-corner-top" )
+                                .end()
+				.find( ".ui-li-link-alt, .ui-li-link-alt span:first-child" )
 					.addClass( "ui-corner-tr" )
 				.end()
 				.find( ".ui-li-thumb" )
+					.not(".ui-li-icon")
 					.addClass( "ui-corner-tl" );
 
 			// Select the last visible li element
@@ -102,7 +84,61 @@ $.widget( "mobile.listview", $.mobile.widget, {
 					.addClass( "ui-corner-br" )
 				.end()
 				.find( ".ui-li-thumb" )
+					.not(".ui-li-icon")
 					.addClass( "ui-corner-bl" );
+		}
+		if ( !create ) {
+			this.element.trigger( "updatelayout" );
+		}
+	},
+
+	// This is a generic utility method for finding the first
+	// node with a given nodeName. It uses basic DOM traversal
+	// to be fast and is meant to be a substitute for simple
+	// $.fn.closest() and $.fn.children() calls on a single
+	// element. Note that callers must pass both the lowerCase
+	// and upperCase version of the nodeName they are looking for.
+	// The main reason for this is that this function will be
+	// called many times and we want to avoid having to lowercase
+	// the nodeName from the element every time to ensure we have
+	// a match. Note that this function lives here for now, but may
+	// be moved into $.mobile if other components need a similar method.
+	_findFirstElementByTagName: function( ele, nextProp, lcName, ucName )
+	{
+		var dict = {};
+		dict[ lcName ] = dict[ ucName ] = true;
+		while ( ele ) {
+			if ( dict[ ele.nodeName ] ) {
+				return ele;
+			}
+			ele = ele[ nextProp ];
+		}
+		return null;
+	},
+	_getChildrenByTagName: function( ele, lcName, ucName )
+	{
+		var results = [],
+			dict = {};
+		dict[ lcName ] = dict[ ucName ] = true;
+		ele = ele.firstChild;
+		while ( ele ) {
+			if ( dict[ ele.nodeName ] ) {
+				results.push( ele );
+			}
+			ele = ele.nextSibling;
+		}
+		return $( results );
+	},
+
+	_addThumbClasses: function( containers )
+	{
+		var i, img, len = containers.length;
+		for ( i = 0; i < len; i++ ) {
+			img = $( this._findFirstElementByTagName( containers[ i ].firstChild, "nextSibling", "img", "IMG" ) );
+			if ( img.length ) {
+				img.addClass( "ui-li-thumb" );
+				$( this._findFirstElementByTagName( img[ 0 ].parentNode, "parentNode", "li", "LI" ) ).addClass( img.is( ".ui-li-icon" ) ? "ui-li-has-icon" : "ui-li-has-thumb" );
+			}
 		}
 	},
 
@@ -116,13 +152,18 @@ $.widget( "mobile.listview", $.mobile.widget, {
 			dividertheme = $list.jqmData( "dividertheme" ) || o.dividerTheme,
 			listsplittheme = $list.jqmData( "splittheme" ),
 			listspliticon = $list.jqmData( "spliticon" ),
-			li = $list.children( "li" ),
+			li = this._getChildrenByTagName( $list[ 0 ], "li", "LI" ),
 			counter = $.support.cssPseudoElement || !$.nodeName( $list[ 0 ], "ol" ) ? 0 : 1,
+			itemClassDict = {},
 			item, itemClass, itemTheme,
-			a, last, splittheme, countParent, icon;
+			a, last, splittheme, countParent, icon, imgParents, img;
 
 		if ( counter ) {
 			$list.find( ".ui-li-dec" ).remove();
+		}
+		
+		if ( !o.theme ) {
+			o.theme = $.mobile.getInheritedTheme( this.element, "c" );
 		}
 
 		for ( var pos = 0, numli = li.length; pos < numli; pos++ ) {
@@ -132,7 +173,7 @@ $.widget( "mobile.listview", $.mobile.widget, {
 			// If we're creating the element, we update it regardless
 			if ( create || !item.hasClass( "ui-li" ) ) {
 				itemTheme = item.jqmData("theme") || o.theme;
-				a = item.children( "a" );
+				a = this._getChildrenByTagName( item[ 0 ], "a", "A" );
 
 				if ( a.length ) {
 					icon = item.jqmData("icon");
@@ -159,7 +200,7 @@ $.widget( "mobile.listview", $.mobile.widget, {
 						splittheme = listsplittheme || last.jqmData( "theme" ) || o.splitTheme;
 
 						last.appendTo(item)
-							.attr( "title", last.text() )
+							.attr( "title", last.getEncodedText() )
 							.addClass( "ui-li-link-alt" )
 							.empty()
 							.buttonMarkup({
@@ -171,7 +212,7 @@ $.widget( "mobile.listview", $.mobile.widget, {
 							})
 							.find( ".ui-btn-inner" )
 								.append(
-									$( "<span />" ).buttonMarkup({
+									$( document.createElement( "span" ) ).buttonMarkup({
 										shadow: true,
 										corners: true,
 										theme: splittheme,
@@ -202,10 +243,58 @@ $.widget( "mobile.listview", $.mobile.widget, {
 					.prepend( "<span class='ui-li-dec'>" + (counter++) + ". </span>" );
 			}
 
-			item.add( item.children( ".ui-btn-inner" ) ).addClass( itemClass );
+			// Instead of setting item class directly on the list item and its
+			// btn-inner at this point in time, push the item into a dictionary
+			// that tells us what class to set on it so we can do this after this
+			// processing loop is finished.
 
-			self._itemApply( $list, item );
+			if ( !itemClassDict[ itemClass ] ) {
+				itemClassDict[ itemClass ] = [];
+			}
+
+			itemClassDict[ itemClass ].push( item[ 0 ] );
 		}
+
+		// Set the appropriate listview item classes on each list item
+		// and their btn-inner elements. The main reason we didn't do this
+		// in the for-loop above is because we can eliminate per-item function overhead
+		// by calling addClass() and children() once or twice afterwards. This
+		// can give us a significant boost on platforms like WP7.5.
+
+		for ( itemClass in itemClassDict ) {
+			$( itemClassDict[ itemClass ] ).addClass( itemClass ).children( ".ui-btn-inner" ).addClass( itemClass );
+		}
+
+		$list.find( "h1, h2, h3, h4, h5, h6" ).addClass( "ui-li-heading" )
+			.end()
+
+			.find( "p, dl" ).addClass( "ui-li-desc" )
+			.end()
+
+			.find( ".ui-li-aside" ).each(function() {
+					var $this = $(this);
+					$this.prependTo( $this.parent() ); //shift aside to front for css float
+				})
+			.end()
+
+			.find( ".ui-li-count" ).each( function() {
+					$( this ).closest( "li" ).addClass( "ui-li-has-count" );
+				}).addClass( "ui-btn-up-" + ( $list.jqmData( "counttheme" ) || this.options.countTheme) + " ui-btn-corner-all" );
+
+		// The idea here is to look at the first image in the list item
+		// itself, and any .ui-link-inherit element it may contain, so we
+		// can place the appropriate classes on the image and list item.
+		// Note that we used to use something like:
+		//
+		//    li.find(">img:eq(0), .ui-link-inherit>img:eq(0)").each( ... );
+		//
+		// But executing a find() like that on Windows Phone 7.5 took a
+		// really long time. Walking things manually with the code below
+		// allows the 400 listview item page to load in about 3 seconds as
+		// opposed to 30 seconds.
+
+		this._addThumbClasses( li );
+		this._addThumbClasses( $list.find( ".ui-link-inherit" ) );
 
 		this._refreshCorners( create );
 	},
@@ -240,7 +329,7 @@ $.widget( "mobile.listview", $.mobile.widget, {
 				parent = list.parent(),
 				nodeEls = $( list.prevAll().toArray().reverse() ),
 				nodeEls = nodeEls.length ? nodeEls : $( "<span>" + $.trim(parent.contents()[ 0 ].nodeValue) + "</span>" ),
-				title = nodeEls.first().text(),//url limits to first 30 chars of text
+				title = nodeEls.first().getEncodedText(),//url limits to first 30 chars of text
 				id = ( parentUrl || "" ) + "&" + $.mobile.subPageUrlKey + "=" + listId,
 				theme = list.jqmData( "theme" ) || o.theme,
 				countTheme = list.jqmData( "counttheme" ) || parentList.jqmData( "counttheme" ) || o.countTheme,

@@ -1,11 +1,12 @@
+
 jQuery Mobile Splitview plugin
-=====
+-------------------------------
 demo at: asyraf9.github.com/jquery-mobile/
 
 This is a plugin for jQuery Mobile that detects your device's browser width and renders pages accordingly - e.g. splitview for desktop and tablets, and standard jqm for mobile phones. 
 
 Features
-======================
+-------------------------------
 1. auto-detection of how to render for the browser you are using.
 2. independent panel scrolling (still a lot more to work on here)
 3. orientation and resize aware - renders the side panel in a popover fashion when in portrait mode
@@ -14,7 +15,7 @@ Features
 6. panel specific links - links on the side panel can affect pages in the main panel, or in the side panel itself.  
 
 Anatomy of a Splitview page
-===============================
+-------------------------------
 the anatomy of a splitview page can be seen at the demo page above. Basically, you need to position your pages in the following order:
 
 	<!DOCTYPE html> 
@@ -82,7 +83,7 @@ NOTE: although with this beta2 release I've managed to minimize the amount of ch
 pages can also be loaded dynamically provided you specify the panel it needs to load into (as explained below). you need to preload two pages - one for each panel, to avoid an empty page on either of your panels.
 
 Panel settings
-===================================
+-------------------------------
 there are two settings for panel divs:
 
 1. data-hash - takes the following values: true(default), false, and crumbs
@@ -102,7 +103,7 @@ NOTE: this attribute, if used on a page, overrides panel data-context attributes
 	<div data-role="page" data-context="a#default">
 
 Splitview Links
-===================================
+-------------------------------
 splitview links work just like the links in jQuery Mobile. the only difference is, you can define the panel you want the page that link points to load into using the 'data-panel' attribute. for example:
 
 	<a href="some_other_page" data-panel="main">

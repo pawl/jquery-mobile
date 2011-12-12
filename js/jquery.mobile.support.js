@@ -1,7 +1,5 @@
 /*
-* jQuery Mobile Framework : support tests
-* Copyright (c) jQuery Project
-* Dual licensed under the MIT (MIT-LICENSE.txt) and GPL (GPL-LICENSE.txt) licenses.
+* support tests
 */
 
 (function( $, undefined ) {
@@ -10,6 +8,7 @@ var fakeBody = $( "<body>" ).prependTo( "html" ),
 	fbCSS = fakeBody[ 0 ].style,
 	vendors = [ "Webkit", "Moz", "O" ],
 	webos = "palmGetResource" in window, //only used to rule out scrollTop
+	operamini = window.operamini && ({}).toString.call( window.operamini ) === "[object OperaMini]",
 	bb = window.blackberry; //only used to rule out box shadow, as it's filled opaque on BB
 
 // thx Modernizr
@@ -38,9 +37,9 @@ function baseTagTest() {
 		href = base.attr( "href" );
 	}
 
-	link = $( "<a href='testurl'></a>" ).prependTo( fakeBody );
+	link = $( "<a href='testurl' />" ).prependTo( fakeBody );
 	rebase = link[ 0 ].href;
-	base[ 0 ].href = href ? href : location.pathname;
+	base[ 0 ].href = href || location.pathname;
 
 	if ( fauxEle ) {
 		fauxEle.remove();
@@ -57,14 +56,16 @@ $.mobile.browser.ie = (function() {
 	div = document.createElement( "div" ),
 	a = div.all || [];
 
-	while ( div.innerHTML = "<!--[if gt IE " + ( ++v ) + "]><br><![endif]-->", a[ 0 ] );
+	// added {} to silence closure compiler warnings. registering my dislike of all things
+	// overly clever here for future reference
+	while ( div.innerHTML = "<!--[if gt IE " + ( ++v ) + "]><br><![endif]-->", a[ 0 ] ){};
 
 	return v > 4 ? v : !v;
 })();
 
 
 $.extend( $.support, {
-	orientation: "orientation" in window,
+	orientation: "orientation" in window && "onorientationchange" in window,
 	touch: "ontouchend" in document,
 	cssTransitions: "WebKitTransitionEvent" in window,
 	pushState: "pushState" in history && "replaceState" in history,
@@ -72,7 +73,7 @@ $.extend( $.support, {
 	cssPseudoElement: !!propExists( "content" ),
 	touchOverflow: !!propExists( "overflowScrolling" ),
 	boxShadow: !!propExists( "boxShadow" ) && !bb,
-	scrollTop: ( "pageXOffset" in window || "scrollTop" in document.documentElement || "scrollTop" in fakeBody[ 0 ] ) && !webos,
+	scrollTop: ( "pageXOffset" in window || "scrollTop" in document.documentElement || "scrollTop" in fakeBody[ 0 ] ) && !webos && !operamini,
 	dynamicBaseTag: baseTagTest()
 });
 
@@ -98,7 +99,7 @@ $.mobile.ajaxBlacklist =
 			// BlackBerry browsers, pre-webkit
 			window.blackberry && !window.WebKitPoint ||
 			// Opera Mini
-			window.operamini && Object.prototype.toString.call( window.operamini ) === "[object OperaMini]" ||
+			operamini ||
 			// Symbian webkits pre 7.3
 			nokiaLTE7_3;
 
@@ -107,7 +108,7 @@ $.mobile.ajaxBlacklist =
 // This simply reappends the CSS in place, which for some reason makes it apply
 if ( nokiaLTE7_3 ) {
 	$(function() {
-		$( "head link[rel=stylesheet]" ).attr( "rel", "alternate stylesheet" ).attr( "rel", "stylesheet" );
+		$( "head link[rel='stylesheet']" ).attr( "rel", "alternate stylesheet" ).attr( "rel", "stylesheet" );
 	});
 }
 

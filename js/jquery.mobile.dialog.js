@@ -1,7 +1,5 @@
 /*
-* jQuery Mobile Framework : "dialog" plugin.
-* Copyright (c) jQuery Project
-* Dual licensed under the MIT (MIT-LICENSE.txt) and GPL (GPL-LICENSE.txt) licenses.
+* "dialog" plugin.
 */
 
 (function( $, window, undefined ) {
@@ -9,20 +7,15 @@
 $.widget( "mobile.dialog", $.mobile.widget, {
 	options: {
 		closeBtnText 	: "Close",
-		theme			: "a",
+		overlayTheme	: "a",
 		initSelector	: ":jqmData(role='dialog')"
 	},
 	_create: function() {
 		var self = this,
 			$el = this.element,
-			pageTheme = $el.attr( "class" ).match( /ui-body-[a-z]/ ),
 			headerCloseButton = $( "<a href='#' data-" + $.mobile.ns + "icon='delete' data-" + $.mobile.ns + "iconpos='notext'>"+ this.options.closeBtnText + "</a>" );
 
-		if( pageTheme.length ){
-			$el.removeClass( pageTheme[ 0 ] );
-		}
-
-		$el.addClass( "ui-body-" + this.options.theme );
+		$el.addClass( "ui-overlay-" + this.options.overlayTheme );
 
 		// Class the markup for dialog styling
 		// Set aria role
@@ -33,8 +26,9 @@ $.widget( "mobile.dialog", $.mobile.widget, {
 				.prepend( headerCloseButton )
 			.end()
 			.find( ":jqmData(role='content'),:jqmData(role='footer')" )
+				.addClass( "ui-overlay-shadow" )
 				.last()
-				.addClass( "ui-corner-bottom ui-overlay-shadow" );
+				.addClass( "ui-corner-bottom" );
 
 		// this must be an anonymous function so that select menu dialogs can replace
 		// the close method. This is a change from previously just defining data-rel=back
@@ -72,7 +66,7 @@ $.widget( "mobile.dialog", $.mobile.widget, {
 });
 
 //auto self-init widgets
-$( $.mobile.dialog.prototype.options.initSelector ).live( "pagecreate", function(){
+$( document ).delegate( $.mobile.dialog.prototype.options.initSelector, "pagecreate", function(){
 	$( this ).dialog();
 });
 

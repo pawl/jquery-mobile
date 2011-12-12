@@ -6,8 +6,14 @@
 	var onChangeCnt = 0;
 	window.onChangeCounter = function() {
 		onChangeCnt++;
-	}
-	module('jquery.mobile.slider.js');
+	};
+
+	module('jquery.mobile.slider.js', {
+		setup: function() {
+			// force the value to be an increment of 10 when we aren't testing the rounding
+			$("#stepped").val( 20 );
+		}
+	});
 
 	var keypressTest = function(opts){
 		var slider = $(opts.selector),
@@ -99,7 +105,7 @@
 		slider.keyup();
 		same(slider.val(), "200");
 	});
-	
+
 	test( "input type should degrade to number when slider is created", function(){
 		same($("#range-slider-up").attr( "type" ), "number");
 	});
@@ -160,7 +166,15 @@
 		ok( !$("#enhancetest").appendTo(".ui-page-active").find(".ui-slider").length, "did not have enhancements applied" );
 		ok( $("#enhancetest").trigger("create").find(".ui-slider").length, "enhancements applied" );
 	});
-	
+
+	var createEvent = function( name, target, x, y ) {
+		var event = $.Event( name );
+		event.target = target;
+		event.pageX = x;
+		event.pageY = y;
+		return event;
+	};
+
 	test( "toggle switch should fire one change event when clicked", function(){
 		var control = $( "#slider-switch" ),
 			widget = control.data( "slider" ),
@@ -174,15 +188,6 @@
 			event = null,
 			offset = handle.offset(),
 			currentValue = control[0].selectedIndex;
-
-		function createEvent( name, target, x, y )
-		{
-			var event = $.Event( name );
-			event.target = target;
-			event.pageX = x;
-			event.pageY = y;
-			return event;
-		}
 
 		control.bind( "change", changeFunc );
 
@@ -198,5 +203,174 @@
 
 		ok( control[0].selectedIndex !== currentValue, "value did change");
 		same( changeCount, 1, "change event should be fired once during a click" );
+	});
+
+	var assertLeftCSS = function( obj, opts ) {
+		var integerLeft, compare, css, threshold;
+
+		css = obj.css('left');
+		threshold = opts.pxThreshold || 0;
+
+		if( css.indexOf( "px" ) > -1 ) {
+			// parse the actual pixel value returned by the left css value
+			// and the pixels passed in for comparison
+			integerLeft = Math.round( parseFloat( css.replace("px", "") ) ),
+			compare = parseInt( opts.pixels.replace( "px", "" ), 10 );
+
+			// check that the pixel value provided is within a given threshold; default is 0px
+			ok( compare >= integerLeft - threshold && compare <= integerLeft + threshold, opts.message );
+		} else {
+			equal( css, opts.percent, opts.message );
+		}
+	};
+
+	asyncTest( "toggle switch handle should snap in the old position if dragged less than half of the slider width, in the new position if dragged more than half of the slider width", function() {
+		var control = $( "#slider-switch" ),
+			widget = control.data( "slider" ),
+			slider = widget.slider,
+			handle = widget.handle,
+			width = handle.width(),
+			offset = null;
+
+		$.testHelper.sequence([
+			function() {
+				// initialize the switch
+				control.val('on').slider('refresh');
+			},
+
+			function() {
+				assertLeftCSS(handle, {
+					percent: '100%',
+					pixels: handle.parent().css('width'),
+					message: 'handle starts on the right side'
+				});
+
+				// simulate dragging less than a half
+				offset = handle.offset();
+				slider.trigger( createEvent( "mousedown", handle[ 0 ], offset.left + width - 10, offset.top + 10 ) );
+				slider.trigger( createEvent( "mousemove", handle[ 0 ], offset.left + width - 20, offset.top + 10 ) );
+				slider.trigger( createEvent( "mouseup", handle[ 0 ], offset.left + width - 20, offset.top + 10 ) );
+			},
+
+			function() {
+				assertLeftCSS(handle, {
+					percent: '100%',
+					pixels: handle.parent().css('width'),
+					message: 'handle ends on the right side'
+				});
+
+				// initialize the switch
+				control.val('on').slider('refresh');
+			},
+
+			function() {
+				assertLeftCSS(handle, {
+					percent: '100%',
+					pixels: handle.parent().css('width'),
+					message: 'handle starts on the right side'
+				});
+
+				// simulate dragging more than a half
+				offset = handle.offset();
+				slider.trigger( createEvent( "mousedown", handle[ 0 ], offset.left + 10, offset.top + 10 ) );
+				slider.trigger( createEvent( "mousemove", handle[ 0 ], offset.left - ( width / 2 ), offset.top + 10 ) );
+				slider.trigger( createEvent( "mouseup", handle[ 0 ], offset.left - ( width / 2 ), offset.top + 10 ) );
+			},
+
+			function() {
+				assertLeftCSS(handle, {
+					percent: '0%',
+					pixels: '0px',
+					message: 'handle ends on the left side'
+				});
+
+				start();
+			}
+		], 500);
+	});
+
+	asyncTest( "toggle switch handle should not move if user is dragging and value is changed", function() {
+		var control = $( "#slider-switch" ),
+			widget = control.data( "slider" ),
+			slider = widget.slider,
+			handle = widget.handle,
+			width = handle.width(),
+			offset = null;
+
+		$.testHelper.sequence([
+			function() {
+				// initialize the switch
+				control.val('on').slider('refresh');
+			},
+
+			function() {
+				assertLeftCSS(handle, {
+					percent: '100%',
+					pixels: handle.parent().css('width'),
+					message: 'handle starts on the right side'
+				});
+
+				// simulate dragging more than a half
+				offset = handle.offset();
+				slider.trigger( createEvent( "mousedown", handle[ 0 ], offset.left + 10, offset.top + 10 ) );
+				slider.trigger( createEvent( "mousemove", handle[ 0 ], offset.left - ( width / 2 ), offset.top + 10 ) );
+			},
+
+			function() {
+				var min, max;
+				if( handle.css('left').indexOf("%") > -1 ){
+					min = "0%";
+					max = "100%";
+				} else {
+					min = "0px";
+					max = handle.parent().css( 'width' );
+				}
+
+				notEqual(handle.css('left'), min, 'handle is not on the left side');
+				notEqual(handle.css('left'), max, 'handle is not on the right side');
+
+				// reset slider state so it is ready for other tests
+				slider.trigger( createEvent( "mouseup", handle[ 0 ], offset.left - ( width / 2 ), offset.top + 10 ) );
+
+				start();
+			}
+		], 500);
+	});
+
+	asyncTest( "toggle switch should refresh when disabled", function() {
+		var control = $( "#slider-switch" ),
+			handle = control.data( "slider" ).handle;
+
+		$.testHelper.sequence([
+			function() {
+				// set the initial value
+				control.val('off').slider('refresh');
+			},
+
+			function() {
+				assertLeftCSS(handle, {
+					percent: '0%',
+					pixels: '0px',
+					message: 'handle starts on the left side'
+				});
+
+				// disable and change value
+				control.slider('disable');
+				control.val('on').slider('refresh');
+			},
+
+			function() {
+				assertLeftCSS(handle, {
+					percent: '100%',
+					pixels: handle.parent().css( 'width' ),
+					message: 'handle ends on the right side'
+				});
+
+				// reset slider state so it is ready for other tests
+				control.slider('enable');
+
+				start();
+			}
+		], 500);
 	});
 })(jQuery);

@@ -516,41 +516,23 @@
 //Other event bindings: scrollview, crumbs, data-context and content height adjustments
 //----------------------------------------------------------------------------------
 
-      //DONE: pageshow binding for scrollview
+      //DONE: pageshow binding for scrollview - now using IScroll4! hell yeah!
       $('div:jqmData(role="page")').live('pagebeforeshow.scroll', function(event, ui){
         if ($.support.touch) {
 
-          var $page = $(this);
-            
-          $page.find('div:jqmData(role="content")').attr('data-scroll','y');
-          $page.find("[data-scroll]:not(.ui-scrollview-clip)").each(function(){
-            var $this = $(this);
-            //XXX: Remove this check for ui-scrolllistview once we've
-            //integrated list divider support into the main scrollview class.
-            if ($this.hasClass("ui-scrolllistview"))
-              $this.scrolllistview();
-            else
-            {
-              var st = $this.data("scroll") + "";
-              var paging = st && st.search(/^[xy]p$/) != -1;
-              var dir = st && st.search(/^[xy]/) != -1 ? st.charAt(0) : null;
+          var $page = $(this),
+              $scrollArea = $page.find('div:jqmData(role="content")');
+              $scrAreaChildren = $scrollArea.children();
 
-              var opts = {};
-              if (dir)
-                opts.direction = dir;
-              if (paging)
-                opts.pagingEnabled = true;
-
-              var method = $this.data("scroll-method");
-              if (method)
-                opts.scrollMethod = method;
-
-              // opts.delayedClickEnabled = false;
-
-              $this.scrollview(opts);
-            }
-          
-          });
+          if ($scrAreaChildren.length > 1) {
+            $scrAreaChildren = $scrollArea.wrapInner("<div></div>").children();
+          }
+          $scrollArea.css({ 'width':'auto',
+                            'height':'auto',
+                            'overflow':'hidden'});
+          //TODO: if too many pages are in the DOM that have iscroll on, this might slow down the browser significantly, 
+          //in which case we'll need to destroy() the iscroll as the page hides. 
+          $scrollArea.iscroll();
         }
       });
 

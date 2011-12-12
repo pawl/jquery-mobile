@@ -1,8 +1,5 @@
 /*
-* jQuery Mobile Framework : "listview" filter extension
-* Copyright (c) jQuery Project
-* Dual licensed under the MIT or GPL Version 2 licenses.
-* http://jquery.org/license
+* "listview" filter extension
 */
 
 (function( $, undefined ) {
@@ -14,7 +11,7 @@ $.mobile.listview.prototype.options.filterCallback = function( text, searchValue
 	return text.toLowerCase().indexOf( searchValue ) === -1;
 };
 
-$( ":jqmData(role='listview')" ).live( "listviewcreate", function() {
+$( document ).delegate( ":jqmData(role='listview')", "listviewcreate", function() {
 
 	var list = $( this ),
 		listview = list.data( "listview" );
@@ -40,16 +37,13 @@ $( ":jqmData(role='listview')" ).live( "listviewcreate", function() {
 				lastval = $this.jqmData( "lastval" ) + "",
 				childItems = false,
 				itemtext = "",
-				item, change;
+				item;
 
 			// Change val as lastval for next execution
 			$this.jqmData( "lastval" , val );
+			if ( val.length < lastval.length || val.indexOf(lastval) !== 0 ) {
 
-			change = val.replace( new RegExp( "^" + lastval ) , "" );
-
-			if ( val.length < lastval.length || change.length != ( val.length - lastval.length ) ) {
-
-				// Removed chars or pasted something totaly different, check all items
+				// Removed chars or pasted something totally different, check all items
 				listItems = list.children();
 			} else {
 
@@ -79,7 +73,7 @@ $( ":jqmData(role='listview')" ).live( "listviewcreate", function() {
 						item.toggleClass( "ui-filter-hidequeue" , true );
 					} else {
 
-						// There"s a shown item in the bucket
+						// There's a shown item in the bucket
 						childItems = true;
 					}
 				}

@@ -1,8 +1,5 @@
 /*
-* jQuery Mobile Framework : custom "selectmenu" plugin
-* Copyright (c) jQuery Project
-* Dual licensed under the MIT or GPL Version 2 licenses.
-* http://jquery.org/license
+* custom "selectmenu" plugin
 */
 
 (function( $, undefined ) {
@@ -17,7 +14,7 @@
 			isMultiple = widget.isMultiple = widget.select[ 0 ].multiple,
 			buttonId = selectID + "-button",
 			menuId = selectID + "-menu",
-			menuPage = $( "<div data-" + $.mobile.ns + "role='dialog' data-" +$.mobile.ns + "theme='"+ widget.options.menuPageTheme +"'>" +
+			menuPage = $( "<div data-" + $.mobile.ns + "role='dialog' data-" +$.mobile.ns + "theme='"+ widget.options.theme +"' data-" +$.mobile.ns + "overlay-theme='"+ widget.options.overlayTheme +"'>" +
 				"<div data-" + $.mobile.ns + "role='header'>" +
 				"<div class='ui-title'>" + label.getEncodedText() + "</div>"+
 				"</div>"+
@@ -324,7 +321,7 @@
 					// fall into a black hole
 					self.thisPage.unbind( "pagehide.remove" );
 
-					//for webos (set lastscroll using button offset)
+					//for WebOS/Opera Mini (set lastscroll using button offset)
 					if ( scrollTop == 0 && btnOffset > screenHeight ) {
 						self.thisPage.one( "pagehide", function() {
 							$( this ).jqmData( "lastScroll", btnOffset );
@@ -346,6 +343,7 @@
 
 					self.menuType = "page";
 					self.menuPageContent.append( self.list );
+					self.menuPage.find("div .ui-title").text(self.label.text());
 					$.mobile.changePage( self.menuPage, {
 						transition: $.mobile.defaultDialogTransition
 					});
@@ -485,7 +483,7 @@
 		});
 	};
 
-	$( "select" ).live( "selectmenubeforecreate", function(){
+	$( document ).delegate( "select", "selectmenubeforecreate", function(){
 		var selectmenuWidget = $( this ).data( "selectmenu" );
 
 		if( !selectmenuWidget.options.nativeMenu ){

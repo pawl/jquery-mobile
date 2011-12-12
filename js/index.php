@@ -1,6 +1,7 @@
 <?php
 $type = 'text/javascript';
 $files = array(
+	'../LICENSE-INFO.txt',
 	'jquery.ui.widget.js',
 	'jquery.mobile.widget.js',
 	'jquery.mobile.media.js',
@@ -17,6 +18,7 @@ $files = array(
 	'jquery.mobile.dialog.js',
 	'jquery.mobile.page.sections.js',
 	'jquery.mobile.collapsible.js',
+	'jquery.mobile.collapsibleSet.js',
 	'jquery.mobile.fieldContain.js',
 	'jquery.mobile.grid.js',
 	'jquery.mobile.navbar.js',

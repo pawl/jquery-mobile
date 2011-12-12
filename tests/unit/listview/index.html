@@ -9,11 +9,13 @@
 	<script src="../jquery.setNameSpace.js"></script>
 	<script src="../../../js/"></script>
 	<script src="../../jquery.testHelper.js"></script>
-	<link rel="stylesheet"  href="../../../themes/default" />
+	<link rel="stylesheet"  href="../../../css/themes/default/" />
 	<link rel="stylesheet" href="../../../external/qunit.css"/>
 	<script src="../../../external/qunit.js"></script>
 
 	<script src="listview_core.js"></script>
+
+	<script src="../swarminject.js"></script>
 </head>
 <body>
 
@@ -295,6 +297,12 @@
 		<li><a href="#basic-link-results">Back</a></li>
 		<li><a href="#basic-link-results">Return</a></li>
 	</ul>
+</div>
+
+<div id="list-theme-inherit" data-nstest-theme="b">
+  <ul data-nstest-role="listview">
+    <li>foo</li>
+  </ul>
 </div>
 
 <div data-nstest-role="page" id="ui-li-has-test">

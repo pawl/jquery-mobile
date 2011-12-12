@@ -51,16 +51,16 @@
 
 		$checkbox.unbind( "change" );
 
-		expect( 2 );
+		expect( 1 );
 
-		$checkbox.change(function(){
+		$checkbox.one('change', function(){
 			ok( true, "change fired on click to check the box" );
 		});
 
 		$checkboxLabel.trigger( "click" );
 
 		//test above will be triggered twice, and the start here once
-		$checkbox.change( function(){
+		$checkbox.one('change', function(){
 			start();
 		});
 
@@ -115,5 +115,31 @@
 		ok( $("#enhancetest").trigger("create").find(".ui-checkbox").length, "enhancements applied" );
 	});
 
+	$.mobile.page.prototype.options.keepNative = "input.should-be-native";
 
+	// not testing the positive case here since's it's obviously tested elsewhere
+	test( "checkboxradio elements in the keepNative set shouldn't be enhanced", function() {
+		ok( !$("input.should-be-native").parent().is("div.ui-checkbox") );
+	});
+
+	asyncTest( "clicking the label triggers a click on the element", function() {
+		var clicked = false;
+
+		expect( 1 );
+
+		$( "#checkbox-click-triggered" ).one('click', function() {
+			clicked = true;
+		});
+
+		$.testHelper.sequence([
+			function() {
+				$( "[for='checkbox-click-triggered']" ).click();
+			},
+
+			function() {
+				ok(clicked, "click was fired on input");
+				start();
+			}
+		], 2000);
+	});
 })(jQuery);

@@ -1,9 +1,7 @@
 /*
-* jQuery Mobile Framework : "collapsible" plugin
-* Copyright (c) jQuery Project
-* Dual licensed under the MIT or GPL Version 2 licenses.
-* http://jquery.org/license
+* "collapsible" plugin
 */
+
 (function( $, undefined ) {
 
 $.widget( "mobile.collapsible", $.mobile.widget, {
@@ -11,7 +9,7 @@ $.widget( "mobile.collapsible", $.mobile.widget, {
 		expandCueText: " click to expand contents",
 		collapseCueText: " click to collapse contents",
 		collapsed: true,
-		heading: ">:header,>legend",
+		heading: "h1,h2,h3,h4,h5,h6,legend",
 		theme: null,
 		contentTheme: null,
 		iconTheme: "d",
@@ -22,10 +20,9 @@ $.widget( "mobile.collapsible", $.mobile.widget, {
 		var $el = this.element,
 			o = this.options,
 			collapsible = $el.addClass( "ui-collapsible" ),
-			collapsibleHeading = $el.find( o.heading ).eq( 0 ),
+			collapsibleHeading = $el.children( o.heading ).first(),
 			collapsibleContent = collapsible.wrapInner( "<div class='ui-collapsible-content'></div>" ).find( ".ui-collapsible-content" ),
-			collapsibleSet = $el.closest( ":jqmData(role='collapsible-set')" ).addClass( "ui-collapsible-set" ),
-			colllapsiblesInSet = collapsibleSet.children( ":jqmData(role='collapsible')" );
+			collapsibleSet = $el.closest( ":jqmData(role='collapsible-set')" ).addClass( "ui-collapsible-set" );
 
 		// Replace collapsibleHeading if it's a legend
 		if ( collapsibleHeading.is( "legend" ) ) {
@@ -54,57 +51,17 @@ $.widget( "mobile.collapsible", $.mobile.widget, {
 			.addClass( "ui-collapsible-heading" )
 			.append( "<span class='ui-collapsible-heading-status'></span>" )
 			.wrapInner( "<a href='#' class='ui-collapsible-heading-toggle'></a>" )
-			.find( "a:eq(0)" )
+			.find( "a" )
+				.first()
 				.buttonMarkup({
 					shadow: false,
 					corners: false,
 					iconPos: "left",
 					icon: "plus",
 					theme: o.theme
-				});
-
-		if ( !collapsibleSet.length ) {
-			collapsibleHeading
-				.find( "a:eq(0), .ui-btn-inner" )
-					.addClass( "ui-corner-top ui-corner-bottom" );
-		} else {
-			// If we are in a collapsible set
-
-			// Initialize the collapsible set if it's not already initialized
-			if ( !collapsibleSet.jqmData( "collapsiblebound" ) ) {
-
-				collapsibleSet
-					.jqmData( "collapsiblebound", true )
-					.bind( "expand", function( event ) {
-
-						$( event.target )
-							.closest( ".ui-collapsible" )
-							.siblings( ".ui-collapsible" )
-							.trigger( "collapse" );
-
-					});
-			}
-
-			colllapsiblesInSet.first()
-				.find( "a:eq(0)" )
-					.addClass( "ui-corner-top" )
-						.find( ".ui-btn-inner" )
-							.addClass( "ui-corner-top" );
-
-			colllapsiblesInSet.last()
-				.jqmData( "collapsible-last", true )
-				.find( "a:eq(0)" )
-					.addClass( "ui-corner-bottom" )
-						.find( ".ui-btn-inner" )
-							.addClass( "ui-corner-bottom" );
-
-
-			if ( collapsible.jqmData( "collapsible-last" ) ) {
-				collapsibleHeading
-					.find( "a:eq(0), .ui-btn-inner" )
-						.addClass( "ui-corner-bottom" );
-			}
-		}
+				})
+			.add( ".ui-btn-inner" )
+				.addClass( "ui-corner-top ui-corner-bottom" );
 
 		//events
 		collapsible
@@ -120,7 +77,7 @@ $.widget( "mobile.collapsible", $.mobile.widget, {
 					collapsibleHeading
 						.toggleClass( "ui-collapsible-heading-collapsed", isCollapse)
 						.find( ".ui-collapsible-heading-status" )
-							.text( o.expandCueText )
+							.text( isCollapse ? o.expandCueText : o.collapseCueText )
 						.end()
 						.find( ".ui-icon" )
 							.toggleClass( "ui-icon-minus", !isCollapse )
@@ -131,10 +88,11 @@ $.widget( "mobile.collapsible", $.mobile.widget, {
 
 					if ( contentTheme && ( !collapsibleSet.length || collapsible.jqmData( "collapsible-last" ) ) ) {
 						collapsibleHeading
-							.find( "a:eq(0), .ui-btn-inner" )
+							.find( "a" ).first().add( collapsibleHeading.find( ".ui-btn-inner" ) )
 							.toggleClass( "ui-corner-bottom", isCollapse );
 						collapsibleContent.toggleClass( "ui-corner-bottom", !isCollapse );
 					}
+					collapsibleContent.trigger( "updatelayout" );
 				}
 			})
 			.trigger( o.collapsed ? "collapse" : "expand" );

@@ -1,13 +1,10 @@
-/*!
- * jQuery Mobile v@VERSION
- * http://jquerymobile.com/
- *
- * Copyright 2010, jQuery Project
- * Dual licensed under the MIT or GPL Version 2 licenses.
- * http://jquery.org/license
- */
+/*
+* "core" - The base file for jQm
+*/
 
 (function( $, window, undefined ) {
+
+	var nsNormalizeDict = {};
 
 	// jQuery.mobile configurable options
 	$.extend( $.mobile, {
@@ -32,6 +29,9 @@
 		// Automatically load and show pages based on location.hash
 		hashListeningEnabled: true,
 
+		// disable to prevent jquery from bothering with links
+		linkBindingEnabled: true,
+
 		// Set default page transition - 'none' for no transitions
 		defaultPageTransition: "slide",
 
@@ -52,6 +52,9 @@
 		autoInitializePage: true,
 
 		pushStateEnabled: true,
+
+		// turn of binding to the native orientationchange due to android orientation behavior
+		orientationChangeEnabled: true,
 
 		// Support conditions that must be met in order to proceed
 		// default enhanced qualifications are media query support OR IE 7+
@@ -114,14 +117,59 @@
 			}, 150 );
 		},
 
+		// Expose our cache for testing purposes.
+		nsNormalizeDict: nsNormalizeDict,
+
 		// Take a data attribute property, prepend the namespace
-		// and then camel case the attribute string
+		// and then camel case the attribute string. Add the result
+		// to our nsNormalizeDict so we don't have to do this again.
 		nsNormalize: function( prop ) {
 			if ( !prop ) {
 				return;
 			}
 
-			return $.camelCase( $.mobile.ns + prop );
+			return nsNormalizeDict[ prop ] || ( nsNormalizeDict[ prop ] = $.camelCase( $.mobile.ns + prop ) );
+		},
+
+		getInheritedTheme: function( el, defaultTheme ) {
+
+			// Find the closest parent with a theme class on it. Note that
+			// we are not using $.fn.closest() on purpose here because this
+			// method gets called quite a bit and we need it to be as fast
+			// as possible.
+
+			var e = el[ 0 ],
+				ltr = "",
+				re = /ui-(bar|body)-([a-z])\b/,
+				c, m;
+
+			while ( e ) {
+				var c = e.className || "";
+				if ( ( m = re.exec( c ) ) && ( ltr = m[ 2 ] ) ) {
+					// We found a parent with a theme class
+					// on it so bail from this loop.
+					break;
+				}
+				e = e.parentNode;
+			}
+
+			// Return the theme letter we found, if none, return the
+			// specified default.
+
+			return ltr || defaultTheme || "a";
+		},
+
+		// TODO the following $ and $.fn extensions can/probably should be moved into jquery.mobile.core.helpers
+		//
+		// Find the closest javascript page element to gather settings data jsperf test
+		// http://jsperf.com/single-complex-selector-vs-many-complex-selectors/edit
+		// possibly naive, but it shows that the parsing overhead for *just* the page selector vs
+		// the page and dialog selector is negligable. This could probably be speed up by
+		// doing a similar parent node traversal to the one found in the inherited theme code above
+		closestPageData: function( $target ) {
+			return $target
+				.closest(':jqmData(role="page"), :jqmData(role="dialog")')
+				.data("page");
 		}
 	});
 
@@ -180,10 +228,11 @@
 	};
 
 	// Monkey-patching Sizzle to filter the :jqmData selector
-	var oldFind = $.find;
+	var oldFind = $.find,
+		jqmDataRE = /:jqmData\(([^)]*)\)/g;
 
 	$.find = function( selector, context, ret, extra ) {
-		selector = selector.replace(/:jqmData\(([^)]*)\)/g, "[data-" + ( $.mobile.ns || "" ) + "$1]");
+		selector = selector.replace( jqmDataRE, "[data-" + ( $.mobile.ns || "" ) + "$1]" );
 
 		return oldFind.call( this, selector, context, ret, extra );
 	};

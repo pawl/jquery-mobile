@@ -1,9 +1,7 @@
-/*
-* jQuery Mobile Framework: "controlgroup" plugin - corner-rounding for groups of buttons, checks, radios, etc
-* Copyright (c) jQuery Project
-* Dual licensed under the MIT or GPL Version 2 licenses.
-* http://jquery.org/license
+/* 
+* "controlgroup" plugin - corner-rounding for groups of buttons, checks, radios, etc
 */
+
 (function( $, undefined ) {
 
 $.fn.controlgroup = function( options ) {
@@ -16,9 +14,9 @@ $.fn.controlgroup = function( options ) {
 						shadow: false,
 						excludeInvisible: true
 					}, options ),
-			groupheading = $el.find( ">legend" ),
+			groupheading = $el.children( "legend" ),
 			flCorners = o.direction == "horizontal" ? [ "ui-corner-left", "ui-corner-right" ] : [ "ui-corner-top", "ui-corner-bottom" ],
-			type = $el.find( "input:eq(0)" ).attr( "type" );
+			type = $el.find( "input" ).first().attr( "type" );
 
 		// Replace legend with more stylable replacement div
 		if ( groupheading.length ) {
@@ -35,7 +33,7 @@ $.fn.controlgroup = function( options ) {
 			els.removeClass( "ui-btn-corner-all ui-shadow" )
 				.eq( 0 ).addClass( flCorners[ 0 ] )
 				.end()
-				.filter( ":last" ).addClass( flCorners[ 1 ] ).addClass( "ui-controlgroup-last" );
+				.last().addClass( flCorners[ 1 ] ).addClass( "ui-controlgroup-last" );
 		}
 
 		flipClasses( $el.find( ".ui-btn" + ( o.excludeInvisible ? ":visible" : "" ) ) );
