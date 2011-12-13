@@ -3,22 +3,28 @@
 	<head> 
 	<title>Jquery Mobile Splitview</title> 
   <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
-	<link rel="stylesheet" href="jquery.mobile-1.0a4.1.css" />
+	<link rel="stylesheet" href="../../compiled/jquery.mobile.css" />
 	<link rel="stylesheet" href="jquery.mobile.splitview.css" />
-  <link rel="stylesheet"  href="jquery.mobile.scrollview.css" /-->
+  <link rel="stylesheet"  href="jquery.mobile.grids.collapsible.css" />
+  <script type="text/javascript" src="jquery-1.6.4.js"></script>
+  <script type="text/javascript" src="jquery.mobile.splitview.js"></script>
+  <script type="text/javascript" src="../../compiled/jquery.mobile.js"></script>
+  <script type="text/javascript" src="iscroll-wrapper.js"></script>
+  <script type="text/javascript" src="iscroll.js"></script>
 </head> 
+
   <body> 
 
     <div data-role="panel" data-id="menu" data-hash="crumbs" data-context="a#default">
       <!-- Start of first page -->
-      <div data-role="page" id="main">
+      <div data-role="page" id="main" data-hash="false">
 
-        <div data-role="header" data-backbtn="false" >
-          <h1>Main</h1>
-        </div><!-- /header -->
+      	<div data-role="header">
+      		<h1>Main</h1>
+      	</div><!-- /header -->
 
-        <div data-role="content"> 
-          <ul data-role="listview" data-theme="g">
+      	<div data-role="content">	
+      		<ul data-role="listview">
             <li>About
               <ul>
                 <li><a href="#aboutus" data-panel="main">About Us</a></li>
@@ -30,36 +36,35 @@
                   <li><a href="#panels" data-panel="main">Panels</a></li>
                   <li><a href="#orientation" data-panel="main">Orientation</a></li>
                   <li><a href="#scroll" data-panel="main">Scroll</a></li>
-                  <li><a href="#context" data-panel="main">Context Loading</a></li>
               </ul>
             </li>
             <li><a href="#credits" data-panel="main">Credits</a></li>
             <li><a href="#source" data-panel="main">Source@Github</a></li>
           </ul>
-        </div><!-- /content -->
+      	</div><!-- /content -->
 
-        <div data-role="footer" data-position="fixed" data-id="ew-footer">
-          <div data-role="navbar">
+      	<div data-role="footer" data-position="fixed" data-id="ew-footer">
+      		<div data-role="navbar">
             <ul>
               <li><a href="#main" class="ui-btn-active" data-transition="slideup">Main</a></li>
               <li><a href="#demo" data-transition="slideup">Demos</a></li>
             </ul>
           </div><!-- /navbar -->
-          <h2>Engineworks &copy CS8</h2>
-        </div><!-- /footer -->
+          <h2 class="ui-splitview-hidden">Engineworks &copy CS8</h2>
+      	</div><!-- /footer -->
       </div><!-- /page -->
 
 
 
       <!-- Start of 2nd page -->
-      <div data-role="page" id="demo">
+      <div data-role="page" id="demo" data-hash="false">
 
-        <div data-role="header" data-backbtn="false">
+        <div data-role="header">
           <h1>Demos</h1>
         </div><!-- /header -->
 
         <div data-role="content"> 
-          <ul data-role="listview" data-theme="g">
+          <ul data-role="listview">
             <li><a href="#bar" data-panel="main" id="default">Bar</a></li>
             <li><a href="#badz" data-panel="main">badz</a></li>
             <li>First level list
@@ -109,7 +114,7 @@
               <li><a href="#demo" data-transition="slideup">Demos</a></li>
             </ul>
           </div><!-- /navbar -->
-          <h2>Engineworks &copy CS8</h2>
+          <h2 class="ui-splitview-hidden">Engineworks &copy CS8</h2>
         </div><!-- /footer -->
       </div><!-- /page -->
 
@@ -133,11 +138,9 @@
           <p>There are still a lot of things to do, but we hope you enjoy using this plugin, and contribute back to it by reporting bugs, requesting features, and best of all, submitting your own code contributions. Thanks!</p>
         
           <p><b>NOTE:</b> keep in mind that I added some namespacing to event handlers in jQMobile core. use the version of jQuerymobile found in the experiments/splitview/ folder of my fork.</p>
-        
-
         </div><!-- /content -->
 
-        <div data-role="footer" data-position="fixed" data-id="ew-footer"  class="ui-splitview-hidden">
+        <div data-role="footer" data-position="fixed" data-id="ew-footer" class="ui-splitview-hidden">
           <div data-role="navbar">
             <ul>
               <li><a href="#main" class="ui-btn-active" data-transition="slideup">Main</a></li>
@@ -247,7 +250,7 @@
           <p>Splitview detects if your device is touch enabled or not. it will then implement the proper scrolling mechanism for your device. This is possible thanks to the jQuery Mobile team's experimental momentum scroll implementation, which the team promptly pointed us to. Thanks!
         </div><!-- /content -->
 
-        <div data-role="footer" data-position="fixed" data-id="ew-footer" class="ui-splitview-hidden">
+        <div data-role="footer" data-position="fixed" data-id="ew-footer"  class="ui-splitview-hidden">
           <div data-role="navbar">
             <ul>
               <li><a href="#main" class="ui-btn-active" data-transition="slideup">Main</a></li>
@@ -307,42 +310,7 @@
 
           <p>To report bugs (and there are still a few of them!), file an issue under our fork of jquery-mobile at github. Thanks!</p>
         
-          <p><b>NOTE:</b> keep in mind that I added some namespacing to event handlers in jQMobile core. use the version of jQuerymobile found in the experiments/compiled/ folder of my fork.</p>
-        </div><!-- /content -->
-
-        <div data-role="footer" data-position="fixed" data-id="ew-footer" class="ui-splitview-hidden">
-          <div data-role="navbar">
-            <ul>
-              <li><a href="#main" class="ui-btn-active" data-transition="slideup">Main</a></li>
-              <li><a href="#demo" data-transition="slideup">Demos</a></li>
-            </ul>
-          </div><!-- /navbar -->
-          <h2>Engineworks &copy CS8</h2>
-        </div><!-- /footer -->
-      </div><!-- /page -->
-
-      <div data-role="page" id="context">
-
-        <div data-role="header">
-          <h1>Context Loading</h1>
-        </div><!-- /header -->
-
-        <div data-role="content"> 
-          <p>When you navigate on to some menus on the 'menu' panel, you'll find that it is more intuitive for users that the main panel also transitions to a related page. This is what we call context page loading<p>
-
-          <p>Splitview now supports this. you need to define a data-context attribute on the panel with a value of the selector of the link you'd like the main page to transition to. this link has to be inside the page that is transitioning into view in the menu panel, and it has to reference the main panel using the data-panel attribute. Example:</p>
-
-          <p style="padding-left:30px;"><b>data-context="a#default"</b></p>
-
-          <p>This will look for a link with id="default" on the newly transitioned page, and trigger a click event on it, changing the main panel to that page (<b>NOTE:</b> the link needs to refer to the main panel using the data-panel="main" attribute!)</p>
-
-          <p>To see this in action, click on the demo button at the bottom of the menu panel on the left</p>
-
-          <p>Also, you can also define a data-context attribute on a page itself - this will override any data-context attributes defined on the panels</p>
-
-          <p>There are still a few things i need to do to make sense of context for both pages, e.g. when hitting back on history, what happens etc, but they will have to wait for now :)</p>
-          
-          <p><b>ANOTHER NOTE:</b> To make this happen, I made some small changes to the changePage method in jQMobile core. use the version of jQuerymobile found in the experiments/compiled/ folder of my fork. It will not break any changePage calls you've made on your own js code</p>
+          <p><b>NOTE:</b> keep in mind that I added some namespacing to event handlers in jQMobile core. use the version of jQuerymobile found in the experiments/splitview/ folder of my fork.</p>
         </div><!-- /content -->
 
         <div data-role="footer" data-position="fixed" data-id="ew-footer" class="ui-splitview-hidden">
@@ -359,7 +327,7 @@
       <!-- Start of 3rd page -->
       <div data-role="page" id="bar">
 
-        <div data-role="header">
+        <div data-role="header" data-backbtn="false">
           <h1>Bar</h1>
         </div><!-- /header -->
 
@@ -388,17 +356,22 @@
         </div><!-- /header -->
 
         <div data-role="content"> 
-          <p>I'm first in the source order so I'm shown as the page.</p>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque consectetur, ligula quis convallis gravida, tortor odio mattis purus, a fringilla mauris velit eu nisi. Vivamus laoreet tincidunt diam, sit amet tristique purus lobortis ac. Etiam commodo placerat elit. In aliquam dapibus felis, molestie molestie purus scelerisque sit amet. Donec vitae varius arcu. Aliquam dapibus dolor magna, nec posuere felis. Nullam in suscipit massa. Duis nec nulla nec urna sollicitudin fringilla. Proin at rutrum mi. Maecenas vitae urna ante, ac gravida tortor.</p>
+          <div class='row'>
+            <div class='sixcol'
+              <p>I'm first in the source order so I'm shown as the page.</p>
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque consectetur, ligula quis convallis gravida, tortor odio mattis purus, a fringilla mauris velit eu nisi. Vivamus laoreet tincidunt diam, sit amet tristique purus lobortis ac. Etiam commodo placerat elit. In aliquam dapibus felis, molestie molestie purus scelerisque sit amet. Donec vitae varius arcu. Aliquam dapibus dolor magna, nec posuere felis. Nullam in suscipit massa. Duis nec nulla nec urna sollicitudin fringilla. Proin at rutrum mi. Maecenas vitae urna ante, ac gravida tortor.</p>
 
-          <p>Vestibulum porta pretium nunc, at adipiscing tortor fringilla sit amet. Sed venenatis varius turpis, vel fringilla purus egestas in. Curabitur interdum mauris nec velit vehicula sed aliquam nulla convallis. Nulla id magna libero, sagittis fringilla metus. Suspendisse dapibus tincidunt tristique. Fusce interdum tincidunt tincidunt. Phasellus tempus fringilla augue eget tincidunt. Donec facilisis mauris ut metus eleifend eget scelerisque nulla sagittis. Ut vel elit non risus dapibus luctus. Pellentesque vel nibh tortor.</p>
+              <p>Vestibulum porta pretium nunc, at adipiscing tortor fringilla sit amet. Sed venenatis varius turpis, vel fringilla purus egestas in. Curabitur interdum mauris nec velit vehicula sed aliquam nulla convallis. Nulla id magna libero, sagittis fringilla metus. Suspendisse dapibus tincidunt tristique. Fusce interdum tincidunt tincidunt. Phasellus tempus fringilla augue eget tincidunt. Donec facilisis mauris ut metus eleifend eget scelerisque nulla sagittis. Ut vel elit non risus dapibus luctus. Pellentesque vel nibh tortor.</p>
+            </div>
+            <div class='sixcol last'
+              <p>Fusce a nisi at dolor rutrum tristique. Donec faucibus metus vitae lorem scelerisque malesuada scelerisque enim imperdiet. Aliquam in erat orci. Ut ultrices, erat eu luctus accumsan, lorem nibh cursus purus, in laoreet nisi tellus interdum sem. Nulla fringilla molestie lectus nec hendrerit. In in mollis tortor. Nunc lectus tortor, porttitor vitae viverra non, dignissim ac ligula. In tincidunt libero id turpis gravida iaculis rhoncus dolor aliquam. Vestibulum congue massa nec nibh sagittis tempor. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Quisque quis urna arcu. Quisque feugiat ante id turpis ultrices vel imperdiet ipsum volutpat. Donec enim magna, pretium eu scelerisque ut, pretium placerat risus.</p> Sed sed lacinia ante. Aenean non quam in ipsum pharetra condimentum.
 
-          <p>Fusce a nisi at dolor rutrum tristique. Donec faucibus metus vitae lorem scelerisque malesuada scelerisque enim imperdiet. Aliquam in erat orci. Ut ultrices, erat eu luctus accumsan, lorem nibh cursus purus, in laoreet nisi tellus interdum sem. Nulla fringilla molestie lectus nec hendrerit. In in mollis tortor. Nunc lectus tortor, porttitor vitae viverra non, dignissim ac ligula. In tincidunt libero id turpis gravida iaculis rhoncus dolor aliquam. Vestibulum congue massa nec nibh sagittis tempor. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Quisque quis urna arcu. Quisque feugiat ante id turpis ultrices vel imperdiet ipsum volutpat. Donec enim magna, pretium eu scelerisque ut, pretium placerat risus.</p> Sed sed lacinia ante. Aenean non quam in ipsum pharetra condimentum.
+              <p>Donec turpis lacus, pharetra ac viverra sit amet, lobortis eu nisl. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Curabitur porttitor dignissim orci ut feugiat. Praesent quis auctor purus. Suspendisse non elit accumsan mi pellentesque laoreet. Nullam et sapien sed nibh dictum tempor sit amet ut velit. Vestibulum varius ultricies lorem sed ultricies. Vestibulum auctor velit vitae ante eleifend eget bibendum metus rutrum. Nulla facilisis luctus mi laoreet rutrum. Nunc accumsan urna at elit pellentesque ut venenatis lectus adipiscing. Ut et arcu urna. Aliquam eros leo, ultricies vel porta nec, tempor sit amet leo. Quisque imperdiet facilisis orci ut malesuada. Nunc eget elit mauris. Mauris sed felis lectus.</p>
 
-          <p>Donec turpis lacus, pharetra ac viverra sit amet, lobortis eu nisl. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Curabitur porttitor dignissim orci ut feugiat. Praesent quis auctor purus. Suspendisse non elit accumsan mi pellentesque laoreet. Nullam et sapien sed nibh dictum tempor sit amet ut velit. Vestibulum varius ultricies lorem sed ultricies. Vestibulum auctor velit vitae ante eleifend eget bibendum metus rutrum. Nulla facilisis luctus mi laoreet rutrum. Nunc accumsan urna at elit pellentesque ut venenatis lectus adipiscing. Ut et arcu urna. Aliquam eros leo, ultricies vel porta nec, tempor sit amet leo. Quisque imperdiet facilisis orci ut malesuada. Nunc eget elit mauris. Mauris sed felis lectus.</p>
-
-          <p>Duis purus sem, condimentum eget posuere sed, vulputate non lorem. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Cras risus urna, commodo quis interdum sit amet, elementum vitae lacus. Ut tempor hendrerit ante et facilisis. Vivamus elementum purus justo, ut auctor arcu. Cras varius rhoncus venenatis. Nulla dignissim velit a erat euismod pretium. In sed leo orci, et consectetur justo. Vestibulum ipsum urna, cursus in placerat in, malesuada eu odio. Nunc eget ullamcorper tortor. In commodo, turpis sed egestas egestas, dolor sem mattis nulla, eu semper lectus metus at eros. Sed cursus nisl id risus fermentum quis aliquam odio pretium. Quisque justo eros, blandit gravida tristique eget, rhoncus in magna. Integer volutpat faucibus dolor, sit amet tempor metus ornare consequat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nunc et lacus enim, sit amet consequat turpis.</p>    
-          <p><a href="#foo">Back to foo</a></p> 
+              <p>Duis purus sem, condimentum eget posuere sed, vulputate non lorem. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Cras risus urna, commodo quis interdum sit amet, elementum vitae lacus. Ut tempor hendrerit ante et facilisis. Vivamus elementum purus justo, ut auctor arcu. Cras varius rhoncus venenatis. Nulla dignissim velit a erat euismod pretium. In sed leo orci, et consectetur justo. Vestibulum ipsum urna, cursus in placerat in, malesuada eu odio. Nunc eget ullamcorper tortor. In commodo, turpis sed egestas egestas, dolor sem mattis nulla, eu semper lectus metus at eros. Sed cursus nisl id risus fermentum quis aliquam odio pretium. Quisque justo eros, blandit gravida tristique eget, rhoncus in magna. Integer volutpat faucibus dolor, sit amet tempor metus ornare consequat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nunc et lacus enim, sit amet consequat turpis.</p>    
+              <p><a href="#foo">Back to foo</a></p> 
+            </div>
+          </div>
         </div><!-- /content -->
 
         <div data-role="footer" data-position="fixed" data-id="ew-footer" class="ui-splitview-hidden">
@@ -417,21 +390,4 @@
 
 
   </body>
-  <script type="text/javascript" src="jquery-1.5.2.min.js"></script>
-  <script type="text/javascript" src="jquery.mobile.splitview.js"></script>
-  <script type="text/javascript" src="jquery.mobile-1.0a4.1.js"></script>
-  <script type="text/javascript" src="jquery.easing.1.3.js"></script>
-  <script type="text/javascript" src="jquery.mobile.scrollview.js"></script>
-  <script type="text/javascript" src="https://getfirebug.com/firebug-lite.js"></script>  
-  <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-8090758-5']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  </script>
 </html>
