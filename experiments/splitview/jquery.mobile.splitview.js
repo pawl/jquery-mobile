@@ -4,7 +4,11 @@
     //some class for css to detect touchscreens
     if($.support.touch){
       $('html').addClass('touch');
+    } else {
+      $.support.touchOverflow = true; //NOTE: this is a hack. until we actually have support for the standard overflow:auto for desktop browsers
     }
+    $.mobile.touchOverflowEnabled = true;
+
     if ($.mobile.media("screen and (min-width:480px)")||($.mobile.browser.ie && $(this).width() >= 480)) {
       $('html').addClass('splitview');
       //on window.ready() execution:
@@ -435,7 +439,7 @@
         function popover(){
           $menu.addClass('panel-popover')
                .removeClass('ui-panel-left')
-               .css({'width':'25%', 'min-width':'250px', 'display':''});     
+               .css({'width':'25%', 'min-width':'250px', 'display':'', 'overflow-x':'visible'});     
           if(!$menu.children('.popover_triangle').length){ 
             $menu.prepend('<div class="popover_triangle"></div>'); 
           }
@@ -519,7 +523,7 @@
 
       //DONE: pageshow binding for scrollview - now using IScroll4! hell yeah!
       $('div:jqmData(role="page")').live('pagebeforeshow.scroll', function(event, ui){
-        if ($.support.touch) {
+        if ($.support.touch && !$.support.touchOverflow) {
 
           var $page = $(this),
               $scrollArea = $page.find('div:jqmData(role="content")');
@@ -603,7 +607,7 @@
             $footer=$this.children(':jqmData(role="footer")'),
             thisHeaderHeight=$header.css('display') == 'none' ? 0 : $header.outerHeight(),
             thisFooterHeight=$footer.css('display') == 'none' ? 0 : $footer.outerHeight();
-        $this.children(':jqmData(role="content")').css({'top':thisHeaderHeight, 'bottom':thisFooterHeight});
+        // $this.children(':jqmData(role="content")').css({'top':thisHeaderHeight, 'bottom':thisFooterHeight});
       })
 
       //this allows panels to change their widths upon changepage - useful for pages that need a different width than the ones provided. 
