@@ -4,10 +4,7 @@
     //some class for css to detect touchscreens
     if($.support.touch){
       $('html').addClass('touch');
-    } else {
-      $.support.touchOverflow = true; //NOTE: this is a hack. until we actually have support for the standard overflow:auto for desktop browsers
     }
-    $.mobile.touchOverflowEnabled = true;
 
     if ($.mobile.media("screen and (min-width:480px)")||($.mobile.browser.ie && $(this).width() >= 480)) {
       $('html').addClass('splitview');
@@ -523,21 +520,21 @@
 
       //DONE: pageshow binding for scrollview - now using IScroll4! hell yeah!
       $('div:jqmData(role="page")').live('pagebeforeshow.scroll', function(event, ui){
-        if ($.support.touch && !$.support.touchOverflow) {
+        if ($.support.touch) {
 
           var $page = $(this),
               $scrollArea = $page.find('div:jqmData(role="content")');
               $scrAreaChildren = $scrollArea.children();
 
-          if ($scrAreaChildren.length > 1) {
-            $scrAreaChildren = $scrollArea.wrapInner("<div></div>").children();
-          }
+          // if ($scrAreaChildren.length > 1) {
+            $scrAreaChildren = $scrollArea.wrapInner("<div class='scrollable vertical'></div>").children();
+          // }
           $scrollArea.css({ 'width':'auto',
                             'height':'auto',
                             'overflow':'hidden'});
           //TODO: if too many pages are in the DOM that have iscroll on, this might slow down the browser significantly, 
           //in which case we'll need to destroy() the iscroll as the page hides. 
-          $scrollArea.iscroll();
+          // $scrollArea.iscroll();
         }
       });
 
@@ -579,7 +576,7 @@
 
       //data-context handler - a page with a link that has a data-context attribute will load that page after this page loads
       //this still needs work - pageTransitionQueue messes everything up.
-      $('div:jqmData(role="panel")').live('changepage.context', function(){
+      $('div:jqmData(role="panel")').live('pagechange.context', function(){
         var $this=$(this),
             $currPanelActivePage = $this.children('.' + $.mobile.activePageClass),
             panelContextSelector = $this.jqmData('context'),
