@@ -526,15 +526,15 @@
               $scrollArea = $page.find('div:jqmData(role="content")');
               $scrAreaChildren = $scrollArea.children();
 
-          if ($scrAreaChildren.length > 1) {
+          // if ($scrAreaChildren.length > 1) {
             $scrAreaChildren = $scrollArea.wrapInner("<div class='scrollable vertical'></div>").children();
-          }
+          // }
           $scrollArea.css({ 'width':'auto',
                             'height':'auto',
                             'overflow':'hidden'});
           //TODO: if too many pages are in the DOM that have iscroll on, this might slow down the browser significantly, 
           //in which case we'll need to destroy() the iscroll as the page hides. 
-          $scrollArea.iscroll();
+          // $scrollArea.iscroll();
         // }
       });
 
