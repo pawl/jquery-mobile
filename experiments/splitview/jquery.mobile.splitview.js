@@ -327,7 +327,7 @@
                 transition: transition,
                 changeHash: false,
                 fromHashChange: true,
-                pageContainer: $mainPanel,
+                pageContainer: $mainPanel
               };
 
           if( !$.mobile.hashListeningEnabled || $.mobile.urlHistory.ignoreNextHashChange ){
