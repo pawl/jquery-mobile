@@ -5,7 +5,9 @@
     if($.support.touch){
       $('html').addClass('touch');
     }
-    if ($.mobile.media("screen and (min-width:480px)")||($.mobile.browser.ie && $(this).width() >= 480)) {
+    var $query = $.mobile.media('screen and (min-width: 480px)') && ($.mobile.media('(-webkit-max-device-pixel-ratio: 1.2)') || $.mobile.media('max--moz-device-pixel-ratio: 1.2)'));
+    $.support.splitview = ($query || ($.mobile.browser.ie && $(this).width() >= 480)) && $.mobile.ajaxEnabled;
+    if ($.support.splitview) {
       $('html').addClass('splitview');
       //on window.ready() execution:
       $(function() {
