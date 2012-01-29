@@ -1,1 +1,788 @@
-(function(){var a=document.createElement("style");a.innerHTML='.scrollable{-webkit-transform:translate3d(0,0,0)}.scrollability-scrollbar{position:absolute;top:0;right:2px;width:7px;height:1px;z-index:2147483647;opacity:0;-webkit-transform:translate3d(0,0,0);-webkit-box-sizing:border-box;-webkit-transform-origin:top left;background:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAABCAYAAADuHp8EAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAC5JREFUeNpi/P//vyQDAwMjKytr2Z8/f9gYIICRAQH+Q/n/WVhYfgNBJ4gNEGAAhVUOGMTI0TwAAAAASUVORK5CYII=") no-repeat}',document.head.appendChild(a)})(),function(){(function(a,b,c){function D(){var a=document.createElement("style");document.head.appendChild(a),B=document.styleSheets[document.styleSheets.length-1]}function E(a){function g(a){a.preventDefault(),x=!0,e&&(clearTimeout(e),e=0),c&&(L(c),c=null);var b=f?a.touches[0]:a;v=b.clientX,w=b.clientY;if(z.length>1)for(var d=0;d<z.length;++d){var g=z[d];if(g.disable&&g.disable(v,w,t,u)){g.terminate(),z.splice(d--,1);if(z.length==1){var h=z[0];S("scrollability-lock",h.node,{direction:h.direction})}}}z.forEach(function(b){var c=b.filter(v,w);b.track(c,a.timeStamp)})}function h(a){if(c){var b=document.createEvent("MouseEvents");b.initMouseEvent("click",!0,!0,window,1),c[0].dispatchEvent(b),L(c)}document.removeEventListener(f?"touchmove":"mousemove",g,!1),document.removeEventListener(f?"touchend":"mouseup",h,!1),z.forEach(function(a){a.takeoff()})}var b=f?a.touches[0]:a,c=null;v=t=b.clientX,w=u=b.clientY,x=!1,z=G(a.target,v,w,a.timeStamp);if(!z.length)return!0;var d=a.target,e=setTimeout(function(){e=0,c=K(d)},50);document.addEventListener(f?"touchmove":"mousemove",g,!1),document.addEventListener(f?"touchend":"mouseup",h,!1)}function F(a,b,c,d){function X(a,b){O.push({node:a,callback:b,keyframes:[]})}function Y(a){D=a}function Z(a){P=a,$(I,K)}function $(a,b){L=b-K,K=b,E=a-I,I=a,Math.abs(E)<h?++M:(M&&--M,M=0);if(f)if(v>y&&C==y){var c=v-y;E*=(1-c/G)*j}else if(v<w&&z==w){var c=w-v;E*=(1-c/G)*j}return v+=E,bc(v),e.style.webkitAnimationName="",O.forEach(function(a){a.node.style.webkitAnimationName=""}),!0}function _(a){var b=-w-y;if(u&&t<b){var c=t-p*2,d=c/b*c,e;if(a>y)d=Math.max(d-(a-y),q),e=0;else if(a<w){var f=d-(w-a);d=Math.max(d-(w-a),q),e=c-d}else e=Math.abs(a)/b*(c-d);return e+=p,"translate3d(0, "+Math.round(e)+"px,  0) "+"scaleY("+Math.round(d)+")"}}function ba(){M&&(E=0),v+=E,bc(v),E=E/L*r;var b=bb();if(!b.time){bf();return}S("scrollability-animate",e,{direction:a.direction,time:b.time,keyframes:b.keyframes}),e.cleanup&&e.cleanup(),B.insertRule(b.css,0),O.forEach(function(c,d){c.name="scrollability-track"+A++;var e=J(a,c.keyframes,c.name,b.time);B.insertRule(e,0)}),e.earlyEnd=function(){be(!0)},e.normalEnd=function(){bd(b.keyframes[b.keyframes.length-1].position),be()},e.cleanup=function(){delete e.cleanup,B.deleteRule(0),O.forEach(function(a){B.deleteRule(0)})},e.addEventListener("webkitAnimationEnd",e.normalEnd,!1),Q(e,b.name,b.time),O.forEach(function(a){Q(a.node,a.name,b.time)})}function bb(){function Q(a){var f=v-c;if(a||b-d>=s||e<0!=f<0)n.push({position:v,time:b}),O.forEach(function(a){a.keyframes.push({time:b,css:a.callback(v)})}),e=f,c=v,d=b}var b=0,c=v,d=0,e=0,h,j,l=0,m,n=[];if(i)if(Math.abs(v-y)>H||Math.abs(E)>o)if(v>y){if(y!=C){y+=t+D,w+=t+D;var p=w%t,q=-Math.round((v+t-p)/(t+D));S("scrollability-page",a.node,{page:q})}}else if(w!=z){y-=t+D,w-=t+D;var p=w%t,q=-Math.round((v-t-p)/(t+D));S("scrollability-page",a.node,{page:q})}var u=!0;while(u){if(v>y&&f)if(E>0){var x=v-y,B=1-x/G;E=Math.max(E-k,0)*B,v+=E}else l||(h=v,j=y-v),v=N(l,h,j,F),u=++l<=F&&Math.floor(Math.abs(v))>y;else if(v<w&&f)if(E<0){var x=w-v,B=1-x/G;E=Math.min(E+k,0)*B,v+=E}else l||(h=v,j=w-v),v=N(l,h,j,F),u=++l<=F&&Math.ceil(v)<w;else{u=Math.floor(Math.abs(E)*10)>0;if(!u)break;E*=g,v+=E}Q(!u),b+=r}if(i){var I=Math.round(v/(t+D));v=I*(t+D),Q(!0)}else v>y&&f?(v=y,Q(!0)):v<w&&f&&(v=w,Q(!0));var K=n.length?n[n.length-1].time:0,L="scrollability"+A++,M=J(a,n,L,K,P);return{time:K,position:v,keyframes:n,name:L,css:M}}function bc(b){if(!S("scrollability-scroll",e,{direction:a.direction,position:b}))return;bd(b),u&&x&&R(u)}function bd(b){e.style.webkitTransform=a.update(b+P),e.scrollableOffset=P,O.forEach(function(a){a.node.style.webkitTransform=a.callback(b)})}function be(b){u&&(b?R(u):(u.style.opacity="0",u.style.webkitTransition="opacity 0.33s linear")),e.removeEventListener("webkitAnimationEnd",e.normalEnd,!1),delete e.earlyEnd,delete e.normalEnd,a.mute||S("scrollability-end",e)}function bf(){be()}var e=a.node,f=a.constrained,i=a.paginated,t=a.viewport||0,u=a.scrollbar,v=a.position,w=a.min,y=a.max,z=w,C=Math.round(y/t)*t,D=0,E=0,F=i?m:l,G=a.bounce,H=t*n,I=startTouch=a.filter(b,c),K=d,L=0,M=0,O=[],P=e.scrollableOffset||0;if(!a.mute){var T={position:v,track:X,setSpacing:Y,setOffset:Z};if(!S("scrollability-start",e,T))return null}if(i){if(D===undefined){var U=Math.round(Math.abs(z)%t),V=(Math.abs(z)-U)/t+1;D=U/V}var W=Math.round(v/(t+D));w=y=W*(t+D),z+=D}return u&&(X(u,_),u.parentNode||e.parentNode.appendChild(u)),e.earlyEnd&&(Q(e),O.forEach(function(a){Q(a.node)}),e.earlyEnd(),bc(v)),a.reposition=bc,a.track=$,a.takeoff=ba,a.terminate=bf,a}function G(a,b,c,d){var e=[],f=document.querySelectorAll(".scrollable.universal");for(var g=0;g<f.length;++g)H(f[g],e,b,c,d);return f.length||H(a,e,b,c,d),e}function H(a,b,c,d,e){while(a){if(a.nodeType==1){var f=I(a,c,d,e);if(f){var g=!1;for(var h=0;h<b.length;++h)if(b[h].node==a){g=!0;break}g||(f=F(f,c,d,e),f&&b.push(f))}}a=a.parentNode}}function I(a,b,c,d){var e=a.className.split(" ");if(e.indexOf("scrollable")==-1)return;for(var f=0;f<e.length;++f){var g=e[f];if(C[g]){var h=C[g](a);return h.direction=g,h.paginated=e.indexOf("paginated")!=-1,h}}}function J(a,b,c,d,e){var f=["@-webkit-keyframes "+c+" {"];return b.forEach(function(b){var c=b.time/d*100,g=Math.floor(c)+"% {"+"-webkit-transform: "+(b.css||a.update(b.position+e))+";"+"}";f.push(g)}),f.push("}"),f.join("\n")}function K(a){var b=[];for(var c=a;c;c=c.parentNode)c.nodeType==1&&(c.className=(c.className?c.className+" ":"")+"touched",b.push(c));return b}function L(a){for(var b=0;b<a.length;++b){var c=a[b];c.className=c.className.replace("touched","")}}function M(a){if(!a.scrollableScrollbar){var b=a.scrollableScrollbar=document.createElement("div");b.className="scrollability-scrollbar"}return a.scrollableScrollbar}function N(a,b,c,d){return a==d?b+c:c*(-Math.pow(2,-10*a/d)+1)+b}function O(a){var b=a.parentNode,c=a.querySelector(".scrollable > .clipper")||a;a.style.webkitAnimation&&(a.style.webkitAnimationPlayState="paused");var d=getComputedStyle(a).webkitTransform,e=(new WebKitCSSMatrix(d)).m41-(a.scrollableOffset||0);return{node:a,min:-c.offsetWidth+b.offsetWidth,max:0,position:e,viewport:b.offsetWidth,bounce:b.offsetWidth*j,constrained:!0,filter:function(a,b){return a},disable:function(a,b,c,d){var e=Math.abs(a-c),f=Math.abs(b-d);if(f>e&&f>i)return!0},update:function(a){return"translate3d("+Math.round(a)+"px, 0, 0)"}}}function P(a){var b=a.parentNode,c=a.querySelector(".scrollable > .clipper")||a;a.style.webkitAnimation&&(a.style.webkitAnimationPlayState="paused");var d=getComputedStyle(a).webkitTransform,e=(new WebKitCSSMatrix(d)).m42;return{node:a,scrollbar:M(a),position:e,min:-c.offsetHeight+b.offsetHeight,max:0,viewport:b.offsetHeight,bounce:b.offsetHeight*j,constrained:!0,filter:function(a,b){return b},disable:function(a,b,c,d){var e=Math.abs(a-c),f=Math.abs(b-d);if(e>f&&e>i)return!0},update:function(a){return"translate3d(0, "+Math.round(a)+"px, 0)"}}}function Q(a,b,c){b&&(a.style.webkitAnimation=b+" "+c+"ms linear both"),a.style.webkitAnimationPlayState=b?"running":"paused"}function R(a){a.style.webkitTransition="",a.style.opacity="1"}function S(a,b,c){var d=document.createEvent("Events");d.initEvent(a,!1,!0);if(c)for(var a in c)d[a]=c[a];return b.dispatchEvent(d)}"style scrollability/scrollbar.css";var d="webkitTransform"in document.documentElement.style,e=d&&/OS 5_/.exec(navigator.userAgent),f="ontouchstart"in window,g=.9925,h=4,i=10,j=.75,k=.01,l=240,m=160,n=.5,o=2,p=2,q=7,r=4,s=24,t,u,v,w,x,y=0,z=[],A=0,B,C={horizontal:O,vertical:P};b.directions=C,b.flashIndicators=function(){},a.ready(function(){document.addEventListener(f?"touchstart":"mousedown",E,!1),window.addEventListener("load",D,!1)})})({ready:function(a){a()}},window,{exports:window})}()
+/* See LICENSE for terms of usage */
+
+"style scrollability/scrollbar.css"
+
+// var logs = [];
+
+// function D() {
+//     var args = []; args.push.apply(args, arguments);
+//     console.log(args.join(' '));
+//     // logs.push(args.join(' '));
+// }
+
+// window.showLog = function() {
+//     document.querySelector('.scrollable').innerHTML = logs.join('<br>');
+//     document.querySelector('.scrollable').style.webkitAnimation = '';
+//     document.querySelector('.scrollable').style.webkitTransform = 'translate3d(0,0,0)';
+// }
+
+// *************************************************************************************************
+
+var isWebkit = "webkitTransform" in document.documentElement.style;
+var isiOS5 = isWebkit && /OS 5_/.exec(navigator.userAgent);
+var isTouch = "ontouchstart" in window;
+
+// *************************************************************************************************
+
+// The friction applied while decelerating
+var kFriction = 0.9925;
+
+// If the velocity is below this threshold when the finger is released, animation will stop
+var kStoppedThreshold = 4;
+
+// Number of pixels finger must move to determine horizontal or vertical motion
+var kLockThreshold = 10;
+
+// Percentage of the page which content can be overscrolled before it must bounce back
+var kBounceLimit = 0.75;
+
+// Rate of deceleration when content has overscrolled and is slowing down before bouncing back
+var kBounceDecelRate = 0.01;
+
+// Duration of animation when bouncing back
+var kBounceTime = 240;
+var kPageBounceTime = 160;
+
+// Percentage of viewport which must be scrolled past in order to snap to the next page
+var kPageLimit = 0.5;
+
+// Velocity at which the animation will advance to the next page
+var kPageEscapeVelocity = 2;
+
+// Vertical margin of scrollbar
+var kScrollbarMargin = 2;
+
+// The width or height of the scrollbar along the animated axis
+var kScrollbarSize = 7;
+
+// The number of milliseconds to increment while simulating animation
+var kAnimationStep = 4;
+
+// The number of milliseconds of animation to condense into a keyframe
+var kKeyframeIncrement = 24;
+
+// *************************************************************************************************
+
+var startX, startY, touchX, touchY, touchMoved;
+var animationInterval = 0;
+var touchAnimators = [];
+var animationIndex = 0;
+var globalStyleSheet;
+
+var directions = {
+    'horizontal': createXDirection,
+    'vertical': createYDirection
+};
+
+exports.directions = directions;
+
+exports.flashIndicators = function() {
+    // var scrollables = document.querySelectorAll('.scrollable.vertical');
+    // for (var i = 0; i < scrollables.length; ++i) {
+    //     exports.scrollTo(scrollables[i], 0, 0, 20, true);
+    // }            
+}
+
+function onLoad() {
+    var ss = document.createElement("style");
+    document.head.appendChild(ss);
+    globalStyleSheet = document.styleSheets[document.styleSheets.length-1];
+
+    // exports.flashIndicators();
+}
+
+require.ready(function() {
+    document.addEventListener(isTouch ? 'touchstart' : 'mousedown', onTouchStart, false);
+    window.addEventListener('load', onLoad, false);
+});
+
+function onTouchStart(event) {
+    var touch = isTouch ? event.touches[0] : event;
+    var touched = null;
+
+    touchX = startX = touch.clientX;
+    touchY = startY = touch.clientY;
+    touchMoved = false;
+
+    touchAnimators = getTouchAnimators(event.target, touchX, touchY, event.timeStamp);
+    if (!touchAnimators.length) {
+        return true;
+    }
+
+    var touchCandidate = event.target;
+    var holdTimeout = setTimeout(function() {
+        holdTimeout = 0;
+        touched = setTouched(touchCandidate);
+    }, 50);
+
+    document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onTouchMove, false);
+    document.addEventListener(isTouch ? 'touchend' : 'mouseup', onTouchEnd, false);
+
+    // if (D) event.preventDefault();
+        
+    function onTouchMove(event) {
+        event.preventDefault();
+        touchMoved = true;
+
+        if (holdTimeout) {
+            clearTimeout(holdTimeout);
+            holdTimeout = 0;
+        }
+        if (touched) {
+            releaseTouched(touched);
+            touched = null;
+        }
+
+        var touch = isTouch ? event.touches[0] : event;
+        touchX = touch.clientX;
+        touchY = touch.clientY;
+
+        // Reduce the candidates down to the one whose axis follows the finger most closely
+        if (touchAnimators.length > 1) {
+            for (var i = 0; i < touchAnimators.length; i++) {
+                var animator = touchAnimators[i];
+                if (animator.disable && animator.disable(touchX, touchY, startX, startY)) {
+                    animator.terminate();
+                    touchAnimators.splice(i--, 1);
+
+                    if (touchAnimators.length == 1) {
+                        var locked = touchAnimators[0];
+                        dispatch("scrollability-lock", locked.node, {direction: locked.direction});
+                    }
+                }
+            }
+        }
+
+        touchAnimators.forEach(function(animator) {
+            var touch = animator.filter(touchX, touchY);
+            animator.track(touch, event.timeStamp);
+        });
+    }
+
+    function onTouchEnd(event) {
+        // Simulate a click event when releasing the finger
+        if (touched) {
+            var evt = document.createEvent('MouseEvents'); 
+            evt.initMouseEvent('click', true, true, window, 1);
+            touched[0].dispatchEvent(evt); 
+            releaseTouched(touched);
+        }
+
+        document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onTouchMove, false);
+        document.removeEventListener(isTouch ? 'touchend' : 'mouseup', onTouchEnd, false);
+        
+        touchAnimators.forEach(function(animator) {
+            animator.takeoff();
+        });
+    }
+}
+
+function wrapAnimator(animator, startX, startY, startTime) {
+    var node = animator.node;
+    var constrained = animator.constrained;
+    var paginated = animator.paginated;
+    var viewport = animator.viewport || 0;
+    var scrollbar = animator.scrollbar;
+    var position = animator.position;
+    var min = animator.min;
+    var max = animator.max;
+    var absMin = min;
+    var absMax = Math.round(max/viewport)*viewport;
+    var pageSpacing = 0;
+    var velocity = 0;
+    var bounceTime = paginated ? kPageBounceTime : kBounceTime;
+    var bounceLimit = animator.bounce;
+    var pageLimit = viewport * kPageLimit;
+    var lastTouch = startTouch = animator.filter(startX, startY);
+    var lastTime = startTime;
+    var timeStep = 0;
+    var stopped = 0;
+    var tracked = [];
+    var offset = node.scrollableOffset||0;
+
+    if (!animator.mute) {
+        var event = {
+            position: position,
+            track: addTracker,
+            setSpacing: setSpacing,
+            setOffset: setOffset,
+            setBounds: setBounds
+        };
+        if (!dispatch("scrollability-start", node, event)) {
+            return null;
+        }
+    }
+
+    if (paginated) {
+        if (pageSpacing === undefined) {
+            var excess = Math.round(Math.abs(absMin) % viewport);
+            var pageCount = ((Math.abs(absMin)-excess) / viewport)+1;
+            pageSpacing = excess / pageCount;
+        }
+
+        var pageIndex = Math.round(position/(viewport+pageSpacing));
+        min = max = pageIndex * (viewport+pageSpacing);
+        absMin += pageSpacing;
+    }
+
+    if (scrollbar) {
+        addTracker(scrollbar, trackScrollbar);
+        if (!scrollbar.parentNode) {
+            node.parentNode.appendChild(scrollbar);            
+        }
+    }
+
+    if (node.earlyEnd) {
+        play(node);
+        tracked.forEach(function(item) {
+            play(item.node);
+        });
+
+        node.earlyEnd();
+
+        update(position);
+    }
+        
+    animator.reposition = update;
+    animator.track = track;
+    animator.takeoff = takeoff;
+    animator.terminate = terminate;
+    return animator;
+    
+    function addTracker(node, callback) {
+        tracked.push({node: node, callback: callback, keyframes: []});
+    }
+
+    function setSpacing(x) {
+        pageSpacing = x
+    }
+
+    function setOffset(x) {
+        offset = x;
+
+        track(lastTouch, lastTime);
+    }
+
+    function setBounds(newMin, newMax) {
+        min = newMin;
+        max = newMax;
+    }
+
+    function track(touch, time) {
+        timeStep = time - lastTime;
+        lastTime = time;
+
+        velocity = touch - lastTouch;
+        lastTouch = touch;
+        
+        if (Math.abs(velocity) >= kStoppedThreshold) {
+            if (stopped) {
+                --stopped;
+            }
+            stopped = 0;
+        } else {
+            ++stopped;
+        }
+
+        // Apply resistance along the edges
+        if (constrained) {
+            if (position > max && absMax == max) {
+                var excess = position - max;
+                velocity *= (1.0 - excess / bounceLimit)*kBounceLimit;
+            } else if (position < min && absMin == min) {
+                var excess = min - position;
+                velocity *= (1.0 - excess / bounceLimit)*kBounceLimit;
+            }
+        }
+
+        position += velocity;
+
+        update(position);
+
+        node.style.webkitAnimationName = '';
+        tracked.forEach(function(item) {
+            item.node.style.webkitAnimationName = '';
+        });
+        return true;
+    }
+
+    function trackScrollbar(position) {
+        var range = max - min;
+        if (scrollbar && min < 0) {
+            var viewable = viewport - kScrollbarMargin*2;
+            var height = (viewable/(range+viewport)) * viewable;
+            var scrollPosition;
+            if (position > max) {
+                height = Math.max(height - (position-max), kScrollbarSize);
+                scrollPosition = 0;
+            } else if (position < min) {
+                var h = height - (min - position);
+                height = Math.max(height - (min - position), kScrollbarSize);
+                scrollPosition = viewable-height;
+            } else {
+                scrollPosition = (Math.abs((max-position)) / range) * (viewable-height);
+            }
+            scrollPosition += kScrollbarMargin;
+
+            return 'translate3d(0, ' + Math.round(scrollPosition) + 'px,  0) '
+                   + 'scaleY(' + Math.round(height) + ')';
+        }
+    }
+
+    function takeoff() {
+        dispatch("scrollability-takeoff", node, {
+            position: position,
+            min: min,
+            max: max,
+            setBounds: setBounds
+        });
+
+        if (stopped) {
+            velocity = 0;
+        }
+
+        position += velocity;
+        update(position);
+
+        velocity = (velocity/timeStep) * kAnimationStep;
+
+        var timeline = createTimeline();
+        if (!timeline.time) {
+            terminate();
+            return;
+        }
+
+        dispatch("scrollability-animate", node, {
+            direction: animator.direction,
+            time: timeline.time,
+            keyframes: timeline.keyframes
+        });
+
+        if (node.cleanup) {
+            node.cleanup();
+        }        
+
+        globalStyleSheet.insertRule(timeline.css, 0);
+
+        tracked.forEach(function(item, i) {
+            item.name = 'scrollability-track'+(animationIndex++);
+            var css = generateCSSKeyframes(animator, item.keyframes, item.name, timeline.time);
+            globalStyleSheet.insertRule(css, 0);
+        });
+
+        node.earlyEnd = function() {
+            terminex(true);
+        }
+        node.normalEnd = function() {
+            reposition(timeline.keyframes[timeline.keyframes.length-1].position);
+            terminex();
+        }
+
+        node.cleanup = function() {
+            delete node.cleanup;
+            globalStyleSheet.deleteRule(0);
+            tracked.forEach(function(item) {
+                globalStyleSheet.deleteRule(0);
+            });
+        }
+
+        node.addEventListener("webkitAnimationEnd", node.normalEnd, false);
+        
+        play(node, timeline.name, timeline.time);
+
+        tracked.forEach(function(item) {
+            play(item.node, item.name, timeline.time);
+        });
+    }
+
+    function createTimeline() {
+        var time = 0;
+        var lastPosition = position;
+        var lastKeyTime = 0;
+        var lastDiff = 0;
+        var decelOrigin;
+        var decelDelta;
+        var decelStep = 0;
+        var decelTime;
+        // var enterVelocity;
+        var keyframes = [];
+
+        if (paginated) {
+            // When finger is released, decide whether to jump to next/previous page
+            // or to snap back to the current page
+            if (Math.abs(position - max) > pageLimit || Math.abs(velocity) > kPageEscapeVelocity) {
+                if (position > max) {
+                    if (max != absMax) {
+                        max += viewport+pageSpacing;
+                        min += viewport+pageSpacing;
+
+                        // XXXjoe Only difference between this and code below is -viewport. Merge 'em!
+                        var totalSpacing = min % viewport;
+                        var page = -Math.round((position+viewport-totalSpacing)/(viewport+pageSpacing));
+                        dispatch("scrollability-page", animator.node, {page: page});
+                    }
+                } else {
+                    if (min != absMin) {
+                        max -= viewport+pageSpacing;
+                        min -= viewport+pageSpacing;
+
+                        var totalSpacing = min % viewport;
+                        var page = -Math.round((position-viewport-totalSpacing)/(viewport+pageSpacing));
+                        dispatch("scrollability-page", animator.node, {page: page});
+                    }
+                }
+            }
+        }
+
+        var continues = true;
+        while (continues) {
+            if (position > max && constrained) {
+                if (velocity > 0) {
+                    // Slowing down
+                    var excess = position - max;
+                    var elasticity = (1.0 - excess / bounceLimit);
+                    velocity = Math.max(velocity - kBounceDecelRate, 0) * elasticity;
+                    // D&&D('slowing down', velocity);
+                    position += velocity;
+                } else {
+                    // Bouncing back
+                    if (!decelStep) {
+                        decelOrigin = position;
+                        decelDelta = max - position;
+                    }
+                    // D&&D('bouncing back');
+                    position = easeOutExpo(decelStep, decelOrigin, decelDelta, bounceTime);
+                    continues = ++decelStep <= bounceTime && Math.floor(Math.abs(position)) > max;
+                }
+            } else if (position < min && constrained) {
+                if (velocity < 0) {
+                    // if (!enterVelocity) {
+                    //     enterVelocity = velocity;
+                    // }
+                    // Slowing down
+                    var excess = min - position;
+                    var elasticity = (1.0 - excess / bounceLimit);
+                    velocity = Math.min(velocity + kBounceDecelRate, 0) * elasticity;
+                    position += velocity;
+                } else {
+                    // Bouncing back
+                    if (!decelStep) {
+                        decelOrigin = position;
+                        decelDelta = min - position;
+                        // XXXjoe Record velocity when going past limit, use to shrink bounceTime
+                        // decelTime = bounceTime * (-enterVelocity / 10);
+                        // D&&D(decelTime);
+                    }
+                    position = easeOutExpo(decelStep, decelOrigin, decelDelta, bounceTime);
+                    continues = ++decelStep <= bounceTime && Math.ceil(position) < min;
+                }
+            } else {
+                continues = Math.floor(Math.abs(velocity)*10) > 0;
+                if (!continues)
+                    break;
+
+                velocity *= kFriction;
+                position += velocity;
+            }
+
+            saveKeyframe(!continues);            
+            time += kAnimationStep;
+        }
+
+        if (paginated) {
+            var pageIndex = Math.round(position/(viewport+pageSpacing));
+            position = pageIndex * (viewport+pageSpacing);
+            saveKeyframe(true);
+        } else if (position > max && constrained) {
+            position = max;
+            saveKeyframe(true);
+        } else if (position < min && constrained) {
+            position = min;
+            saveKeyframe(true);
+        }
+
+        var totalTime = keyframes.length ? keyframes[keyframes.length-1].time : 0;
+
+        var name = "scrollability" + (animationIndex++);
+        var css = generateCSSKeyframes(animator, keyframes, name, totalTime, offset);
+
+        return {time: totalTime, position: position, keyframes: keyframes, name: name, css: css};
+
+        function saveKeyframe(force) {
+            var diff = position - lastPosition;
+            // Add a new frame when we've changed direction, or passed the prescribed granularity
+            if (force || (time-lastKeyTime >= kKeyframeIncrement || (lastDiff < 0 != diff < 0))) {
+                keyframes.push({position: position, time: time});
+
+                tracked.forEach(function(item) {
+                    item.keyframes.push({time: time, css: item.callback(position)});
+                });
+
+                lastDiff = diff;
+                lastPosition = position;
+                lastKeyTime = time;
+            }
+        }
+    }
+
+    function update(pos) {
+        if (!dispatch("scrollability-scroll", node,
+            {direction: animator.direction, position: pos})) {
+            return;
+        }
+
+        reposition(pos);
+
+        if (scrollbar && touchMoved) {
+            fadeIn(scrollbar);
+        }
+    }
+
+    function reposition(pos) {
+        // D&&D('move to', pos, offset);
+        node.style.webkitTransform = animator.update(pos+offset);
+        node.scrollableOffset = offset;
+
+        tracked.forEach(function(item) {
+            item.node.style.webkitTransform = item.callback(pos);
+        });
+    }
+
+    function terminex(showScrollbar) {
+        if (scrollbar) {
+            if (showScrollbar) {
+                fadeIn(scrollbar);
+            } else {
+                scrollbar.style.opacity = '0';
+                scrollbar.style.webkitTransition = 'opacity 0.33s linear';                
+            }
+        }
+
+        node.removeEventListener("webkitAnimationEnd", node.normalEnd, false);            
+
+        delete node.earlyEnd;
+        delete node.normalEnd;
+        
+        if (!animator.mute) {
+            dispatch("scrollability-end", node);
+        }
+        
+    }
+
+    function terminate() {
+        terminex();
+    }
+}
+
+// *************************************************************************************************
+
+function getTouchAnimators(node, touchX, touchY, startTime) {
+    var animators = [];
+    
+    // Get universally scrollable elements
+    var candidates = document.querySelectorAll('.scrollable.universal');
+    for (var j = 0; j < candidates.length; ++j) {
+        findAnimators(candidates[j], animators, touchX, touchY, startTime);
+    }
+
+    if (!candidates.length) {
+        // Find scrollable nodes that were directly touched
+        findAnimators(node, animators, touchX, touchY, startTime);
+    }
+
+    return animators;
+}
+
+function findAnimators(element, animators, touchX, touchY, startTime) {
+    while (element) {
+        if (element.nodeType == 1) {
+            var animator = createAnimatorForElement(element, touchX, touchY, startTime);
+            if (animator) {
+                // Look out for duplicates
+                var exists = false;
+                for (var j = 0; j < animators.length; j++) {
+                    if (animators[j].node == element) {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists) {
+                    animator = wrapAnimator(animator, touchX, touchY, startTime);
+                    if (animator) {
+                        animators.push(animator);                            
+                    }
+                }
+            }
+        }
+       element = element.parentNode;
+    }
+}
+
+function createAnimatorForElement(element, touchX, touchY, startTime) {
+    var classes = element.className.split(' ');
+    if (classes.indexOf("scrollable") == -1)
+        return;
+    
+    for (var i = 0; i < classes.length; i++) {
+        var name = classes[i];
+        if (directions[name]) {
+            var animator = directions[name](element);
+            animator.direction = name;
+            animator.paginated = classes.indexOf('paginated') != -1;
+            return animator;
+        }
+    }
+}
+
+function generateCSSKeyframes(animator, keyframes, name, time, offset) {
+    var lines = ['@-webkit-keyframes ' + name + ' {'];
+
+    keyframes.forEach(function(keyframe) {
+        var percent = (keyframe.time / time) * 100;
+        var frame = Math.floor(percent) + '% {'
+            + '-webkit-transform: ' + (keyframe.css || animator.update(keyframe.position+offset)) + ';'
+            + '}';
+        // D&&D(frame);
+        lines.push(frame);
+    });
+
+    lines.push('}');
+
+    return lines.join('\n');    
+}
+
+function setTouched(target) {
+    var touched = [];
+    for (var n = target; n; n = n.parentNode) {
+        if (n.nodeType == 1) {
+            n.className = (n.className ? n.className + ' ' : '') + 'touched';
+            touched.push(n);
+        }
+    }
+    return touched;
+}
+
+function releaseTouched(touched) {
+    for (var i = 0; i < touched.length; i++) {
+        var n = touched[i];
+        n.className = n.className.replace('touched', '');
+    }
+}
+
+function initScrollbar(element) {
+    if (!element.scrollableScrollbar) {
+        var scrollbar = element.scrollableScrollbar = document.createElement('div');
+        scrollbar.className = 'scrollability-scrollbar';
+    }
+    return element.scrollableScrollbar;
+}
+
+function easeOutExpo(t, b, c, d) {
+    return (t==d) ? b+c : c * (-Math.pow(2, -10 * t/d) + 1) + b;
+}
+
+// *************************************************************************************************
+
+function createXDirection(node) {
+    var parent = node.parentNode;
+    var clipper = node.querySelector(".scrollable > .clipper") || node;
+
+    // Necessary to pause animation in order to get correct transform value
+    if (node.style.webkitAnimation) {
+        node.style.webkitAnimationPlayState = "paused";
+    }
+    var transform = getComputedStyle(node).webkitTransform;
+    var position = new WebKitCSSMatrix(transform).m41 - (node.scrollableOffset||0);
+
+    return {
+        node: node,
+        min: -clipper.offsetWidth + parent.offsetWidth,
+        max: 0,
+        position: position,
+        viewport: parent.offsetWidth,
+        bounce: parent.offsetWidth * kBounceLimit,
+        constrained: true,
+        
+        filter: function(x, y) {
+            return x; 
+        },
+
+        disable: function (x, y, startX, startY) {
+            var dx = Math.abs(x - startX);
+            var dy = Math.abs(y - startY);
+            if (dy > dx && dy > kLockThreshold) {
+                return true;
+            }
+        },
+
+        update: function(position) {
+            return 'translate3d(' + Math.round(position) + 'px, 0, 0)';
+        }
+    };
+}
+
+function createYDirection(node) {
+    var parent = node.parentNode;
+    var clipper = node.querySelector(".scrollable > .clipper") || node;
+
+    // Necessary to pause animation in order to get correct transform value
+    if (node.style.webkitAnimation) {
+        node.style.webkitAnimationPlayState = "paused";
+    }
+
+    var transform = getComputedStyle(node).webkitTransform;
+    var position = new WebKitCSSMatrix(transform).m42;
+    // D&&D('start ' + position);
+
+    return {
+        node: node,
+        scrollbar: initScrollbar(node),
+        position: position,
+        min: -clipper.offsetHeight + parent.offsetHeight,
+        max: 0,
+        viewport: parent.offsetHeight,
+        bounce: parent.offsetHeight * kBounceLimit,
+        constrained: true,
+        
+        filter: function(x, y) {
+            return y;
+        },
+        
+        disable: function(x, y, startX, startY) {
+            var dx = Math.abs(x - startX);
+            var dy = Math.abs(y - startY);
+            if (dx > dy && dx > kLockThreshold) {
+                return true;
+            }
+        },
+        
+        update: function(position) {
+            return 'translate3d(0, ' + Math.round(position) + 'px, 0)';
+        }
+    };    
+}
+
+function play(node, name, time) {
+    if (name) {
+        node.style.webkitAnimation = name + " " + time + "ms linear both";
+    }
+    node.style.webkitAnimationPlayState = name ? "running" : "paused";
+}
+
+function fadeIn(node) {
+    node.style.webkitTransition = '';
+    node.style.opacity = '1';
+}
+
+function dispatch(name, target, props) {
+    var e = document.createEvent("Events");
+    e.initEvent(name, false, true);
+
+    if (props) {
+        for (var name in props) {
+            e[name] = props[name];
+        }
+    }
+
+    return target.dispatchEvent(e);
+}
