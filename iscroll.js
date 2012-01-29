@@ -308,10 +308,22 @@ iScroll.prototype = {
 	},
 	
 	_start: function (e) {
-		var that = this,
-			point = hasTouch ? e.touches[0] : e,
-			matrix, x, y,
-			c1, c2;
+        var that = this,
+            point = hasTouch ? e.touches[0] : e,
+            matrix, x, y,
+            c1, c2,
+            tagName = e.target.nodeName.toLowerCase();
+
+        if (tagName === "select" || tagName === "input" || tagName === "textarea") {
+            e.target.focus();
+            that.focusedInput = e.target;
+            return;
+        }
+
+        if (that.focusedInput){
+            that.focusedInput.blur();
+            that.focusedInput = false;
+        }
 
 		if (!that.enabled) return;
 

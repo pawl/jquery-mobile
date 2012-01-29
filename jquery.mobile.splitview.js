@@ -5,8 +5,9 @@
     if($.support.touch){
       $('html').addClass('touch');
     }
-
-    if ($.mobile.media("screen and (min-width:480px)")||($.mobile.browser.ie && $(this).width() >= 480)) {
+    var $query = $.mobile.media('screen and (min-width: 480px)') && ($.mobile.media('(-webkit-max-device-pixel-ratio: 1.2)') || $.mobile.media('max--moz-device-pixel-ratio: 1.2)'));
+    $.support.splitview = ($query || ($.mobile.browser.ie && $(this).width() >= 480)) && $.mobile.ajaxEnabled;
+    if ($.support.splitview) {
       $('html').addClass('splitview');
       //on window.ready() execution:
       $(function() {
@@ -326,7 +327,7 @@
                 transition: transition,
                 changeHash: false,
                 fromHashChange: true,
-                pageContainer: $mainPanel,
+                pageContainer: $mainPanel
               };
 
           if( !$.mobile.hashListeningEnabled || $.mobile.urlHistory.ignoreNextHashChange ){
@@ -526,15 +527,15 @@
               $scrollArea = $page.find('div:jqmData(role="content")');
               $scrAreaChildren = $scrollArea.children();
 
-          // if ($scrAreaChildren.length > 1) {
+          if ($scrAreaChildren.length > 1) {
             $scrAreaChildren = $scrollArea.wrapInner("<div class='scrollable vertical'></div>").children();
-          // }
+          }
           $scrollArea.css({ 'width':'auto',
                             'height':'auto',
                             'overflow':'hidden'});
           //TODO: if too many pages are in the DOM that have iscroll on, this might slow down the browser significantly, 
           //in which case we'll need to destroy() the iscroll as the page hides. 
-          // $scrollArea.iscroll();
+          $scrollArea.iscroll();
         // }
       });
 
