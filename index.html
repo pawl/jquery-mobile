@@ -11,6 +11,7 @@
   <script type="text/javascript" src="jquery.mobile.js"></script>
   <script type="text/javascript" src="iscroll-wrapper.js"></script>
   <script type="text/javascript" src="iscroll.js"></script>
+  <!--script type="text/javascript" src="scrollability.js"></script-->
 </head> 
 
   <body> 
@@ -36,6 +37,7 @@
                   <li><a href="#panels" data-panel="main">Panels</a></li>
                   <li><a href="#orientation" data-panel="main">Orientation</a></li>
                   <li><a href="#scroll" data-panel="main">Scroll</a></li>
+                  <li><a href="#context" data-panel="main">Context Pages</a></li>
               </ul>
             </li>
             <li><a href="#credits" data-panel="main">Credits</a></li>
@@ -248,6 +250,28 @@
 
         <div data-role="content"> 
           <p>Splitview detects if your device is touch enabled or not. it will then implement the proper scrolling mechanism for your device. This is possible thanks to the jQuery Mobile team's experimental momentum scroll implementation, which the team promptly pointed us to. Thanks!
+        </div><!-- /content -->
+
+        <div data-role="footer" data-position="fixed" data-id="ew-footer"  class="ui-splitview-hidden">
+          <div data-role="navbar">
+            <ul>
+              <li><a href="#main" class="ui-btn-active" data-transition="slideup">Main</a></li>
+              <li><a href="#demo" data-transition="slideup">Demos</a></li>
+            </ul>
+          </div><!-- /navbar -->
+          <h2>Engineworks &copy CS8</h2>
+        </div><!-- /footer -->
+      </div><!-- /page -->
+
+      <!-- Start of 9 and 3/4 page - somehow i left this out -->
+      <div data-role="page" id="context">
+
+        <div data-role="header">
+          <h1>Context Pages</h1>
+        </div><!-- /header -->
+
+        <div data-role="content"> 
+          <p>Sometimes when you change a page in the side panel, you want the page on the main panel to change as well (or vice versa). using the data-context attribute on a page or a panel, you can make this happen. to use this, enter a CSS selector in the data-context, e.g. data-context=".default" and set a link with attributes that satisfy that selector within the page you are navigating into. In order to see an example, hit on the Demo button down below.</p> 
         </div><!-- /content -->
 
         <div data-role="footer" data-position="fixed" data-id="ew-footer"  class="ui-splitview-hidden">
